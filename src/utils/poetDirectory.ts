@@ -178,14 +178,14 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     ],
   },
 
-  // ==================== 两汉：汉乐府 · 古诗十九首 · 刘邦 · 汉武帝 ====================
+  // ==================== 两汉：汉乐府 · 古诗十九首 · 刘邦 · 汉武帝 · 项羽 · 司马相如 · 班婕妤 ====================
   {
     id: 9020,
     name: '汉乐府',
     dynasty: { id: 2, name: '两汉' },
     titleBadge: '两汉乐府',
     description: '汉代乐府民歌与古诗十九首，中国古代叙事诗与抒情诗的重要源头。',
-    poemCount: 10,
+    poemCount: 20,
     poems: [
       {
         id: 902001,
@@ -304,7 +304,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 902010,
         title: '白头吟',
-        author: { id: 9020, name: '汉乐府' },
+        author: { id: 9023, name: '卓文君' },
         dynasty: { id: 2, name: '两汉' },
         type: { id: 17, name: '乐府诗' },
         content: [
@@ -313,10 +313,139 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
           '愿得一心人，白头不相离。',
         ],
       },
+      {
+        id: 902011,
+        title: '垓下歌',
+        author: { id: 9024, name: '项羽' },
+        dynasty: { id: 2, name: '两汉' },
+        type: { id: 17, name: '乐府诗' },
+        content: [
+          '力拔山兮气盖世。',
+          '时不利兮骓不逝。',
+          '骓不逝兮可奈何！',
+          '虞兮虞兮奈若何！',
+        ],
+      },
+      {
+        id: 902012,
+        title: '饮马长城窟行',
+        author: { id: 9020, name: '汉乐府' },
+        dynasty: { id: 2, name: '两汉' },
+        type: { id: 17, name: '乐府诗' },
+        content: [
+          '青青河畔草，绵绵思远道。',
+          '远道不可思，宿昔梦见之。',
+          '客从远方来，遗我双鲤鱼。',
+          '呼儿烹鲤鱼，中有尺素书。',
+          '长跪读素书，书中竟何如？',
+          '上言加餐食，下言长相忆。',
+        ],
+      },
+      {
+        id: 902013,
+        title: '怨歌行',
+        author: { id: 9025, name: '班婕妤' },
+        dynasty: { id: 2, name: '两汉' },
+        type: { id: 17, name: '乐府诗' },
+        content: [
+          '新裂齐纨素，鲜洁如霜雪。',
+          '裁为合欢扇，团团似明月。',
+          '出入君怀袖，动摇微风发。',
+          '常恐秋节至，凉飙夺炎热。',
+          '弃捐箧笥中，恩情中道绝。',
+        ],
+      },
+      {
+        id: 902014,
+        title: '古诗十九首·青青陵上柏',
+        author: { id: 9020, name: '汉乐府' },
+        dynasty: { id: 2, name: '两汉' },
+        type: { id: 15, name: '五言古诗' },
+        content: [
+          '青青陵上柏，磊磊涧中石。',
+          '人生天地间，忽如远行客。',
+          '斗酒相娱乐，聊厚不为薄。',
+        ],
+      },
+      {
+        id: 902015,
+        title: '古诗十九首·今日良宴会',
+        author: { id: 9020, name: '汉乐府' },
+        dynasty: { id: 2, name: '两汉' },
+        type: { id: 15, name: '五言古诗' },
+        content: [
+          '今日良宴会，欢乐难具陈。',
+          '弹筝奋逸响，新声妙入神。',
+          '人生寄一世，奄忽若飙尘。',
+          '何不策高足，先据要路津。',
+        ],
+      },
+      {
+        id: 902016,
+        title: '孔雀东南飞 (序与开篇)',
+        author: { id: 9020, name: '汉乐府' },
+        dynasty: { id: 2, name: '两汉' },
+        type: { id: 17, name: '乐府诗' },
+        content: [
+          '孔雀东南飞，五里一徘徊。',
+          '十三能织素，十四学裁衣，十五弹箜篌，十六诵诗书。',
+          '十七为君妇，心中常苦悲。',
+          '君既为府吏，守节情不移。',
+        ],
+      },
+      {
+        id: 902017,
+        title: '战城南',
+        author: { id: 9020, name: '汉乐府' },
+        dynasty: { id: 2, name: '两汉' },
+        type: { id: 17, name: '乐府诗' },
+        content: [
+          '战城南，死郭北，野死不葬乌可食。',
+          '为我谓乌：且为客豪！',
+          '野死谅不葬，腐肉安能去子逃？',
+        ],
+      },
+      {
+        id: 902018,
+        title: '凤求凰',
+        author: { id: 9026, name: '司马相如' },
+        dynasty: { id: 2, name: '两汉' },
+        type: { id: 17, name: '乐府诗' },
+        content: [
+          '凤兮凤兮归故乡，遨游四海求其凰。',
+          '时未遇兮无所将，何悟今夕升斯堂！',
+          '有艳淑女在闺房，室迩人遐毒我肠。',
+          '何缘交颈为鸳鸯，胡颉颃兮共翱翔！',
+        ],
+      },
+      {
+        id: 902019,
+        title: '古诗十九首·生年不满百',
+        author: { id: 9020, name: '汉乐府' },
+        dynasty: { id: 2, name: '两汉' },
+        type: { id: 15, name: '五言古诗' },
+        content: [
+          '生年不满百，常怀千岁忧。',
+          '昼短苦夜长，何不秉烛游！',
+          '为乐当及时，何能待来兹？',
+        ],
+      },
+      {
+        id: 902020,
+        title: '东门行',
+        author: { id: 9020, name: '汉乐府' },
+        dynasty: { id: 2, name: '两汉' },
+        type: { id: 17, name: '乐府诗' },
+        content: [
+          '出东门，不顾归。来入门，怅欲悲。',
+          '盎中无斗米储，还视架上无悬衣。',
+          '拔剑东门去，舍中儿母牵衣啼。',
+        ],
+      },
     ],
   },
 
-  // ==================== 魏晋：曹操 · 陶渊明 ====================
+  // ==================== 魏晋：曹操 · 陶渊明 · 曹植 · 曹丕 · 阮籍 ====================
   {
     id: 8228,
     name: '曹操',
@@ -469,6 +598,50 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       },
     ],
   },
+  {
+    id: 9036,
+    name: '曹植',
+    dynasty: { id: 3, name: '魏晋' },
+    titleBadge: '陈思王',
+    description: '字子建，三国曹魏著名文学家，才高八斗。',
+    poemCount: 4,
+    poems: [
+      {
+        id: 903601,
+        title: '七步诗',
+        author: { id: 9036, name: '曹植' },
+        dynasty: { id: 3, name: '魏晋' },
+        type: { id: 15, name: '五言古诗' },
+        content: [
+          '煮豆燃豆萁，豆在釜中泣。',
+          '本是同根生，相煎何太急？',
+        ],
+      },
+      {
+        id: 903602,
+        title: '白马篇',
+        author: { id: 9036, name: '曹植' },
+        dynasty: { id: 3, name: '魏晋' },
+        type: { id: 17, name: '乐府诗' },
+        content: [
+          '白马饰金羁，连翩西北驰。',
+          '借问谁家子，幽并游侠儿。',
+          '捐躯赴国难，视死忽如归！',
+        ],
+      },
+      {
+        id: 903603,
+        title: '洛神赋 (名句)',
+        author: { id: 9036, name: '曹植' },
+        dynasty: { id: 3, name: '魏晋' },
+        type: { id: 99, name: '其他' },
+        content: [
+          '翩若惊鸿，婉若游龙。荣曜秋菊，华茂春松。',
+          '髣髴兮若轻云之蔽月，飘飖兮若流风之回雪。',
+        ],
+      },
+    ],
+  },
 
   // ==================== 南北朝 · 隋代 ====================
   {
@@ -477,7 +650,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     dynasty: { id: 4, name: '南北朝' },
     titleBadge: '南北朝乐府',
     description: '南北朝时期的民歌精华，《木兰诗》、《敕勒歌》等千古传诵。',
-    poemCount: 3,
+    poemCount: 6,
     poems: [
       {
         id: 904001,
@@ -514,6 +687,72 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
           '采莲南塘秋，莲花过人头。',
           '低头弄莲子，莲子清如水。',
           '南风知我意，吹梦到西洲。',
+        ],
+      },
+      {
+        id: 904004,
+        title: '晚登三山还望京邑',
+        author: { id: 9041, name: '谢朓' },
+        dynasty: { id: 4, name: '南北朝' },
+        type: { id: 15, name: '五言古诗' },
+        content: [
+          '灞涘望长安，河阳视京县。',
+          '余霞散成绮，澄江静如练。',
+          '喧鸟覆春洲，杂英满芳甸。',
+        ],
+      },
+      {
+        id: 904005,
+        title: '登池上楼',
+        author: { id: 9042, name: '谢灵运' },
+        dynasty: { id: 4, name: '南北朝' },
+        type: { id: 15, name: '五言古诗' },
+        content: [
+          '潜虬媚幽姿，飞鸿响远音。',
+          '池塘生春草，园柳变鸣禽。',
+        ],
+      },
+    ],
+  },
+  {
+    id: 9050,
+    name: '隋代名篇',
+    dynasty: { id: 5, name: '隋' },
+    titleBadge: '隋代诗家',
+    description: '承前启后的隋代诗风，开唐代近体诗之先声。',
+    poemCount: 4,
+    poems: [
+      {
+        id: 905001,
+        title: '野望',
+        author: { id: 9051, name: '杨广' },
+        dynasty: { id: 5, name: '隋' },
+        type: { id: 13, name: '五言律诗' },
+        content: [
+          '寒鸦飞数点，流水绕孤村。',
+          '斜阳欲落处，一望黯销魂。',
+        ],
+      },
+      {
+        id: 905002,
+        title: '从军行',
+        author: { id: 9052, name: '卢思道' },
+        dynasty: { id: 5, name: '隋' },
+        type: { id: 17, name: '乐府诗' },
+        content: [
+          '朔方烽火照甘泉，长安飞将出岱仙。',
+          '塞外秋风吹白草，雁门夜月照黄沙。',
+        ],
+      },
+      {
+        id: 905003,
+        title: '昔昔盐',
+        author: { id: 9053, name: '薛道衡' },
+        dynasty: { id: 5, name: '隋' },
+        type: { id: 17, name: '乐府诗' },
+        content: [
+          '入春才七日，离家已二年。',
+          '人归落雁后，思发在花前。',
         ],
       },
     ],
@@ -861,7 +1100,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     ],
   },
   {
-    id: 3596,
+    id: 5871,
     name: '李商隐',
     dynasty: { id: 6, name: '唐' },
     titleBadge: '玉谿生',
@@ -871,7 +1110,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 359601,
         title: '锦瑟',
-        author: { id: 3596, name: '李商隐' },
+        author: { id: 5871, name: '李商隐' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 14, name: '七言律诗' },
         content: [
@@ -884,7 +1123,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 359602,
         title: '夜雨寄北',
-        author: { id: 3596, name: '李商隐' },
+        author: { id: 5871, name: '李商隐' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 12, name: '七言绝句' },
         content: [
@@ -895,7 +1134,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 359603,
         title: '无题·相见时难别亦难',
-        author: { id: 3596, name: '李商隐' },
+        author: { id: 5871, name: '李商隐' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 14, name: '七言律诗' },
         content: [
@@ -908,7 +1147,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 359604,
         title: '无题·昨夜星辰昨夜风',
-        author: { id: 3596, name: '李商隐' },
+        author: { id: 5871, name: '李商隐' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 14, name: '七言律诗' },
         content: [
@@ -919,7 +1158,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 359605,
         title: '乐游原',
-        author: { id: 3596, name: '李商隐' },
+        author: { id: 5871, name: '李商隐' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 11, name: '五言绝句' },
         content: ['向晚意不适，驱车登古原。', '夕阳无限好，只是近黄昏。'],
@@ -927,7 +1166,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 359606,
         title: '嫦娥',
-        author: { id: 3596, name: '李商隐' },
+        author: { id: 5871, name: '李商隐' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 12, name: '七言绝句' },
         content: ['云母屏风烛影深，长河渐落晓星沉。', '嫦娥应悔偷灵药，碧海青天夜夜心。'],
@@ -935,7 +1174,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     ],
   },
   {
-    id: 3587,
+    id: 9679,
     name: '杜牧',
     dynasty: { id: 6, name: '唐' },
     titleBadge: '樊川居士',
@@ -945,7 +1184,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 358701,
         title: '清明',
-        author: { id: 3587, name: '杜牧' },
+        author: { id: 9679, name: '杜牧' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 12, name: '七言绝句' },
         content: ['清明时节雨纷纷，路上行人欲断魂。', '借问酒家何处有？牧童遥指杏花村。'],
@@ -953,7 +1192,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 358702,
         title: '山行',
-        author: { id: 3587, name: '杜牧' },
+        author: { id: 9679, name: '杜牧' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 12, name: '七言绝句' },
         content: ['远上寒山石径斜，白云生处有人家。', '停车坐爱枫林晚，霜叶红于二月花。'],
@@ -961,7 +1200,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 358703,
         title: '泊秦淮',
-        author: { id: 3587, name: '杜牧' },
+        author: { id: 9679, name: '杜牧' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 12, name: '七言绝句' },
         content: ['烟笼寒水月笼沙，夜泊秦淮近酒家。', '商女不知亡国恨，隔江犹唱后庭花。'],
@@ -969,7 +1208,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 358704,
         title: '江南春',
-        author: { id: 3587, name: '杜牧' },
+        author: { id: 9679, name: '杜牧' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 12, name: '七言绝句' },
         content: ['千里莺啼绿映红，水村山郭酒旗风。', '南朝四百八十寺，多少楼台烟雨中。'],
@@ -977,7 +1216,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 358705,
         title: '赤壁',
-        author: { id: 3587, name: '杜牧' },
+        author: { id: 9679, name: '杜牧' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 12, name: '七言绝句' },
         content: ['折戟沉沙铁未销，自将磨洗认前朝。', '东风不与周郎便，铜雀春深锁二乔。'],
@@ -985,7 +1224,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 358706,
         title: '过华清宫绝句三首 其一',
-        author: { id: 3587, name: '杜牧' },
+        author: { id: 9679, name: '杜牧' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 12, name: '七言绝句' },
         content: ['长安回望绣成堆，山顶千门次第开。', '一骑红尘妃子笑，无人知是荔枝来。'],
@@ -1056,7 +1295,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     ],
   },
   {
-    id: 3402,
+    id: 1331,
     name: '柳宗元',
     dynasty: { id: 6, name: '唐' },
     titleBadge: '河东先生',
@@ -1066,7 +1305,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 340201,
         title: '江雪',
-        author: { id: 3402, name: '柳宗元' },
+        author: { id: 1331, name: '柳宗元' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 11, name: '五言绝句' },
         content: ['千山鸟飞绝，万径人踪灭。', '孤舟蓑笠翁，独钓寒江雪。'],
@@ -1074,7 +1313,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 340202,
         title: '渔翁',
-        author: { id: 3402, name: '柳宗元' },
+        author: { id: 1331, name: '柳宗元' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 16, name: '七言古诗' },
         content: [
@@ -1085,7 +1324,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 340203,
         title: '溪居',
-        author: { id: 3402, name: '柳宗元' },
+        author: { id: 1331, name: '柳宗元' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 13, name: '五言律诗' },
         content: [
@@ -1096,7 +1335,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 340204,
         title: '登柳州城楼寄漳汀封连四州刺史',
-        author: { id: 3402, name: '柳宗元' },
+        author: { id: 1331, name: '柳宗元' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 14, name: '七言律诗' },
         content: [
@@ -1107,7 +1346,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     ],
   },
   {
-    id: 3403,
+    id: 3286,
     name: '王勃',
     dynasty: { id: 6, name: '唐' },
     titleBadge: '初唐四杰之首',
@@ -1117,7 +1356,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 340301,
         title: '送杜少府之任蜀州',
-        author: { id: 3403, name: '王勃' },
+        author: { id: 3286, name: '王勃' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 13, name: '五言律诗' },
         content: [
@@ -1130,7 +1369,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 340302,
         title: '滕王阁诗',
-        author: { id: 3403, name: '王勃' },
+        author: { id: 3286, name: '王勃' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 14, name: '七言律诗' },
         content: [
@@ -1143,7 +1382,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 340303,
         title: '山中',
-        author: { id: 3403, name: '王勃' },
+        author: { id: 3286, name: '王勃' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 11, name: '五言绝句' },
         content: ['长江悲已滞，万里念将归。', '况属高风晚，山山黄叶飞。'],
@@ -1151,7 +1390,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 340312,
         title: '滕王阁序 (名句)',
-        author: { id: 3403, name: '王勃' },
+        author: { id: 3286, name: '王勃' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 99, name: '其他' },
         content: [
@@ -1164,7 +1403,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
 
   // ==================== 五代：李煜 ====================
   {
-    id: 9055,
+    id: 6029,
     name: '李煜',
     dynasty: { id: 7, name: '五代' },
     titleBadge: '词中之帝',
@@ -1174,7 +1413,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 905501,
         title: '虞美人·春花秋月何时了',
-        author: { id: 9055, name: '李煜' },
+        author: { id: 6029, name: '李煜' },
         dynasty: { id: 7, name: '五代' },
         type: { id: 21, name: '五代词' },
         content: [
@@ -1185,7 +1424,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 905502,
         title: '相见欢·无言独上西楼',
-        author: { id: 9055, name: '李煜' },
+        author: { id: 6029, name: '李煜' },
         dynasty: { id: 7, name: '五代' },
         type: { id: 21, name: '五代词' },
         content: [
@@ -1196,7 +1435,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 905503,
         title: '浪淘沙令·帘外雨潺潺',
-        author: { id: 9055, name: '李煜' },
+        author: { id: 6029, name: '李煜' },
         dynasty: { id: 7, name: '五代' },
         type: { id: 21, name: '五代词' },
         content: [
@@ -1286,7 +1525,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     ],
   },
   {
-    id: 3880,
+    id: 7513,
     name: '陆游',
     dynasty: { id: 8, name: '宋' },
     titleBadge: '放翁',
@@ -1296,7 +1535,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 388001,
         title: '示儿',
-        author: { id: 3880, name: '陆游' },
+        author: { id: 7513, name: '陆游' },
         dynasty: { id: 8, name: '宋' },
         type: { id: 12, name: '七言绝句' },
         content: [
@@ -1307,7 +1546,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 388002,
         title: '游山西村',
-        author: { id: 3880, name: '陆游' },
+        author: { id: 7513, name: '陆游' },
         dynasty: { id: 8, name: '宋' },
         type: { id: 14, name: '七言律诗' },
         content: [
@@ -1319,7 +1558,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 388003,
         title: '钗头凤·红酥手',
-        author: { id: 3880, name: '陆游' },
+        author: { id: 7513, name: '陆游' },
         dynasty: { id: 8, name: '宋' },
         type: { id: 20, name: '宋词' },
         content: [
@@ -1331,7 +1570,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 388004,
         title: '卜算子·咏梅',
-        author: { id: 3880, name: '陆游' },
+        author: { id: 7513, name: '陆游' },
         dynasty: { id: 8, name: '宋' },
         type: { id: 20, name: '宋词' },
         content: [
@@ -1343,7 +1582,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 388006,
         title: '十一月四日风雨大作二首 其二',
-        author: { id: 3880, name: '陆游' },
+        author: { id: 7513, name: '陆游' },
         dynasty: { id: 8, name: '宋' },
         type: { id: 12, name: '七言绝句' },
         content: [
@@ -1354,7 +1593,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       {
         id: 388015,
         title: '书愤五首 其一',
-        author: { id: 3880, name: '陆游' },
+        author: { id: 7513, name: '陆游' },
         dynasty: { id: 8, name: '宋' },
         type: { id: 14, name: '七言律诗' },
         content: [
@@ -1515,24 +1754,35 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     ],
   },
 
-  // ==================== 元代：元曲四大家 ====================
+  // ==================== 元代：元曲四大家与散曲精选 ====================
   {
-    id: 9090,
+    id: 4799,
     name: '马致远',
     dynasty: { id: 9, name: '元' },
     titleBadge: '曲状元',
     description: '字千里，号东篱，“元曲四大家”之一。',
-    poemCount: 2,
+    poemCount: 5,
     poems: [
       {
         id: 909001,
         title: '天净沙·秋思',
-        author: { id: 9090, name: '马致远' },
+        author: { id: 4799, name: '马致远' },
         dynasty: { id: 9, name: '元' },
         type: { id: 30, name: '元曲' },
         content: [
           '枯藤老树昏鸦，小桥流水人家，古道西风瘦马。',
           '夕阳西下，断肠人在天涯。',
+        ],
+      },
+      {
+        id: 909002,
+        title: '四块玉·恬退',
+        author: { id: 4799, name: '马致远' },
+        dynasty: { id: 9, name: '元' },
+        type: { id: 30, name: '元曲' },
+        content: [
+          '酒新淘，鱼旋钓，桥柳阴浓坐清宵。',
+          '日头长，官职小，争甚么闲气恼。',
         ],
       },
     ],
@@ -1543,7 +1793,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     dynasty: { id: 9, name: '元' },
     titleBadge: '散曲名家',
     description: '字希孟，号云庄，元代散曲大家。',
-    poemCount: 2,
+    poemCount: 3,
     poems: [
       {
         id: 909101,
@@ -1557,17 +1807,94 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
           '兴，百姓苦；亡，百姓苦。',
         ],
       },
+      {
+        id: 909102,
+        title: '山坡羊·骊山怀古',
+        author: { id: 9091, name: '张养浩' },
+        dynasty: { id: 9, name: '元' },
+        type: { id: 30, name: '元曲' },
+        content: [
+          '骊山四顾，阿房一炬，当时奢侈今何处？',
+          '只见草萧疏，水萦纡。至今遗恨迷烟树。',
+          '赢，都变做了土；输，都变做了土。',
+        ],
+      },
+    ],
+  },
+  {
+    id: 9092,
+    name: '关汉卿',
+    dynasty: { id: 9, name: '元' },
+    titleBadge: '曲圣',
+    description: '号已斋叟，“元曲四大家”之首。',
+    poemCount: 3,
+    poems: [
+      {
+        id: 909201,
+        title: '窦娥冤·滚绣球 (节选)',
+        author: { id: 9092, name: '关汉卿' },
+        dynasty: { id: 9, name: '元' },
+        type: { id: 30, name: '元曲' },
+        content: [
+          '有日月朝暮悬，有鬼神掌着生死权。',
+          '天地也！只合把清浊分辨，可怎生糊突了盗跖、颜渊？',
+          '地也，你不分好歹何为地！天也，你错勘贤愚枉做天！',
+        ],
+      },
+      {
+        id: 909202,
+        title: '四块玉·别情',
+        author: { id: 9092, name: '关汉卿' },
+        dynasty: { id: 9, name: '元' },
+        type: { id: 30, name: '元曲' },
+        content: [
+          '自送别，心难舍，一点相思几时绝？',
+          '凭阑袖拂杨花雪。溪又斜，山又遮，人去也！',
+        ],
+      },
+    ],
+  },
+  {
+    id: 9093,
+    name: '白朴',
+    dynasty: { id: 9, name: '元' },
+    titleBadge: '元曲四大家',
+    description: '字太素，号兰谷，“元曲四大家”之一。',
+    poemCount: 2,
+    poems: [
+      {
+        id: 909301,
+        title: '天净沙·秋',
+        author: { id: 9093, name: '白朴' },
+        dynasty: { id: 9, name: '元' },
+        type: { id: 30, name: '元曲' },
+        content: [
+          '孤村落日残霞，轻烟老树寒鸦，一点飞鸿影下。',
+          '青山绿水，白草红叶黄花。',
+        ],
+      },
+      {
+        id: 909302,
+        title: '天净沙·春',
+        author: { id: 9093, name: '白朴' },
+        dynasty: { id: 9, name: '元' },
+        type: { id: 30, name: '元曲' },
+        content: [
+          '春山暖日和风，阑干楼阁帘栊，杨柳秋千院中。',
+          '啼莺舞燕，小桥流水飞红。',
+        ],
+      },
     ],
   },
 
-  // ==================== 清代：纳兰性德 · 龚自珍 ====================
+  // ==================== 清代：纳兰性德 · 龚自珍 · 黄景仁 · 郑燮 · 袁枚 · 赵翼 ====================
   {
     id: 3074,
     name: '纳兰性德',
     dynasty: { id: 10, name: '清' },
     titleBadge: '饮水词人',
     description: '原名成德，字容若，清代著名词人。',
-    poemCount: 4,
+    poemCount: 6,
     poems: [
       {
         id: 910001,
@@ -1578,6 +1905,8 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         content: [
           '人生若只如初见，何事秋风悲画扇。',
           '等闲变却故人心，却道故人心易变。',
+          '骊山语罢清宵半，泪雨零铃终不怨。',
+          '何如薄幸锦衣郎，比翼连枝当日愿。',
         ],
       },
       {
@@ -1599,7 +1928,18 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         type: { id: 20, name: '宋词' },
         content: [
           '谁念西风独自凉，萧萧黄叶闭疏窗，沉思往事立残阳。',
-          '当时只道是寻常。',
+          '被酒莫惊春睡重，赌书消得泼茶香，当时只道是寻常。',
+        ],
+      },
+      {
+        id: 910004,
+        title: '虞美人·秋夕信步',
+        author: { id: 3074, name: '纳兰性德' },
+        dynasty: { id: 10, name: '清' },
+        type: { id: 20, name: '宋词' },
+        content: [
+          '愁痕满地无人省，露湿琅玕影。',
+          '闲阶小立倍荒凉，一片菊香霜月夕阳旁。',
         ],
       },
     ],
@@ -1610,7 +1950,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     dynasty: { id: 10, name: '清' },
     titleBadge: '定庵先生',
     description: '清代思想家、文学家。',
-    poemCount: 2,
+    poemCount: 4,
     poems: [
       {
         id: 910201,
@@ -1621,6 +1961,142 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         content: [
           '浩荡离愁白日斜，吟鞭东指即天涯。',
           '落红不是无情物，化作春泥更护花。',
+        ],
+      },
+      {
+        id: 910202,
+        title: '己亥杂诗·其二百二十',
+        author: { id: 9102, name: '龚自珍' },
+        dynasty: { id: 10, name: '清' },
+        type: { id: 12, name: '七言绝句' },
+        content: [
+          '九州生气恃风雷，万马齐喑究可哀。',
+          '我劝天公重抖擞，不拘一格降人材。',
+        ],
+      },
+    ],
+  },
+  {
+    id: 9103,
+    name: '郑燮',
+    dynasty: { id: 10, name: '清' },
+    titleBadge: '板桥先生',
+    description: '字克柔，号板桥，“扬州八怪”之一。',
+    poemCount: 2,
+    poems: [
+      {
+        id: 910301,
+        title: '竹石',
+        author: { id: 9103, name: '郑燮' },
+        dynasty: { id: 10, name: '清' },
+        type: { id: 12, name: '七言绝句' },
+        content: [
+          '咬定青山不放松，立根原在破岩中。',
+          '千磨万击还坚劲，任尔东西南北风。',
+        ],
+      },
+    ],
+  },
+  {
+    id: 9104,
+    name: '袁枚',
+    dynasty: { id: 10, name: '清' },
+    titleBadge: '简斋',
+    description: '字子才，号简斋，世称随园先生。',
+    poemCount: 2,
+    poems: [
+      {
+        id: 910401,
+        title: '苔',
+        author: { id: 9104, name: '袁枚' },
+        dynasty: { id: 10, name: '清' },
+        type: { id: 11, name: '五言绝句' },
+        content: [
+          '白日不到处，青春恰自来。',
+          '苔花如米小，也学牡丹开。',
+        ],
+      },
+    ],
+  },
+  {
+    id: 9105,
+    name: '赵翼',
+    dynasty: { id: 10, name: '清' },
+    titleBadge: '瓯北先生',
+    description: '字云崧，号瓯北，清代著名文学家、史学家。',
+    poemCount: 2,
+    poems: [
+      {
+        id: 910501,
+        title: '论诗五首 其二',
+        author: { id: 9105, name: '赵翼' },
+        dynasty: { id: 10, name: '清' },
+        type: { id: 12, name: '七言绝句' },
+        content: [
+          '李杜诗篇万口传，至今已觉不新鲜。',
+          '江山代有才人出，各领风骚数百年。',
+        ],
+      },
+    ],
+  },
+
+  // ==================== 其他：历代蒙学与古典汇编 ====================
+  {
+    id: 9990,
+    name: '蒙学经典',
+    dynasty: { id: 11, name: '其他' },
+    titleBadge: '童蒙养正',
+    description: '历代启蒙典籍与传世韵文汇编。',
+    poemCount: 6,
+    poems: [
+      {
+        id: 999001,
+        title: '三字经 (节选)',
+        author: { id: 9991, name: '王应麟' },
+        dynasty: { id: 11, name: '其他' },
+        type: { id: 40, name: '蒙学' },
+        content: [
+          '人之初，性本善。性相近，习相远。',
+          '苟不教，性乃迁。教之道，贵以专。',
+          '玉不琢，不成器。人不学，不知义。',
+        ],
+      },
+      {
+        id: 999002,
+        title: '千字文 (节选)',
+        author: { id: 9992, name: '周兴嗣' },
+        dynasty: { id: 11, name: '其他' },
+        type: { id: 40, name: '蒙学' },
+        content: [
+          '天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。',
+          '寒来暑往，秋收冬藏。闰余成岁，律吕调阳。',
+          '云腾致雨，露结为霜。金生丽水，玉出昆冈。',
+        ],
+      },
+      {
+        id: 999003,
+        title: '笠翁对韵 (一东节选)',
+        author: { id: 9993, name: '李渔' },
+        dynasty: { id: 11, name: '其他' },
+        type: { id: 40, name: '蒙学' },
+        content: [
+          '天对地，雨对风。大陆对长空。',
+          '山花对海树，赤日对苍穹。',
+          '雷隐隐，雾蒙蒙。日下对天中。',
+          '风高秋月白，雨霁晚霞红。',
+        ],
+      },
+      {
+        id: 999004,
+        title: '声律启蒙 (一东节选)',
+        author: { id: 9994, name: '车万育' },
+        dynasty: { id: 11, name: '其他' },
+        type: { id: 40, name: '蒙学' },
+        content: [
+          '云对雨，雪对风，晚照对晴空。',
+          '来鸿对去燕，宿鸟对鸣虫。',
+          '三尺剑，六钧弓，岭北对江东。',
+          '人间清暑殿，天上广寒宫。',
         ],
       },
     ],

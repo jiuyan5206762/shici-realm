@@ -95,17 +95,17 @@ export const AUTHOR_TOTAL_COUNTS: Record<number, number> = {
 
 // Precise total counts discovered from database pagination inspection
 export const DYNASTY_TOTAL_COUNTS: Record<number, number> = {
-  1: 418,       // 先秦: 21 pages
-  2: 20,        // 两汉
-  3: 20,        // 魏晋
-  4: 20,        // 南北朝
-  5: 20,        // 隋
-  6: 199940,    // 唐: 9,997 pages
-  7: 160,       // 五代: 8 pages
-  8: 199780,    // 宋: 9,989 pages
-  9: 20,        // 元
-  10: 20,       // 清
-  11: 20,       // 其他
+  1: 404,       // 先秦: 21 页 (404 首)
+  2: 20,        // 两汉: 1 页 (20 首经典)
+  3: 20,        // 魏晋: 1 页 (20 首经典)
+  4: 12,        // 南北朝: 1 页 (12 首经典)
+  5: 8,         // 隋: 1 页 (8 首经典)
+  6: 199940,    // 唐: 9,997 页 (20 万首)
+  7: 420,       // 五代: 21 页 (420 首)
+  8: 199780,    // 宋: 9,989 页 (20 万首)
+  9: 20,        // 元: 1 页 (20 首元曲)
+  10: 20,       // 清: 1 页 (20 首清代名作)
+  11: 20,       // 其他: 1 页 (20 首蒙学典籍)
 };
 
 export const TYPE_TOTAL_COUNTS: Record<number, number> = {
