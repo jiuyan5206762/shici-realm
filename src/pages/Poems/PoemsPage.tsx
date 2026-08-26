@@ -11,7 +11,7 @@ import { FilterPanel } from '@/components/Filter/FilterPanel';
 import { MobileFilterDrawer } from '@/components/Filter/MobileFilterDrawer';
 import { Pagination } from '@/components/Common/Pagination';
 import { ErrorState } from '@/components/Common/ErrorState';
-import { getPoetPoems } from '@/utils/poetDirectory';
+import { filterPoemsByCriteria } from '@/utils/poetDirectory';
 import { Poem } from '@/types';
 
 export const PoemsPage: React.FC = () => {
@@ -38,6 +38,8 @@ export const PoemsPage: React.FC = () => {
 
   const dynasties = dynastiesRes?.data || [];
   const types = typesRes?.data || [];
+
+  const activeFilterCount = (dynasty ? 1 : 0) + (type ? 1 : 0) + (author ? 1 : 0);
 
   // Update URL SearchParams helper
   const updateFilter = (updates: {
@@ -79,7 +81,7 @@ export const PoemsPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 2. Fetch Poems with true multi-page support for author
+  // 2. Fetch Poems with multi-dimensional filtering
   const {
     data: poemsRes,
     isLoading,
@@ -88,28 +90,24 @@ export const PoemsPage: React.FC = () => {
   } = useQuery({
     queryKey: ['poems', { page, pageSize, dynasty, type, author }],
     queryFn: async () => {
-      // If author filter is specified
-      if (author) {
-        const poetData = getPoetPoems(author, page, pageSize);
+      // If any filter is active (dynasty / type / author)
+      if (activeFilterCount > 0) {
+        const filteredResult = filterPoemsByCriteria(dynasty, type, author, page, pageSize);
 
-        if (poetData.totalCount > 0) {
-          let items = poetData.poems;
-          if (dynasty) items = items.filter((p) => p.dynasty?.name === dynasty);
-          if (type) items = items.filter((p) => p.type?.name === type);
-
+        if (filteredResult.totalCount > 0) {
           return {
-            data: items,
+            data: filteredResult.poems,
             pagination: {
               page,
               pageSize,
-              hasMore: poetData.hasMore,
+              hasMore: filteredResult.hasMore,
             },
-            totalCount: poetData.totalCount,
+            totalCount: filteredResult.totalCount,
             lang: 'zh-Hans',
           };
         }
 
-        // For non-indexed authors, query dynamic remote sample & search
+        // For filters without local curated cache, probe remote API
         const pool: Poem[] = [];
         try {
           const sample = await poemApi.getRandom({ author, dynasty, type });
@@ -121,7 +119,8 @@ export const PoemsPage: React.FC = () => {
         }
 
         try {
-          const q = author.length < 3 ? `${author} 诗` : author;
+          const searchKeyword = author || type || (dynasty ? `${dynasty}代 诗` : '古诗');
+          const q = searchKeyword.length < 3 ? `${searchKeyword} 诗` : searchKeyword;
           const searchRes = await searchApi.search({ q, page, pageSize });
           const searchItems = (searchRes.data || []).filter(
             (p) => !pool.some((existing) => existing.id === p.id)
@@ -143,12 +142,9 @@ export const PoemsPage: React.FC = () => {
         };
       }
 
-      // Default pagination browse
+      // Default all poems pagination
       const res = await poemApi.getPoems({ page, pageSize });
-      let filtered = res.data || [];
-      if (dynasty) filtered = filtered.filter((p) => p.dynasty?.name === dynasty);
-      if (type) filtered = filtered.filter((p) => p.type?.name === type);
-      return { ...res, data: filtered, totalCount: 371313 };
+      return { ...res, totalCount: 371313 };
     },
   });
 
@@ -156,8 +152,6 @@ export const PoemsPage: React.FC = () => {
   const pagination = poemsRes?.pagination;
   const hasMore = pagination?.hasMore ?? (poems.length === pageSize);
   const totalCount = (poemsRes as any)?.totalCount;
-
-  const activeFilterCount = (dynasty ? 1 : 0) + (type ? 1 : 0) + (author ? 1 : 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8">

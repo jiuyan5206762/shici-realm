@@ -10,7 +10,7 @@ import { AuthorCardSkeleton } from '@/components/Common/LoadingSkeleton';
 import { Pagination } from '@/components/Common/Pagination';
 import { EmptyState } from '@/components/Common/EmptyState';
 import { ErrorState } from '@/components/Common/ErrorState';
-import { FAMOUS_POETS_DIRECTORY, findPoetByName } from '@/utils/poetDirectory';
+import { findPoetByName, filterAuthorsByCriteria } from '@/utils/poetDirectory';
 import { Author } from '@/types';
 
 export const AuthorsPage: React.FC = () => {
@@ -42,51 +42,53 @@ export const AuthorsPage: React.FC = () => {
   } = useQuery({
     queryKey: ['authors', { page, pageSize, dynasty, q }],
     queryFn: async () => {
-      // If searching by poet name
-      if (q) {
-        // First check our comprehensive famous poet directory
-        const matched = FAMOUS_POETS_DIRECTORY.filter((p) =>
-          p.name.toLowerCase().includes(q.toLowerCase())
-        );
+      // If filtering by dynasty or searching by name
+      if (dynasty || q) {
+        const filtered = filterAuthorsByCriteria(dynasty, q, page, pageSize);
 
-        if (matched.length > 0) {
+        if (filtered.authors.length > 0) {
           return {
-            data: matched as Author[],
-            pagination: { page: 1, pageSize: 20, hasMore: false },
+            data: filtered.authors,
+            pagination: { page, pageSize, hasMore: filtered.hasMore },
+            totalCount: filtered.totalCount,
             lang: 'zh-Hans',
           };
         }
 
         // Try probing remote API for poet
-        try {
-          const probe = await poemApi.getRandom({ author: q });
-          if (probe.data?.author?.name) {
-            const dynamicAuthor: Author = {
-              id: probe.data.author.id,
-              name: probe.data.author.name,
-              description: `${probe.data.dynasty?.name || ''}代文学名家，作品收录于诗泉古籍库。`,
-              dynasty: probe.data.dynasty,
-            };
-            return {
-              data: [dynamicAuthor],
-              pagination: { page: 1, pageSize: 20, hasMore: false },
-              lang: 'zh-Hans',
-            };
+        if (q) {
+          try {
+            const probe = await poemApi.getRandom({ author: q });
+            if (probe.data?.author?.name) {
+              const dynamicAuthor: Author = {
+                id: probe.data.author.id,
+                name: probe.data.author.name,
+                description: `${probe.data.dynasty?.name || ''}代文学名家，作品收录于诗泉古籍库。`,
+                dynasty: probe.data.dynasty,
+              };
+              return {
+                data: [dynamicAuthor],
+                pagination: { page: 1, pageSize: 20, hasMore: false },
+                totalCount: 1,
+                lang: 'zh-Hans',
+              };
+            }
+          } catch {
+            // continue
           }
-        } catch {
-          // continue
         }
 
         return {
           data: [],
           pagination: { page: 1, pageSize: 20, hasMore: false },
+          totalCount: 0,
           lang: 'zh-Hans',
         };
       }
 
-      // Default pagination browse
-      const res = await authorApi.getAuthors({ page, pageSize, dynasty });
-      return res;
+      // Default pagination browse of the 13,000+ author database
+      const res = await authorApi.getAuthors({ page, pageSize });
+      return { ...res, totalCount: 13577 };
     },
   });
 
@@ -136,6 +138,7 @@ export const AuthorsPage: React.FC = () => {
   const authors = authorsRes?.data || [];
   const pagination = authorsRes?.pagination;
   const hasMore = pagination?.hasMore ?? (authors.length === pageSize);
+  const totalCount = (authorsRes as any)?.totalCount;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8">
@@ -311,7 +314,7 @@ export const AuthorsPage: React.FC = () => {
           title="未找到匹配的诗人"
           description="尝试调整朝代筛选，或直接前往古诗库搜索该诗人的作品"
           actionText="前往古诗库检索"
-          onAction={() => updateParam({ q: null })}
+          onAction={() => updateParam({ q: null, dynasty: null })}
         />
       ) : (
         <div className="space-y-8">
@@ -321,12 +324,13 @@ export const AuthorsPage: React.FC = () => {
             ))}
           </div>
 
-          {/* Pagination (only when not searching specific poet) */}
+          {/* Pagination */}
           {!q && (
             <div className="pt-6 border-t border-stone-200 dark:border-stone-800">
               <Pagination
                 currentPage={page}
                 hasMore={hasMore}
+                totalCount={totalCount}
                 pageSize={pageSize}
                 onPageChange={(nextPage) => updateParam({ page: nextPage })}
               />
