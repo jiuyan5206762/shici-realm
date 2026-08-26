@@ -10,8 +10,6 @@ import {
   Layers,
   Menu,
   X,
-  Sparkles,
-  Command,
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useFavoriteStore } from '@/store/favoriteStore';
@@ -23,7 +21,7 @@ export const Navbar: React.FC = () => {
   const favorites = useFavoriteStore((state) => state.favorites);
 
   const navLinks = [
-    { name: '首页', path: '/', icon: <Sparkles className="w-4 h-4" /> },
+    { name: '首页', path: '/', icon: <BookOpen className="w-4 h-4" /> },
     { name: '古诗', path: '/poems', icon: <BookOpen className="w-4 h-4" /> },
     { name: '诗人', path: '/authors', icon: <Users className="w-4 h-4" /> },
     { name: '朝代', path: '/dynasties', icon: <Compass className="w-4 h-4" /> },
@@ -43,7 +41,7 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-paper-100/90 dark:bg-chinese-night/90 border-b border-stone-200/70 dark:border-chinese-nightBorder transition-colors">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-stone-50/90 dark:bg-[#18181A]/90 border-b border-stone-200/80 dark:border-stone-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-18">
           {/* Logo & Brand */}
@@ -52,11 +50,11 @@ export const Navbar: React.FC = () => {
               诗
             </div>
             <div>
-              <span className="font-serif font-bold text-xl tracking-wider text-ink-800 dark:text-ink-50">
+              <span className="font-serif font-bold text-xl tracking-wider text-ink-900 dark:text-ink-50">
                 诗境
               </span>
-              <span className="hidden sm:inline-block ml-2 text-xs font-sans text-ink-400 dark:text-ink-400 border-l border-stone-300 dark:border-stone-700 pl-2">
-                智能诗词阅读
+              <span className="hidden sm:inline-block ml-2 text-xs font-serif text-ink-400 dark:text-ink-400 border-l border-stone-300 dark:border-stone-700 pl-2">
+                中华古籍文库
               </span>
             </div>
           </Link>
@@ -69,15 +67,15 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`relative px-3 py-1.5 rounded-xl text-sm font-medium transition-all flex items-center space-x-1.5 ${
+                  className={`relative px-3.5 py-1.5 rounded-xl text-sm font-serif font-medium transition-all flex items-center space-x-1.5 ${
                     active
                       ? 'text-chinese-ochre font-semibold bg-chinese-ochre/10 dark:bg-chinese-ochre/15'
-                      : 'text-ink-600 dark:text-ink-300 hover:text-ink-900 dark:hover:text-white hover:bg-stone-200/50 dark:hover:bg-chinese-nightCard'
+                      : 'text-ink-600 dark:text-ink-300 hover:text-ink-900 dark:hover:text-white hover:bg-stone-200/50 dark:hover:bg-stone-800'
                   }`}
                 >
                   <span>{link.name}</span>
                   {link.badge !== undefined && (
-                    <span className="ml-1 px-1.5 py-0.2 bg-chinese-cinnabar text-white text-[10px] rounded-full font-bold">
+                    <span className="ml-1 px-1.5 py-0.2 bg-chinese-cinnabar text-white text-xs rounded-full font-bold">
                       {link.badge}
                     </span>
                   )}
@@ -91,24 +89,24 @@ export const Navbar: React.FC = () => {
             {/* Quick Search Button */}
             <button
               onClick={() => navigate('/search')}
-              className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-white dark:bg-chinese-nightCard border border-stone-200 dark:border-chinese-nightBorder text-ink-400 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200 shadow-sm transition-all hover:border-chinese-ochre/50 text-xs sm:text-sm"
-              title="搜索古诗词 (快捷键: /)"
+              className="flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-white dark:bg-[#1E1E22] border border-stone-200 dark:border-stone-700 text-ink-500 dark:text-ink-400 hover:text-ink-800 dark:hover:text-ink-200 shadow-sm transition-all hover:border-chinese-ochre/50 text-sm font-serif"
+              title="搜索古诗词"
             >
               <Search className="w-4 h-4" />
               <span className="hidden lg:inline">搜索诗词、诗人...</span>
-              <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-ink-400 bg-stone-100 dark:bg-stone-800 rounded border border-stone-200 dark:border-stone-700">
-                <Command className="w-2.5 h-2.5 mr-0.5" />/
+              <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-xs font-mono text-ink-400 bg-stone-100 dark:bg-stone-800 rounded border border-stone-200 dark:border-stone-700">
+                /
               </kbd>
             </button>
 
-            {/* Theme Toggle */}
+            {/* Dark/Light Theme Toggle */}
             <ThemeToggle />
 
-            {/* Mobile Menu Trigger */}
+            {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl text-ink-600 dark:text-ink-300 hover:bg-stone-200/60 dark:hover:bg-chinese-nightCard"
-              aria-label="打开菜单"
+              className="p-2 rounded-xl border border-stone-200 dark:border-stone-700 text-ink-600 dark:text-ink-300 hover:bg-stone-100 dark:hover:bg-stone-800 md:hidden"
+              aria-label="切换菜单"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -118,7 +116,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-paper-50 dark:bg-chinese-nightCard border-b border-stone-200 dark:border-chinese-nightBorder px-4 pt-2 pb-4 space-y-1 animate-fadeIn">
+        <div className="md:hidden border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#18181A] px-4 pt-3 pb-6 space-y-2 animate-fadeIn">
           {navLinks.map((link) => {
             const active = isActive(link.path);
             return (
@@ -126,10 +124,10 @@ export const Navbar: React.FC = () => {
                 key={link.path}
                 to={link.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-base font-serif font-medium ${
                   active
-                    ? 'bg-chinese-ochre/15 text-chinese-ochre font-semibold'
-                    : 'text-ink-600 dark:text-ink-200 hover:bg-stone-100 dark:hover:bg-stone-800'
+                    ? 'bg-chinese-ochre text-white shadow-sm'
+                    : 'text-ink-700 dark:text-ink-200 hover:bg-stone-200/60 dark:hover:bg-stone-800'
                 }`}
               >
                 <div className="flex items-center space-x-3">

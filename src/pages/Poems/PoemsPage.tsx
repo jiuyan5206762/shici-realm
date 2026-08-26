@@ -203,10 +203,10 @@ export const PoemsPage: React.FC = () => {
         <div>
           <h1 className="text-2xl sm:text-4xl font-serif font-bold text-ink-900 dark:text-ink-50 flex items-center space-x-2.5">
             <BookOpen className="w-7 h-7 sm:w-8 h-8 text-chinese-ochre" />
-            <span>古诗总库 · 辞章雅聚</span>
+            <span>古诗总库</span>
           </h1>
-          <p className="text-xs sm:text-sm text-ink-400 mt-1">
-            历朝典籍收录，支持按朝代、体裁形式与诗人多维组合探索
+          <p className="text-sm text-ink-500 dark:text-ink-400 mt-1 font-serif">
+            按朝代、体裁与诗人多维组合探索古籍名篇
           </p>
         </div>
 
@@ -214,12 +214,12 @@ export const PoemsPage: React.FC = () => {
         <div className="flex items-center space-x-2 md:hidden">
           <button
             onClick={() => setIsMobileFilterOpen(true)}
-            className="flex-1 px-4 py-2.5 bg-white dark:bg-chinese-nightCard border border-stone-200 dark:border-chinese-nightBorder rounded-xl text-xs font-medium text-ink-700 dark:text-ink-200 flex items-center justify-center space-x-2 shadow-sm"
+            className="flex-1 px-4 py-2.5 bg-white dark:bg-[#1E1E22] border border-stone-200 dark:border-stone-800 rounded-xl text-sm font-serif font-medium text-ink-800 dark:text-ink-200 flex items-center justify-center space-x-2 shadow-sm"
           >
             <Filter className="w-4 h-4 text-chinese-ochre" />
-            <span>多维筛选</span>
+            <span>筛选条件</span>
             {activeFilterCount > 0 && (
-              <span className="px-1.5 py-0.2 bg-chinese-cinnabar text-white rounded-full text-[10px] font-bold">
+              <span className="px-2 py-0.5 bg-chinese-cinnabar text-white rounded-full text-xs font-bold">
                 {activeFilterCount}
               </span>
             )}
@@ -228,7 +228,7 @@ export const PoemsPage: React.FC = () => {
           {activeFilterCount > 0 && (
             <button
               onClick={handleResetFilters}
-              className="p-2.5 rounded-xl border border-stone-200 dark:border-chinese-nightBorder text-ink-500 hover:text-rose-500"
+              className="p-2.5 rounded-xl border border-stone-200 dark:border-stone-800 text-ink-500 hover:text-rose-500"
               title="重置全部"
             >
               <RotateCcw className="w-4 h-4" />
@@ -239,12 +239,12 @@ export const PoemsPage: React.FC = () => {
 
       {/* Active Filter Tags Bar */}
       {activeFilterCount > 0 && (
-        <div className="flex items-center space-x-2 flex-wrap gap-y-1.5 p-3 rounded-2xl bg-chinese-ochre/10 border border-chinese-ochre/20 text-xs">
-          <span className="text-chinese-ochre font-semibold">当前筛选：</span>
+        <div className="flex items-center space-x-2.5 flex-wrap gap-y-2 p-3.5 rounded-2xl bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-sm font-serif">
+          <span className="text-ink-500 dark:text-ink-400">已选条件：</span>
 
           {dynasty && (
-            <span className="inline-flex items-center bg-white dark:bg-stone-800 text-ink-700 dark:text-ink-200 px-2.5 py-1 rounded-lg border border-stone-200 dark:border-stone-700 space-x-1">
-              <span>朝代：{dynasty}</span>
+            <span className="inline-flex items-center bg-white dark:bg-[#1E1E22] text-ink-800 dark:text-ink-100 px-3 py-1 rounded-lg border border-stone-200 dark:border-stone-700 space-x-1.5 shadow-sm">
+              <span>朝代 · {dynasty}</span>
               <button
                 onClick={() => updateFilter({ dynasty: null })}
                 className="text-stone-400 hover:text-rose-500 font-bold ml-1"
@@ -255,8 +255,8 @@ export const PoemsPage: React.FC = () => {
           )}
 
           {type && (
-            <span className="inline-flex items-center bg-white dark:bg-stone-800 text-ink-700 dark:text-ink-200 px-2.5 py-1 rounded-lg border border-stone-200 dark:border-stone-700 space-x-1">
-              <span>体裁：{type}</span>
+            <span className="inline-flex items-center bg-white dark:bg-[#1E1E22] text-ink-800 dark:text-ink-100 px-3 py-1 rounded-lg border border-stone-200 dark:border-stone-700 space-x-1.5 shadow-sm">
+              <span>体裁 · {type}</span>
               <button
                 onClick={() => updateFilter({ type: null })}
                 className="text-stone-400 hover:text-rose-500 font-bold ml-1"
@@ -267,8 +267,8 @@ export const PoemsPage: React.FC = () => {
           )}
 
           {author && (
-            <span className="inline-flex items-center bg-white dark:bg-stone-800 text-ink-700 dark:text-ink-200 px-2.5 py-1 rounded-lg border border-stone-200 dark:border-stone-700 space-x-1">
-              <span>诗人：{author}</span>
+            <span className="inline-flex items-center bg-white dark:bg-[#1E1E22] text-ink-800 dark:text-ink-100 px-3 py-1 rounded-lg border border-stone-200 dark:border-stone-700 space-x-1.5 shadow-sm">
+              <span>诗人 · {author}</span>
               <button
                 onClick={() => updateFilter({ author: null })}
                 className="text-stone-400 hover:text-rose-500 font-bold ml-1"
@@ -280,9 +280,9 @@ export const PoemsPage: React.FC = () => {
 
           <button
             onClick={handleResetFilters}
-            className="text-chinese-cinnabar hover:underline ml-2 font-medium"
+            className="text-chinese-cinnabar hover:underline ml-3 font-medium text-xs sm:text-sm"
           >
-            清空所有筛选
+            清空筛选
           </button>
         </div>
       )}
