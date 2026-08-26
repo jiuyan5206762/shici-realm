@@ -72,15 +72,15 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
   const alignClass = settings.textAlign === 'left' ? 'text-left' : 'text-center';
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 my-4 sm:my-8 px-2 sm:px-0">
+    <div className="max-w-4xl mx-auto space-y-6 my-2 sm:my-8 px-2 sm:px-0">
       {/* Main Poem Reading Canvas */}
-      <div className="relative bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 rounded-3xl p-8 sm:p-14 shadow-sm transition-all">
+      <div className="relative bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 rounded-3xl p-5 sm:p-14 shadow-sm transition-all">
         {/* Top Typography & Customization Strip */}
-        <div className="flex flex-wrap items-center justify-between pb-6 mb-8 border-b border-stone-100 dark:border-stone-800/80 gap-3">
+        <div className="flex flex-wrap items-center justify-between pb-5 mb-6 border-b border-stone-100 dark:border-stone-800/80 gap-3">
           {/* Metadata */}
-          <div className="flex items-center space-x-2 text-sm text-ink-500 dark:text-ink-400 font-serif">
+          <div className="flex items-center space-x-2 text-sm sm:text-base text-ink-600 dark:text-ink-300 font-serif">
             <span>〔{poem.dynasty?.name || '古'}〕</span>
-            <span className="font-semibold text-ink-700 dark:text-ink-200">
+            <span className="font-bold text-ink-800 dark:text-ink-100">
               {poem.author?.name || '佚名'}
             </span>
             {poem.type?.name && (
@@ -92,7 +92,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
           </div>
 
           {/* Typography Controls */}
-          <div className="flex items-center space-x-2 text-sm text-ink-600 dark:text-ink-300">
+          <div className="flex items-center space-x-1.5 sm:space-x-2 text-sm text-ink-700 dark:text-ink-300">
             {/* Font Size decrease */}
             <button
               onClick={() => {
@@ -152,27 +152,27 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
             {/* Zen Fullscreen */}
             <button
               onClick={() => setIsZenOpen(true)}
-              className="px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center space-x-1.5 text-xs font-medium"
-              title="进入全屏禅意纯享模式"
+              className="px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center space-x-1 text-xs font-serif font-medium"
+              title="进入全屏禅意阅读"
             >
               <Maximize2 className="w-3.5 h-3.5" />
-              <span>禅意阅读</span>
+              <span>禅意</span>
             </button>
           </div>
         </div>
 
         {/* Title */}
-        <div className="text-center mb-4">
-          <h1 className="text-3xl sm:text-5xl font-serif font-bold text-ink-900 dark:text-ink-50 tracking-wider">
+        <div className="text-center mb-3">
+          <h1 className="text-2xl sm:text-5xl font-serif font-bold text-ink-900 dark:text-ink-50 tracking-wider">
             {poem.title}
           </h1>
         </div>
 
         {/* Author Link */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <Link
             to={`/authors?q=${encodeURIComponent(poem.author?.name || '')}`}
-            className="inline-flex items-center space-x-1.5 font-serif text-lg sm:text-xl text-chinese-ochre hover:underline font-medium"
+            className="inline-flex items-center space-x-1.5 font-serif text-base sm:text-xl text-chinese-ochre hover:underline font-medium"
           >
             <span>〔{poem.dynasty?.name || '古'}〕</span>
             <span>{poem.author?.name || '佚名'}</span>
@@ -180,7 +180,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
         </div>
 
         {/* Poem Verses (Main Center Canvas) */}
-        <div className={`py-6 px-2 sm:px-12 ${fontClass} ${sizeClass} ${lineSpacingClass} ${alignClass} text-ink-900 dark:text-ink-100 tracking-wider select-text`}>
+        <div className={`py-4 sm:py-6 px-1 sm:px-12 ${fontClass} ${sizeClass} ${lineSpacingClass} ${alignClass} text-ink-900 dark:text-ink-100 tracking-wider select-text`}>
           {(poem.content || []).map((line, idx) => (
             <p key={idx} className="transition-colors hover:text-chinese-ochre">
               {line}
@@ -188,13 +188,13 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
           ))}
         </div>
 
-        {/* Bottom Interactive Action Toolbar */}
-        <div className="mt-14 pt-8 border-t border-stone-100 dark:border-stone-800/80 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center space-x-3 flex-wrap gap-y-2">
+        {/* Bottom Interactive Action Toolbar (Mobile 2-column Grid + Desktop Flex) */}
+        <div className="mt-10 sm:mt-14 pt-6 sm:pt-8 border-t border-stone-100 dark:border-stone-800/80 space-y-3">
+          <div className="grid grid-cols-2 sm:flex sm:items-center sm:space-x-3 gap-2.5">
             {/* Favorite Button */}
             <button
               onClick={handleFavoriteToggle}
-              className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95 ${
+              className={`h-11 flex items-center justify-center space-x-2 px-4 rounded-xl text-sm sm:text-base font-medium transition-all active:scale-95 ${
                 favorite
                   ? 'bg-chinese-cinnabar text-white shadow-sm'
                   : 'bg-stone-100 dark:bg-stone-800 hover:bg-chinese-cinnabar/10 hover:text-chinese-cinnabar text-ink-700 dark:text-ink-200'
@@ -207,7 +207,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
             {/* AI Analysis Button */}
             <button
               onClick={() => setIsAiDrawerOpen(true)}
-              className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium bg-chinese-ochre/15 hover:bg-chinese-ochre/25 text-chinese-ochre transition-all active:scale-95 shadow-sm font-serif"
+              className="h-11 flex items-center justify-center space-x-2 px-4 rounded-xl text-sm sm:text-base font-medium bg-chinese-ochre/15 hover:bg-chinese-ochre/25 text-chinese-ochre transition-all active:scale-95 shadow-sm font-serif"
             >
               <Sparkles className="w-4 h-4" />
               <span>AI 赏析</span>
@@ -216,7 +216,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
             {/* Share / Card Export Button */}
             <button
               onClick={() => setIsShareModalOpen(true)}
-              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-ink-700 dark:text-ink-200 transition-colors"
+              className="h-11 flex items-center justify-center space-x-2 px-4 rounded-xl text-sm sm:text-base font-medium bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-ink-700 dark:text-ink-200 transition-colors"
             >
               <Share2 className="w-4 h-4" />
               <span>分享卡片</span>
@@ -225,7 +225,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
             {/* Copy Full Text */}
             <button
               onClick={() => copyPoemText(poem)}
-              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-ink-700 dark:text-ink-200 transition-colors"
+              className="h-11 flex items-center justify-center space-x-2 px-4 rounded-xl text-sm sm:text-base font-medium bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-ink-700 dark:text-ink-200 transition-colors"
               title="复制诗词全文"
             >
               {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
@@ -233,11 +233,11 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
             </button>
           </div>
 
-          {/* Random Next Button */}
+          {/* Random Next Button (Full width on mobile) */}
           {onRandomNext && (
             <button
               onClick={onRandomNext}
-              className="flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-ink-700 dark:text-ink-200 transition-colors"
+              className="w-full sm:w-auto h-11 flex items-center justify-center space-x-2 px-5 rounded-xl text-sm sm:text-base font-medium border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-ink-700 dark:text-ink-200 transition-colors"
             >
               <Shuffle className="w-4 h-4" />
               <span>偶遇下一首</span>

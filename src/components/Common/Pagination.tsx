@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
   currentPage: number;
@@ -36,26 +36,25 @@ export const Pagination: React.FC<PaginationProps> = ({
     }
   };
 
-  // Generate page numbers array with smart ellipsis
+  // Generate page numbers array for desktop
   const getPageNumbers = () => {
     if (!totalPages) {
-      // Unknown total pages: show current context
       const pages: number[] = [];
-      const start = Math.max(1, currentPage - 2);
-      for (let i = start; i <= currentPage + (hasMore ? 2 : 0); i++) {
+      const start = Math.max(1, currentPage - 1);
+      for (let i = start; i <= currentPage + (hasMore ? 1 : 0); i++) {
         pages.push(i);
       }
       return pages;
     }
 
-    if (totalPages <= 7) {
+    if (totalPages <= 5) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
 
     const pages: (number | string)[] = [];
     pages.push(1);
 
-    if (currentPage > 4) {
+    if (currentPage > 3) {
       pages.push('...');
     }
 
@@ -68,7 +67,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       }
     }
 
-    if (currentPage < totalPages - 3) {
+    if (currentPage < totalPages - 2) {
       pages.push('...');
     }
 
@@ -80,122 +79,99 @@ export const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 py-4 ${className}`}>
-      {/* Total / Status info */}
-      <div className="text-xs sm:text-sm text-ink-400 dark:text-ink-400">
-        第 <span className="font-semibold text-ink-700 dark:text-ink-100">{currentPage}</span> 页
-        {totalPages && (
-          <>
-            {' '}
-            / 共 <span className="font-semibold text-ink-700 dark:text-ink-100">{totalPages}</span> 页
-          </>
-        )}
-        {totalCount !== undefined && (
-          <>
-            {' '}
-            (共 <span className="text-chinese-ochre font-medium">{totalCount.toLocaleString()}</span> 首)
-          </>
+    <div className={`space-y-4 py-4 ${className}`}>
+      {/* Mobile & Desktop Header: Page Info & Direct Nav */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm font-serif text-ink-600 dark:text-ink-300">
+        <div>
+          第 <span className="font-bold text-ink-900 dark:text-ink-50">{currentPage}</span> 页
+          {totalPages && (
+            <>
+              {' '}
+              / 共 <span className="font-bold text-ink-900 dark:text-ink-50">{totalPages}</span> 页
+            </>
+          )}
+          {totalCount !== undefined && (
+            <span className="text-ink-500 dark:text-ink-400 ml-1">
+              (共 {totalCount.toLocaleString()} 首)
+            </span>
+          )}
+        </div>
+
+        {/* Quick Jump Form */}
+        {totalPages && totalPages > 1 && (
+          <form onSubmit={handleJump} className="flex items-center space-x-2 text-sm">
+            <span className="text-ink-500 dark:text-ink-400">跳至</span>
+            <input
+              type="number"
+              min={1}
+              max={totalPages}
+              value={jumpPage}
+              onChange={(e) => setJumpPage(e.target.value)}
+              placeholder="页码"
+              className="w-16 px-2.5 py-1 text-center bg-white dark:bg-[#1E1E22] border border-stone-200 dark:border-stone-700 rounded-lg text-ink-900 dark:text-ink-100 focus:outline-none focus:ring-1 focus:ring-chinese-ochre font-serif"
+            />
+            <button
+              type="submit"
+              className="px-3 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-200 hover:bg-chinese-ochre hover:text-white transition-colors"
+            >
+              跳转
+            </button>
+          </form>
         )}
       </div>
 
-      {/* Page numbers & Nav buttons */}
-      <div className="flex items-center space-x-1 sm:space-x-1.5 flex-wrap justify-center">
-        {/* First Page */}
-        <button
-          onClick={() => onPageChange(1)}
-          disabled={currentPage === 1}
-          className="p-1.5 sm:p-2 rounded-lg border border-stone-200 dark:border-chinese-nightBorder text-ink-600 dark:text-ink-300 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          title="首页"
-          aria-label="首页"
-        >
-          <ChevronsLeft className="w-4 h-4" />
-        </button>
-
-        {/* Previous Page */}
+      {/* Buttons Strip (Responsive) */}
+      <div className="flex items-center justify-between sm:justify-center space-x-1.5 sm:space-x-2">
+        {/* Previous Page Button */}
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="p-1.5 sm:p-2 rounded-lg border border-stone-200 dark:border-chinese-nightBorder text-ink-600 dark:text-ink-300 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          title="上一页"
-          aria-label="上一页"
+          className="flex-1 sm:flex-initial h-10 px-4 rounded-xl border border-stone-200 dark:border-stone-700 text-ink-700 dark:text-ink-200 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-1 font-serif text-sm"
         >
           <ChevronLeft className="w-4 h-4" />
+          <span>上一页</span>
         </button>
 
-        {/* Number Buttons */}
-        {getPageNumbers().map((p, idx) => {
-          if (p === '...') {
+        {/* Number Buttons (Hidden on ultra small screens if too many, shown on sm+) */}
+        <div className="hidden sm:flex items-center space-x-1.5">
+          {getPageNumbers().map((p, idx) => {
+            if (p === '...') {
+              return (
+                <span key={`dots-${idx}`} className="px-2 py-1 text-ink-400 font-serif">
+                  …
+                </span>
+              );
+            }
+
+            const pageNum = Number(p);
+            const isActive = pageNum === currentPage;
+
             return (
-              <span key={`dots-${idx}`} className="px-2 py-1 text-ink-400 text-sm">
-                …
-              </span>
+              <button
+                key={pageNum}
+                onClick={() => onPageChange(pageNum)}
+                className={`min-w-[38px] h-10 px-2 rounded-xl text-sm font-serif font-medium transition-all ${
+                  isActive
+                    ? 'bg-chinese-ochre text-white shadow-sm font-bold'
+                    : 'border border-stone-200 dark:border-stone-700 text-ink-700 dark:text-ink-300 hover:bg-stone-100 dark:hover:bg-stone-800'
+                }`}
+              >
+                {pageNum}
+              </button>
             );
-          }
+          })}
+        </div>
 
-          const pageNum = Number(p);
-          const isActive = pageNum === currentPage;
-
-          return (
-            <button
-              key={pageNum}
-              onClick={() => onPageChange(pageNum)}
-              className={`min-w-[32px] sm:min-w-[36px] h-8 sm:h-9 px-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-                isActive
-                  ? 'bg-chinese-ochre text-white shadow-sm font-semibold scale-105'
-                  : 'border border-stone-200 dark:border-chinese-nightBorder text-ink-600 dark:text-ink-300 hover:bg-stone-100 dark:hover:bg-stone-800'
-              }`}
-            >
-              {pageNum}
-            </button>
-          );
-        })}
-
-        {/* Next Page */}
+        {/* Next Page Button */}
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={totalPages ? currentPage >= totalPages : !hasMore}
-          className="p-1.5 sm:p-2 rounded-lg border border-stone-200 dark:border-chinese-nightBorder text-ink-600 dark:text-ink-300 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          title="下一页"
-          aria-label="下一页"
+          className="flex-1 sm:flex-initial h-10 px-4 rounded-xl border border-stone-200 dark:border-stone-700 text-ink-700 dark:text-ink-200 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-1 font-serif text-sm"
         >
+          <span>下一页</span>
           <ChevronRight className="w-4 h-4" />
         </button>
-
-        {/* Last Page (if known) */}
-        {totalPages && (
-          <button
-            onClick={() => onPageChange(totalPages)}
-            disabled={currentPage === totalPages}
-            className="p-1.5 sm:p-2 rounded-lg border border-stone-200 dark:border-chinese-nightBorder text-ink-600 dark:text-ink-300 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            title="尾页"
-            aria-label="尾页"
-          >
-            <ChevronsRight className="w-4 h-4" />
-          </button>
-        )}
       </div>
-
-      {/* Jump input */}
-      <form onSubmit={handleJump} className="flex items-center space-x-1.5 text-xs sm:text-sm">
-        <span className="text-ink-400">跳至</span>
-        <input
-          type="number"
-          min="1"
-          max={totalPages}
-          value={jumpPage}
-          onChange={(e) => setJumpPage(e.target.value)}
-          placeholder="页码"
-          className="w-12 sm:w-14 px-2 py-1 text-center bg-white dark:bg-chinese-nightCard border border-stone-200 dark:border-chinese-nightBorder rounded-lg text-ink-700 dark:text-ink-200 focus:outline-none focus:ring-1 focus:ring-chinese-ochre"
-        />
-        <span className="text-ink-400">页</span>
-        <button
-          type="submit"
-          disabled={!jumpPage}
-          className="px-2 py-1 rounded-lg bg-stone-100 dark:bg-chinese-nightCard border border-stone-200 dark:border-chinese-nightBorder text-ink-600 dark:text-ink-300 hover:bg-stone-200 dark:hover:bg-stone-700 disabled:opacity-40 transition-colors"
-        >
-          前往
-        </button>
-      </form>
     </div>
   );
 };
