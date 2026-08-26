@@ -6,8 +6,10 @@ import {
   poemApi,
   DYNASTY_NAME_TO_ID,
   TYPE_NAME_TO_ID,
+  AUTHOR_NAME_TO_ID,
   DYNASTY_TOTAL_COUNTS,
   TYPE_TOTAL_COUNTS,
+  AUTHOR_TOTAL_COUNTS,
 } from '@/api/poems';
 import { searchApi } from '@/api/search';
 import { dynastyApi } from '@/api/dynasties';
@@ -17,7 +19,7 @@ import { FilterPanel } from '@/components/Filter/FilterPanel';
 import { MobileFilterDrawer } from '@/components/Filter/MobileFilterDrawer';
 import { Pagination } from '@/components/Common/Pagination';
 import { ErrorState } from '@/components/Common/ErrorState';
-import { filterPoemsByCriteria, findPoetByName } from '@/utils/poetDirectory';
+import { filterPoemsByCriteria } from '@/utils/poetDirectory';
 
 export const PoemsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -86,7 +88,7 @@ export const PoemsPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 2. Fetch Poems with 100% Reliable Multi-Source Filtering
+  // 2. Fetch Poems with true backend filtering and full database pagination
   const {
     data: poemsRes,
     isLoading,
@@ -95,44 +97,9 @@ export const PoemsPage: React.FC = () => {
   } = useQuery({
     queryKey: ['poems', { page, pageSize, dynasty, type, author }],
     queryFn: async () => {
-      // Priority 1: If author filter is active
-      if (author) {
-        const poetProfile = findPoetByName(author);
-        if (poetProfile && poetProfile.poems.length > 0) {
-          const localFiltered = filterPoemsByCriteria(dynasty, type, author, page, pageSize);
-          return {
-            data: localFiltered.poems,
-            pagination: {
-              page,
-              pageSize,
-              hasMore: localFiltered.hasMore,
-            },
-            totalCount: localFiltered.totalCount,
-            lang: 'zh-Hans',
-          };
-        }
-
-        // Custom author search via /api/search
-        try {
-          if (author.length >= 2) {
-            const searchRes = await searchApi.search({ q: author, page, pageSize });
-            if (searchRes.data && searchRes.data.length > 0) {
-              return {
-                data: searchRes.data,
-                pagination: searchRes.pagination || { page, pageSize, hasMore: false },
-                totalCount: searchRes.data.length,
-                lang: 'zh-Hans',
-              };
-            }
-          }
-        } catch {
-          // fallback
-        }
-      }
-
-      // Priority 2: Query backend using dynastyId and typeId
       const dynastyId = dynasty ? DYNASTY_NAME_TO_ID[dynasty] : undefined;
       const typeId = type ? TYPE_NAME_TO_ID[type] : undefined;
+      const authorId = author ? AUTHOR_NAME_TO_ID[author] : undefined;
 
       // Special handling for dynasties not indexed in remote database (两汉: 2, 南北朝: 4, 隋: 5)
       if (dynastyId === 2 || dynastyId === 4 || dynastyId === 5) {
@@ -149,17 +116,21 @@ export const PoemsPage: React.FC = () => {
         };
       }
 
+      // Query real backend API by authorId / dynastyId / typeId
       const res = await poemApi.getPoems({
         page,
         pageSize,
         dynastyId,
         typeId,
+        authorId,
       });
 
       // If backend returns poems, compute accurate total count
       if (res.data && res.data.length > 0) {
         let computedTotal = 371313;
-        if (dynastyId && DYNASTY_TOTAL_COUNTS[dynastyId]) {
+        if (authorId && AUTHOR_TOTAL_COUNTS[authorId]) {
+          computedTotal = AUTHOR_TOTAL_COUNTS[authorId];
+        } else if (dynastyId && DYNASTY_TOTAL_COUNTS[dynastyId]) {
           computedTotal = DYNASTY_TOTAL_COUNTS[dynastyId];
         } else if (typeId && TYPE_TOTAL_COUNTS[typeId]) {
           computedTotal = TYPE_TOTAL_COUNTS[typeId];
@@ -169,6 +140,40 @@ export const PoemsPage: React.FC = () => {
           ...res,
           totalCount: computedTotal,
         };
+      }
+
+      // If author is not indexed by ID in remote API (e.g. 李清照, 陶渊明, 孟浩然):
+      if (author) {
+        const localFiltered = filterPoemsByCriteria(dynasty, type, author, page, pageSize);
+        if (localFiltered.totalCount > 0) {
+          return {
+            data: localFiltered.poems,
+            pagination: {
+              page,
+              pageSize,
+              hasMore: localFiltered.hasMore,
+            },
+            totalCount: localFiltered.totalCount,
+            lang: 'zh-Hans',
+          };
+        }
+
+        // Try /api/search for custom query
+        try {
+          if (author.length >= 2) {
+            const searchRes = await searchApi.search({ q: author, page, pageSize });
+            if (searchRes.data && searchRes.data.length > 0) {
+              return {
+                data: searchRes.data,
+                pagination: searchRes.pagination || { page, pageSize, hasMore: false },
+                totalCount: searchRes.data.length,
+                lang: 'zh-Hans',
+              };
+            }
+          }
+        } catch {
+          // fallback
+        }
       }
 
       // Priority 3: Fallback to curated library

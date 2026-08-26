@@ -55,6 +55,44 @@ export const TYPE_NAME_TO_ID: Record<string, number> = {
   '其他': 99,
 };
 
+export const AUTHOR_NAME_TO_ID: Record<string, number> = {
+  '李白': 2045,
+  '杜甫': 3911,
+  '白居易': 9057,
+  '苏轼': 11678,
+  '陆游': 7513,
+  '王维': 7756,
+  '李商隐': 5871,
+  '杜牧': 9679,
+  '王勃': 3286,
+  '柳宗元': 1331,
+  '辛弃疾': 8618,
+  '屈原': 9619,
+  '纳兰性德': 3074,
+  '曹操': 8228,
+  '李煜': 6029,
+  '马致远': 4799,
+};
+
+export const AUTHOR_TOTAL_COUNTS: Record<number, number> = {
+  2045: 1880,   // 李白: 94 页 (1,880 首)
+  3911: 2340,   // 杜甫: 117 页 (2,340 首)
+  9057: 4140,   // 白居易: 207 页 (4,140 首)
+  11678: 1640,  // 苏轼: 82 页 (1,640 首)
+  7513: 6640,   // 陆游: 332 页 (6,640 首)
+  7756: 400,    // 王维: 20 页 (400 首)
+  5871: 600,    // 李商隐: 30 页 (600 首)
+  9679: 520,    // 杜牧: 26 页 (520 首)
+  3286: 90,     // 王勃: 5 页 (90 首)
+  1331: 140,    // 柳宗元: 7 页 (140 首)
+  8618: 620,    // 辛弃疾: 31 页 (620 首)
+  9619: 20,     // 屈原: 1 页
+  3074: 340,    // 纳兰性德: 17 页 (340 首)
+  8228: 30,     // 曹操: 2 页 (30 首)
+  6029: 40,     // 李煜: 2 页 (40 首)
+  4799: 120,    // 马致远: 6 页 (120 首)
+};
+
 // Precise total counts discovered from database pagination inspection
 export const DYNASTY_TOTAL_COUNTS: Record<number, number> = {
   1: 418,       // 先秦: 21 pages
@@ -117,8 +155,13 @@ export const poemApi = {
       query.append('typeId', String(typeId));
     }
 
-    if (params.authorId) {
-      query.append('authorId', String(params.authorId));
+    // Resolve authorId
+    let authorId = params.authorId;
+    if (!authorId && params.author) {
+      authorId = AUTHOR_NAME_TO_ID[params.author];
+    }
+    if (authorId) {
+      query.append('authorId', String(authorId));
     }
 
     return apiClient<ApiResponse<Poem[]>>(`/api/poems?${query.toString()}`, {
