@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Filter, BookOpen, RotateCcw } from 'lucide-react';
-import { poemApi } from '@/api/poems';
-import { searchApi } from '@/api/search';
+import {
+  poemApi,
+  DYNASTY_NAME_TO_ID,
+  TYPE_NAME_TO_ID,
+  DYNASTY_TOTAL_COUNTS,
+  TYPE_TOTAL_COUNTS,
+} from '@/api/poems';
 import { dynastyApi } from '@/api/dynasties';
 import { typeApi } from '@/api/types';
 import { PoemList } from '@/components/Poem/PoemList';
@@ -11,8 +16,7 @@ import { FilterPanel } from '@/components/Filter/FilterPanel';
 import { MobileFilterDrawer } from '@/components/Filter/MobileFilterDrawer';
 import { Pagination } from '@/components/Common/Pagination';
 import { ErrorState } from '@/components/Common/ErrorState';
-import { filterPoemsByCriteria } from '@/utils/poetDirectory';
-import { Poem } from '@/types';
+import { filterPoemsByCriteria, findPoetByName } from '@/utils/poetDirectory';
 
 export const PoemsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -81,7 +85,7 @@ export const PoemsPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 2. Fetch Poems with 100% Reliable Filtering Engine
+  // 2. Fetch Poems with true backend filtering and precise total calculations
   const {
     data: poemsRes,
     isLoading,
@@ -90,56 +94,62 @@ export const PoemsPage: React.FC = () => {
   } = useQuery({
     queryKey: ['poems', { page, pageSize, dynasty, type, author }],
     queryFn: async () => {
-      // If ANY filter (dynasty / type / author) is active:
-      if (activeFilterCount > 0) {
-        const filtered = filterPoemsByCriteria(dynasty, type, author, page, pageSize);
-
-        if (filtered.totalCount > 0) {
+      // 1. If author filter is active
+      if (author) {
+        const poetProfile = findPoetByName(author);
+        if (poetProfile && poetProfile.poems.length > 0) {
+          const localFiltered = filterPoemsByCriteria(dynasty, type, author, page, pageSize);
           return {
-            data: filtered.poems,
+            data: localFiltered.poems,
             pagination: {
               page,
               pageSize,
-              hasMore: filtered.hasMore,
+              hasMore: localFiltered.hasMore,
             },
-            totalCount: filtered.totalCount,
+            totalCount: localFiltered.totalCount,
             lang: 'zh-Hans',
           };
         }
+      }
 
-        // Fallback for rare un-indexed query: probe remote API
-        const pool: Poem[] = [];
-        try {
-          const sample = await poemApi.getRandom({ author, dynasty, type });
-          if (sample.data?.id) pool.push(sample.data);
-        } catch {
-          // continue
-        }
+      // 2. Query backend using dynastyId and typeId
+      const dynastyId = dynasty ? DYNASTY_NAME_TO_ID[dynasty] : undefined;
+      const typeId = type ? TYPE_NAME_TO_ID[type] : undefined;
 
-        try {
-          const q = author || type || (dynasty ? `${dynasty}代 诗` : '诗');
-          if (q.length >= 3) {
-            const searchRes = await searchApi.search({ q, page, pageSize });
-            const items = (searchRes.data || []).filter(
-              (p) => !pool.some((existing) => existing.id === p.id)
-            );
-            pool.push(...items);
-          }
-        } catch {
-          // continue
+      const res = await poemApi.getPoems({
+        page,
+        pageSize,
+        dynastyId,
+        typeId,
+      });
+
+      // If backend returns poems, compute true total count
+      if (res.data && res.data.length > 0) {
+        let computedTotal = 371313;
+        if (dynastyId && DYNASTY_TOTAL_COUNTS[dynastyId]) {
+          computedTotal = DYNASTY_TOTAL_COUNTS[dynastyId];
+        } else if (typeId && TYPE_TOTAL_COUNTS[typeId]) {
+          computedTotal = TYPE_TOTAL_COUNTS[typeId];
         }
 
         return {
-          data: pool,
-          pagination: { page, pageSize, hasMore: false },
-          totalCount: pool.length,
-          lang: 'zh-Hans',
+          ...res,
+          totalCount: computedTotal,
         };
       }
 
-      // Default: browse all 371,313 poems with multi-page pagination
-      const res = await poemApi.getPoems({ page, pageSize });
-      return { ...res, totalCount: 371313 };
+      // 3. Fallback to curated library if remote dynastyId has 0 entries (e.g. 两汉/南北朝/隋)
+      const localFiltered = filterPoemsByCriteria(dynasty, type, author, page, pageSize);
+      return {
+        data: localFiltered.poems,
+        pagination: {
+          page,
+          pageSize,
+          hasMore: localFiltered.hasMore,
+        },
+        totalCount: localFiltered.totalCount,
+        lang: 'zh-Hans',
+      };
     },
   });
 
