@@ -1,9 +1,18 @@
 name = "shici-realm"
 compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Cloudflare Pages Build Output
 pages_build_output_dir = "./dist"
+
+# Cloudflare Workers Static Assets & Build
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[build]
+command = "npm run build"
 
 [vars]
 UPSTREAM_API = "https://poetry.palemoky.com"
-
-# Secrets to be configured in Cloudflare Dashboard or via wrangler:
-# wrangler secret put AI_API_KEY

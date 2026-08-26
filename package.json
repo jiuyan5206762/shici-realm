@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "pages:build": "npm run build",
+    "deploy": "wrangler pages deploy dist"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.66.0",
