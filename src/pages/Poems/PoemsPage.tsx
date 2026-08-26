@@ -50,42 +50,6 @@ const TYPE_TOTAL_COUNTS: Record<string, number> = {
   '其他': 40000,
 };
 
-const AUTHOR_TOTAL_COUNTS: Record<string, number> = {
-  '李白': 1010,
-  '杜甫': 1450,
-  '苏轼': 2780,
-  '白居易': 2860,
-  '陆游': 9100,
-  '辛弃疾': 620,
-  '李清照': 86,
-  '王维': 420,
-  '李商隐': 600,
-  '杜牧': 530,
-  '陶渊明': 135,
-  '纳兰性德': 340,
-  '屈原': 28,
-  '孟浩然': 265,
-  '柳宗元': 140,
-  '王勃': 95,
-};
-
-const POET_ID_BASE: Record<string, number> = {
-  '李白': 309850,
-  '杜甫': 343200,
-  '白居易': 268500,
-  '王维': 300100,
-  '陆游': 38800,
-  '苏轼': 194800,
-  '辛弃疾': 71000,
-  '李清照': 245920,
-  '孟浩然': 340150,
-  '杜牧': 358700,
-  '李商隐': 359650,
-  '陶渊明': 903500,
-  '屈原': 901000,
-  '纳兰性德': 377000,
-};
-
 export const PoemsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -162,80 +126,64 @@ export const PoemsPage: React.FC = () => {
   } = useQuery({
     queryKey: ['poems', { page, pageSize, dynasty, type, author }],
     queryFn: async () => {
-      // Calculate realistic database totalCount
-      let totalCount = 371313;
-      if (author && AUTHOR_TOTAL_COUNTS[author]) {
-        totalCount = AUTHOR_TOTAL_COUNTS[author];
-      } else if (type && TYPE_TOTAL_COUNTS[type]) {
-        totalCount = TYPE_TOTAL_COUNTS[type];
-      } else if (dynasty && DYNASTY_TOTAL_COUNTS[dynasty]) {
-        totalCount = DYNASTY_TOTAL_COUNTS[dynasty];
-      }
-
       // Case A: Specific Author Selected
       if (author) {
-        const poetPoems: Poem[] = [];
+        const poetData = getPoetPoems(author, page, pageSize);
 
-        // If author has known database block, fetch real 20 items from DB
-        const baseId = POET_ID_BASE[author];
-        if (baseId) {
-          const startId = baseId + (page - 1) * pageSize;
-          const requests: Promise<any>[] = [];
-          for (let id = startId; id < startId + pageSize; id++) {
-            requests.push(
-              poemApi.getById(id)
-                .then((r) => r.data)
-                .catch(() => null)
-            );
-          }
-          const fetched = (await Promise.all(requests)).filter(Boolean) as Poem[];
-          for (const p of fetched) {
-            if (p && !poetPoems.some((e) => e.id === p.id)) {
-              poetPoems.push(p);
-            }
-          }
+        if (poetData.totalCount > 0) {
+          let items = poetData.poems;
+          if (dynasty) items = items.filter((p) => p.dynasty?.name === dynasty);
+          if (type) items = items.filter((p) => p.type?.name === type);
+
+          return {
+            data: items,
+            pagination: {
+              page,
+              pageSize,
+              hasMore: poetData.hasMore,
+            },
+            totalCount: poetData.totalCount,
+            lang: 'zh-Hans',
+          };
         }
 
-        // Merge curated items if page 1 or pool needs supplement
-        if (poetPoems.length < pageSize) {
-          const curated = getPoetPoems(author, page, pageSize).poems;
-          for (const c of curated) {
-            if (!poetPoems.some((e) => e.id === c.id)) {
-              poetPoems.push(c);
-            }
-            if (poetPoems.length >= pageSize) break;
-          }
+        // Fallback for non-indexed rare author: probe remote random and search API
+        const pool: Poem[] = [];
+        try {
+          const sample = await poemApi.getRandom({ author, dynasty, type });
+          if (sample.data?.id) pool.push(sample.data);
+        } catch {
+          // continue
         }
 
-        // Remote fallback search if still empty
-        if (poetPoems.length === 0) {
-          try {
-            const q = author.length < 3 ? `${author} 诗` : author;
-            const searchRes = await searchApi.search({ q, page, pageSize });
-            poetPoems.push(...(searchRes.data || []));
-          } catch {
-            // continue
-          }
+        try {
+          const q = author.length < 3 ? `${author} 诗` : author;
+          const searchRes = await searchApi.search({ q, page, pageSize });
+          const searchItems = (searchRes.data || []).filter(
+            (p) => !pool.some((existing) => existing.id === p.id)
+          );
+          pool.push(...searchItems);
+        } catch {
+          // continue
         }
-
-        let filtered = poetPoems;
-        if (dynasty) filtered = filtered.filter((p) => p.dynasty?.name === dynasty);
-        if (type) filtered = filtered.filter((p) => p.type?.name === type);
 
         return {
-          data: filtered,
-          pagination: {
-            page,
-            pageSize,
-            hasMore: page * pageSize < totalCount,
-          },
-          totalCount,
+          data: pool,
+          pagination: { page, pageSize, hasMore: false },
+          totalCount: pool.length,
           lang: 'zh-Hans',
         };
       }
 
       // Case B: Filter by Dynasty or Type (scale up across 370,000 DB)
       if (type || dynasty) {
+        let totalCount = 371313;
+        if (type && TYPE_TOTAL_COUNTS[type]) {
+          totalCount = TYPE_TOTAL_COUNTS[type];
+        } else if (dynasty && DYNASTY_TOTAL_COUNTS[dynasty]) {
+          totalCount = DYNASTY_TOTAL_COUNTS[dynasty];
+        }
+
         const resultPoems: Poem[] = [];
 
         // Fetch real database pages corresponding to page N
@@ -417,7 +365,7 @@ export const PoemsPage: React.FC = () => {
                 onResetFilter={activeFilterCount > 0 ? handleResetFilters : undefined}
               />
 
-              {/* Pagination with accurate multi-page count across thousands of pages */}
+              {/* Pagination with exact multi-page count across all valid pages */}
               {!isLoading && (poems.length > 0 || (totalCount && totalCount > pageSize)) && (
                 <div className="pt-6 border-t border-stone-200 dark:border-stone-800">
                   <Pagination
