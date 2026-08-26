@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Users, Search, Compass, RotateCcw, Sparkles, BookOpen, ArrowRight } from 'lucide-react';
-import { authorApi } from '@/api/authors';
+import { Users, Search, Compass, RotateCcw, BookOpen, ArrowRight } from 'lucide-react';
 import { dynastyApi } from '@/api/dynasties';
 import { poemApi } from '@/api/poems';
 import { AuthorCard } from '@/components/Author/AuthorCard';
@@ -63,7 +62,7 @@ export const AuthorsPage: React.FC = () => {
               const dynamicAuthor: Author = {
                 id: probe.data.author.id,
                 name: probe.data.author.name,
-                description: `${probe.data.dynasty?.name || ''}代文学名家，作品收录于诗泉古籍库。`,
+                description: `${probe.data.dynasty?.name || ''}代文学大家，作品收录于诗境典籍库。`,
                 dynasty: probe.data.dynasty,
               };
               return {
@@ -74,7 +73,7 @@ export const AuthorsPage: React.FC = () => {
               };
             }
           } catch {
-            // continue
+            // fallback
           }
         }
 
@@ -86,9 +85,14 @@ export const AuthorsPage: React.FC = () => {
         };
       }
 
-      // Default pagination browse of the 13,000+ author database
-      const res = await authorApi.getAuthors({ page, pageSize });
-      return { ...res, totalCount: 13577 };
+      // Default: Return full verified famous poets directory
+      const filtered = filterAuthorsByCriteria(undefined, undefined, page, pageSize);
+      return {
+        data: filtered.authors,
+        pagination: { page, pageSize, hasMore: filtered.hasMore },
+        totalCount: filtered.totalCount,
+        lang: 'zh-Hans',
+      };
     },
   });
 
@@ -141,34 +145,34 @@ export const AuthorsPage: React.FC = () => {
   const totalCount = (authorsRes as any)?.totalCount;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-200 dark:border-stone-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-stone-200 dark:border-stone-800">
         <div>
-          <h1 className="text-2xl sm:text-4xl font-serif font-bold text-ink-900 dark:text-ink-50 flex items-center space-x-2.5">
-            <Users className="w-7 h-7 sm:w-8 h-8 text-chinese-cinnabar" />
+          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ink-900 dark:text-ink-50 flex items-center space-x-3">
+            <Users className="w-8 h-8 text-chinese-cinnabar" />
             <span>千古先贤 · 诗人百科</span>
           </h1>
-          <p className="text-xs sm:text-sm text-ink-400 mt-1">
-            历朝 13,000+ 位诗人辞采，溯源华夏文学巨匠生平与作品集录
+          <p className="text-base text-ink-600 dark:text-ink-300 mt-2 font-serif">
+            溯源历朝文学巨匠生平与传世名篇
           </p>
         </div>
 
         {/* Poet Quick Search Input */}
         <form onSubmit={handleSearchSubmit} className="flex items-center space-x-2 max-w-sm w-full">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
+            <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="搜索诗人名字 (如李白、杜甫)..."
-              className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-white dark:bg-chinese-nightCard border border-stone-200 dark:border-chinese-nightBorder rounded-xl text-ink-800 dark:text-ink-100 focus:outline-none focus:ring-1 focus:ring-chinese-ochre"
+              placeholder="搜索诗人姓名 (如李白、苏轼)..."
+              className="w-full pl-11 pr-4 py-2.5 text-base bg-white dark:bg-[#1E1E22] border border-stone-200 dark:border-stone-700 rounded-xl text-ink-900 dark:text-ink-50 focus:outline-none focus:ring-1 focus:ring-chinese-ochre font-serif"
             />
           </div>
           <button
             type="submit"
-            className="px-4 py-2 bg-chinese-ochre hover:bg-chinese-ochre/90 text-white rounded-xl text-xs sm:text-sm font-medium shadow-sm transition-colors"
+            className="px-5 py-2.5 bg-chinese-ochre hover:bg-chinese-ochre/90 text-white rounded-xl text-base font-medium shadow-sm transition-colors"
           >
             搜索
           </button>
@@ -176,31 +180,31 @@ export const AuthorsPage: React.FC = () => {
       </div>
 
       {/* Dynasty Filter Chips Bar */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar text-xs">
-        <span className="text-ink-400 font-semibold flex items-center space-x-1 whitespace-nowrap">
-          <Compass className="w-3.5 h-3.5" />
+      <div className="flex items-center space-x-2.5 overflow-x-auto pb-2 no-scrollbar text-base font-serif">
+        <span className="text-ink-500 dark:text-ink-400 font-semibold flex items-center space-x-1.5 whitespace-nowrap">
+          <Compass className="w-4 h-4 text-chinese-ochre" />
           <span>朝代：</span>
         </span>
 
         <button
           onClick={() => updateParam({ dynasty: null })}
-          className={`px-3 py-1.5 rounded-xl font-medium whitespace-nowrap transition-all ${
+          className={`px-4 py-2 rounded-xl whitespace-nowrap transition-colors ${
             !dynasty
-              ? 'bg-chinese-ochre text-white font-semibold shadow-sm'
-              : 'bg-stone-100 dark:bg-stone-800 text-ink-600 dark:text-ink-300 hover:bg-stone-200'
+              ? 'bg-chinese-ochre text-white font-medium shadow-sm'
+              : 'bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-300 hover:bg-stone-200 dark:hover:bg-stone-700'
           }`}
         >
-          全部朝代
+          全部
         </button>
 
         {dynasties.map((d) => (
           <button
             key={d.id}
             onClick={() => updateParam({ dynasty: d.name === dynasty ? null : d.name })}
-            className={`px-3 py-1.5 rounded-xl font-medium whitespace-nowrap transition-all ${
+            className={`px-4 py-2 rounded-xl whitespace-nowrap transition-colors ${
               dynasty === d.name
-                ? 'bg-chinese-ochre text-white font-semibold shadow-sm'
-                : 'bg-stone-100 dark:bg-stone-800 text-ink-600 dark:text-ink-300 hover:bg-stone-200'
+                ? 'bg-chinese-ochre text-white font-medium shadow-sm'
+                : 'bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-300 hover:bg-stone-200 dark:hover:bg-stone-700'
             }`}
           >
             {d.name}
@@ -210,9 +214,9 @@ export const AuthorsPage: React.FC = () => {
         {(dynasty || q) && (
           <button
             onClick={handleReset}
-            className="text-chinese-cinnabar hover:underline ml-2 flex items-center space-x-1 whitespace-nowrap"
+            className="text-chinese-cinnabar hover:underline ml-3 flex items-center space-x-1 whitespace-nowrap text-sm"
           >
-            <RotateCcw className="w-3 h-3" />
+            <RotateCcw className="w-4 h-4" />
             <span>重置</span>
           </button>
         )}
@@ -220,87 +224,57 @@ export const AuthorsPage: React.FC = () => {
 
       {/* When a poet is searched: Show Poet Works Spotlight & Direct Links */}
       {q && (matchedFamousPoet || poetSamplePoem) && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-paper-50 to-paper-200/90 dark:from-chinese-nightCard dark:to-stone-900 border border-chinese-ochre/30 shadow-oriental space-y-6 animate-fadeIn">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-2xl bg-chinese-cinnabar text-white font-serif font-black text-xl flex items-center justify-center shadow-sm">
+        <div className="p-8 rounded-3xl bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100 dark:border-stone-800">
+            <div className="flex items-center space-x-4">
+              <div className="w-14 h-14 rounded-2xl bg-chinese-cinnabar text-white font-serif font-bold text-2xl flex items-center justify-center shadow-sm">
                 {q.charAt(0)}
               </div>
               <div>
-                <h3 className="text-xl sm:text-2xl font-serif font-bold text-ink-900 dark:text-ink-50">
-                  {q} 的古诗作品与生平
+                <h3 className="text-2xl font-serif font-bold text-ink-900 dark:text-ink-50">
+                  {q}
                 </h3>
-                <p className="text-xs text-ink-400">
-                  已为您检索到诗人资料与经典存目
-                </p>
+                <div className="text-base text-ink-500 dark:text-ink-400 font-serif mt-0.5">
+                  〔{matchedFamousPoet?.dynasty?.name || poetSamplePoem?.dynasty?.name || '古'}〕文学大家
+                </div>
               </div>
             </div>
 
             <Link
               to={`/poems?author=${encodeURIComponent(q)}`}
-              className="inline-flex items-center space-x-1.5 px-4 py-2 bg-chinese-ochre hover:bg-chinese-ochre/90 text-white rounded-xl text-xs font-semibold shadow-sm transition-transform active:scale-95 self-start sm:self-auto"
+              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-chinese-ochre hover:bg-chinese-ochre/90 text-white text-base font-medium shadow-sm transition-colors"
             >
-              <BookOpen className="w-4 h-4" />
-              <span>在古诗库中浏览 {q} 的全部诗作</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <BookOpen className="w-5 h-5" />
+              <span>查看 {q} 全部诗篇</span>
+              <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
           </div>
 
-          {/* Representative Works Cards */}
-          {matchedFamousPoet?.poems && matchedFamousPoet.poems.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2 text-xs font-serif font-bold text-chinese-ochre">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>传世名篇精选</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                {matchedFamousPoet.poems.slice(0, 4).map((work) => (
-                  <Link
-                    key={work.id}
-                    to={`/poems/${work.id}`}
-                    className="p-4 rounded-2xl bg-white dark:bg-chinese-nightCard border border-stone-200/80 dark:border-chinese-nightBorder hover:border-chinese-ochre/60 dark:hover:border-chinese-ochre/60 transition-all hover:shadow-md block group"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-serif font-bold text-base text-ink-800 dark:text-ink-100 group-hover:text-chinese-ochre transition-colors truncate">
-                        {work.title}
-                      </h4>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-ink-400">
-                        {work.type?.name}
-                      </span>
-                    </div>
-                    <p className="text-xs text-ink-500 dark:text-ink-400 font-serif line-clamp-2 leading-relaxed">
-                      {(work.content || []).join(' ')}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </div>
+          {matchedFamousPoet?.description && (
+            <p className="text-base sm:text-lg text-ink-700 dark:text-ink-300 font-serif leading-relaxed">
+              {matchedFamousPoet.description}
+            </p>
           )}
 
-          {/* Sample Poem from DB */}
           {poetSamplePoem && (
-            <div className="p-4 rounded-2xl bg-white/80 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-              <div className="space-y-1">
-                <span className="text-chinese-ochre font-semibold">随机发现典籍作品：</span>
-                <span className="font-serif font-bold text-ink-800 dark:text-ink-100 text-sm ml-1">
+            <div className="p-6 rounded-2xl bg-stone-50 dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 text-center space-y-2">
+              <div className="text-sm font-serif text-chinese-ochre">名篇赏析</div>
+              <Link to={`/poems/${poetSamplePoem.id}`}>
+                <h4 className="text-xl font-serif font-bold text-ink-900 dark:text-ink-50 hover:text-chinese-ochre">
                   《{poetSamplePoem.title}》
-                </span>
-                <span className="text-ink-400 font-serif ml-2">
-                  « {(poetSamplePoem.content || []).slice(0, 2).join('，')}…… »
-                </span>
-              </div>
-              <Link
-                to={`/poems/${poetSamplePoem.id}`}
-                className="text-chinese-ochre font-medium hover:underline flex-shrink-0"
-              >
-                阅读这首诗 →
+                </h4>
               </Link>
+              <div className="font-serif text-ink-800 dark:text-ink-200 text-base sm:text-lg leading-loose py-2">
+                {(poetSamplePoem.content || []).slice(0, 4).map((line, idx) => (
+                  <p key={idx}>{line}</p>
+                ))}
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* Main Author Cards Grid */}
+      {/* Main Authors Grid */}
       {isError ? (
         <ErrorState onRetry={() => refetch()} />
       ) : isLoading ? (
