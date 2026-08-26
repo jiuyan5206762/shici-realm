@@ -1,0 +1,16 @@
+{
+  "name": "诗境 · 中国古诗词智能阅读与检索平台",
+  "short_name": "诗境",
+  "description": "数字化中国古典诗词阅读与检索平台",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8F5EF",
+  "theme_color": "#BA3B46",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

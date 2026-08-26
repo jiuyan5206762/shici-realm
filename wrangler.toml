@@ -1,0 +1,9 @@
+name = "shici-realm"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "./dist"
+
+[vars]
+UPSTREAM_API = "https://poetry.palemoky.com"
+
+# Secrets to be configured in Cloudflare Dashboard or via wrangler:
+# wrangler secret put AI_API_KEY
