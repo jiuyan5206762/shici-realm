@@ -5,15 +5,15 @@ export interface FamousPoetProfile extends Author {
   poems: Poem[];
 }
 
-// Comprehensive database of famous historical poets across all dynasties with authentic full collections
+// Comprehensive curated database of famous historical poets and dynasties
 export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
-  // ==================== 先秦：诗经 · 楚辞 · 先秦诸子 ====================
+  // ==================== 先秦：屈原 · 诗经 ====================
   {
     id: 9619,
     name: '屈原',
     dynasty: { id: 1, name: '先秦' },
     titleBadge: '楚辞之祖',
-    description: '战国时期楚国诗人、政治家，中国浪漫主义文学奠基人，“楚辞”创立者。其诗情志深沉，文采绚烂。',
+    description: '战国时期楚国诗人、政治家，中国浪漫主义文学奠基人，“楚辞”创立者。',
     poemCount: 6,
     poems: [
       {
@@ -21,7 +21,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '离骚 (节选)',
         author: { id: 9619, name: '屈原' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 18, name: '楚辞' },
+        type: { id: 70, name: '楚辞' },
         content: [
           '帝高阳之苗裔兮，朕皇考曰伯庸。',
           '摄提贞于孟陬兮，惟庚寅吾以降。',
@@ -36,7 +36,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '九歌·湘夫人',
         author: { id: 9619, name: '屈原' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 18, name: '楚辞' },
+        type: { id: 70, name: '楚辞' },
         content: [
           '帝子降兮北渚，目眇眇兮愁予。',
           '袅袅兮秋风，洞庭波兮木叶下。',
@@ -49,7 +49,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '九歌·国殇',
         author: { id: 9619, name: '屈原' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 18, name: '楚辞' },
+        type: { id: 70, name: '楚辞' },
         content: [
           '操吴戈兮被犀甲，车错毂兮短兵接。',
           '旌蔽日兮敌若云，矢交坠兮士争先。',
@@ -62,7 +62,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '九歌·山鬼',
         author: { id: 9619, name: '屈原' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 18, name: '楚辞' },
+        type: { id: 70, name: '楚辞' },
         content: [
           '若有人兮山之阿，被薜荔兮带女萝。',
           '既含睇兮又宜笑，子慕予兮善窈窕。',
@@ -75,7 +75,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '九章·涉江',
         author: { id: 9619, name: '屈原' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 18, name: '楚辞' },
+        type: { id: 70, name: '楚辞' },
         content: [
           '余幼好此奇服兮，年既老而不衰。',
           '带长铗之陆离兮，冠切云之崔嵬。',
@@ -88,7 +88,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '天问 (节选)',
         author: { id: 9619, name: '屈原' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 18, name: '楚辞' },
+        type: { id: 70, name: '楚辞' },
         content: [
           '曰：遂古之初，谁传道之？',
           '上下未形，何由考之？',
@@ -103,21 +103,19 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     name: '诗经',
     dynasty: { id: 1, name: '先秦' },
     titleBadge: '群经之首',
-    description: '中国古代诗歌开山总集，收录西周初年至春秋中叶诗歌305篇，分为风、雅、颂三部分。',
-    poemCount: 8,
+    description: '中国古代诗歌开山总集，收录西周初年至春秋中叶诗歌305篇。',
+    poemCount: 6,
     poems: [
       {
         id: 901011,
         title: '关雎',
         author: { id: 9610, name: '诗经' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 1, name: '诗经' },
+        type: { id: 50, name: '诗经' },
         content: [
           '关关雎鸠，在河之洲。窈窕淑女，君子好逑。',
           '参差荇菜，左右流之。窈窕淑女，寤寐求之。',
           '求之不得，寤寐思服。悠哉悠哉，辗转反侧。',
-          '参差荇菜，左右采之。窈窕淑女，琴瑟友之。',
-          '参差荇菜，左右芼之。窈窕淑女，钟鼓乐之。',
         ],
       },
       {
@@ -125,12 +123,10 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '蒹葭',
         author: { id: 9610, name: '诗经' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 1, name: '诗经' },
+        type: { id: 50, name: '诗经' },
         content: [
           '蒹葭苍苍，白露为霜。所谓伊人，在水一方。',
           '溯洄从之，道阻且长。溯游从之，宛在水中央。',
-          '蒹葭萋萋，白露未晞。所谓伊人，在水之湄。',
-          '溯洄从之，道阻且跻。溯游从之，宛在水中坻。',
         ],
       },
       {
@@ -138,11 +134,10 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '桃夭',
         author: { id: 9610, name: '诗经' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 1, name: '诗经' },
+        type: { id: 50, name: '诗经' },
         content: [
           '桃之夭夭，灼灼其华。之子于归，宜其室家。',
           '桃之夭夭，有蕡其实。之子于归，宜其家室。',
-          '桃之夭夭，其叶蓁蓁。之子于归，宜其家人。',
         ],
       },
       {
@@ -150,7 +145,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '采薇 (节选)',
         author: { id: 9610, name: '诗经' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 1, name: '诗经' },
+        type: { id: 50, name: '诗经' },
         content: [
           '昔我往矣，杨柳依依。',
           '今我来思，雨雪霏霏。',
@@ -163,11 +158,10 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '木瓜',
         author: { id: 9610, name: '诗经' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 1, name: '诗经' },
+        type: { id: 50, name: '诗经' },
         content: [
           '投我以木瓜，报之以琼琚。匪报也，永以为好也！',
           '投我以木桃，报之以琼瑶。匪报也，永以为好也！',
-          '投我以木李，报之以琼玖。匪报也，永以为好也！',
         ],
       },
       {
@@ -175,23 +169,23 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '子衿',
         author: { id: 9610, name: '诗经' },
         dynasty: { id: 1, name: '先秦' },
-        type: { id: 1, name: '诗经' },
+        type: { id: 50, name: '诗经' },
         content: [
           '青青子衿，悠悠我心。纵我不往，子宁不嗣音？',
-          '青青子佩，悠悠我思。纵我不往，子宁不来？',
           '一日不见，如三月兮！',
         ],
       },
     ],
   },
-  // ==================== 两汉：汉乐府 · 古诗十九首 · 汉赋 ====================
+
+  // ==================== 两汉：汉乐府 · 古诗十九首 · 刘邦 · 汉武帝 ====================
   {
     id: 9020,
     name: '汉乐府',
     dynasty: { id: 2, name: '两汉' },
-    titleBadge: '民歌正宗',
-    description: '汉代乐府机关采集的民间诗歌总汇，开创了中国古代叙事诗与抒情诗的崭新风貌。',
-    poemCount: 14,
+    titleBadge: '两汉乐府',
+    description: '汉代乐府民歌与古诗十九首，中国古代叙事诗与抒情诗的重要源头。',
+    poemCount: 10,
     poems: [
       {
         id: 902001,
@@ -243,8 +237,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
           '行行重行行，与君生别离。',
           '相去万余里，各在天一涯。',
           '道路阻且长，会面安可知？',
-          '胡马依北风，越鸟巢南枝。',
-          '相去日已远，衣带日已缓。',
           '弃捐勿复道，努力加餐饭。',
         ],
       },
@@ -257,7 +249,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         content: [
           '涉江采芙蓉，兰泽多芳草。',
           '采之欲遗谁？所思在远道。',
-          '还顾望旧乡，长路漫浩浩。',
           '同心而离居，忧伤以终老。',
         ],
       },
@@ -271,8 +262,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
           '日出东南隅，照我秦氏楼。秦氏有好女，自名为罗敷。',
           '罗敷喜蚕桑，采桑城南隅。青丝为笼系，桂枝为笼钩。',
           '头部倭堕髻，耳中明月珠。缃绮为下裙，紫绮为上襦。',
-          '行者见罗敷，下担捋髭须。少年见罗敷，脱帽著帞头。',
-          '耕者忘其犁，锄者忘其锄。来归相怨怒，但坐观罗敷。',
         ],
       },
       {
@@ -285,10 +274,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
           '十五从军征，八十始得归。',
           '道逢乡里人：家中有阿谁？',
           '遥看是君家，松柏冢累累。',
-          '兔从狗窦入，雉从梁上飞。',
-          '中庭生旅谷，井上生旅葵。',
-          '舂谷持作饭，采葵持作羹。',
-          '羹饭一时熟，不知贻阿谁！',
           '出门东向看，泪落沾我衣。',
         ],
       },
@@ -313,8 +298,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         content: [
           '秋风起兮白云飞，草木黄落兮雁南归。',
           '兰有秀兮菊有芳，怀佳人兮不能忘。',
-          '泛楼船兮济汾河，横中流兮扬素波。',
-          '箫鼓鸣兮发操歌，欢乐极兮哀情多。',
           '少壮几时兮奈老何！',
         ],
       },
@@ -327,21 +310,19 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         content: [
           '皑如山上雪，皎若云间月。',
           '闻君有两意，故来相决绝。',
-          '今日斗酒会，明旦沟水头。',
-          '躞蹀御沟上，沟水东西流。',
-          '凄凄复凄凄，嫁娶不须啼。',
           '愿得一心人，白头不相离。',
         ],
       },
     ],
   },
-  // ==================== 魏晋：建安风骨 · 陶渊明 ====================
+
+  // ==================== 魏晋：曹操 · 陶渊明 ====================
   {
     id: 8228,
     name: '曹操',
     dynasty: { id: 3, name: '魏晋' },
     titleBadge: '魏武帝',
-    description: '字孟德，东汉末年杰出政治家、文学家，建安文学代表人物。其诗气魄雄伟，慷慨悲凉。',
+    description: '字孟德，东汉末年杰出政治家、文学家，建安文学代表人物。',
     poemCount: 5,
     poems: [
       {
@@ -354,7 +335,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
           '对酒当歌，人生几何！譬如朝露，去日苦多。',
           '慨当以慷，忧思难忘。何以解忧？唯有杜康。',
           '青青子衿，悠悠我心。但为君故，沉吟至今。',
-          '呦呦鹿鸣，食野之苹。我有嘉宾，鼓瑟吹笙。',
           '山不厌高，海不厌深。周公吐哺，天下归心。',
         ],
       },
@@ -381,7 +361,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
           '神龟虽寿，犹有竟时；螣蛇乘雾，终为土灰。',
           '老骥伏枥，志在千里；烈士暮年，壮心不已。',
           '盈缩之期，不但在天；养怡之福，可得永年。',
-          '幸甚至哉，歌以咏志。',
         ],
       },
       {
@@ -391,9 +370,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         dynasty: { id: 3, name: '魏晋' },
         type: { id: 17, name: '乐府诗' },
         content: [
-          '关东有义士，兴兵讨群凶。初期会盟津，乃心在咸阳。',
-          '铠甲生虮虱，万姓以死亡。白骨露于野，千里无鸡鸣。',
-          '生民百遗一，念之断人肠。',
+          '白骨露于野，千里无鸡鸣。生民百遗一，念之断人肠。',
         ],
       },
       {
@@ -404,8 +381,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         type: { id: 17, name: '乐府诗' },
         content: [
           '北上太行山，艰哉何巍巍！羊肠坂诘屈，车轮为之摧。',
-          '树木何萧瑟，北风声正悲。熊罴对我蹲，虎豹夹路啼。',
-          '溪谷少人民，雪落何霏霏！',
         ],
       },
     ],
@@ -415,7 +390,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     name: '陶渊明',
     dynasty: { id: 3, name: '魏晋' },
     titleBadge: '五柳先生',
-    description: '字元亮，号五柳先生，世称靖节先生。东晋末至南朝宋初期伟大诗人，田园诗派开创者。',
+    description: '字元亮，号五柳先生，世称靖节先生，田园诗派开创者。',
     poemCount: 6,
     poems: [
       {
@@ -478,10 +453,8 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         dynasty: { id: 3, name: '魏晋' },
         type: { id: 15, name: '五言古诗' },
         content: [
-          '孟夏草木长，绕屋树扶疏。',
-          '众鸟欣有托，吾亦爱吾庐。',
-          '微雨从东来，好风与之俱。',
-          '俯仰终宇宙，不乐复何如？',
+          '孟夏草木长，绕屋树扶疏。众鸟欣有托，吾亦爱吾庐。',
+          '微雨从东来，好风与之俱。俯仰终宇宙，不乐复何如？',
         ],
       },
       {
@@ -491,21 +464,20 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         dynasty: { id: 3, name: '魏晋' },
         type: { id: 15, name: '五言古诗' },
         content: [
-          '饥来驱我去，不知竟何之。',
-          '行行至斯里，叩门拙言辞。',
-          '主人解余意，遗赠岂虚来。',
+          '饥来驱我去，不知竟何之。行行至斯里，叩门拙言辞。',
         ],
       },
     ],
   },
+
   // ==================== 南北朝 · 隋代 ====================
   {
     id: 9040,
     name: '南北朝民歌',
     dynasty: { id: 4, name: '南北朝' },
-    titleBadge: '北歌南曲',
-    description: '南北朝时期南北两地的民歌精华，既有北朝的雄浑刚健，又有南朝的清丽缠绵。',
-    poemCount: 5,
+    titleBadge: '南北朝乐府',
+    description: '南北朝时期的民歌精华，《木兰诗》、《敕勒歌》等千古传诵。',
+    poemCount: 3,
     poems: [
       {
         id: 904001,
@@ -539,8 +511,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         dynasty: { id: 4, name: '南北朝' },
         type: { id: 17, name: '乐府诗' },
         content: [
-          '忆梅下西洲，折梅寄江北。',
-          '单衫杏子红，双鬓鸦雏色。',
           '采莲南塘秋，莲花过人头。',
           '低头弄莲子，莲子清如水。',
           '南风知我意，吹梦到西洲。',
@@ -548,14 +518,15 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       },
     ],
   },
+
   // ==================== 唐代：李白 · 杜甫 · 白居易 · 王维 · 李商隐 · 杜牧 · 孟浩然 · 柳宗元 · 王勃 ====================
   {
     id: 2045,
     name: '李白',
     dynasty: { id: 6, name: '唐' },
     titleBadge: '诗仙',
-    description: '字太白，号青莲居士，唐代伟大的浪漫主义诗人。其诗风豪放飘逸，气吞山河，与杜甫并称“大李杜”。',
-    poemCount: 40,
+    description: '字太白，号青莲居士，唐代伟大的浪漫主义诗人，与杜甫并称“大李杜”。',
+    poemCount: 20,
     poems: [
       {
         id: 309946,
@@ -576,11 +547,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
           '君不见高堂明镜悲白发，朝如青丝暮成雪。',
           '人生得意须尽欢，莫使金樽空对月。',
           '天生我材必有用，千金散尽还复来。',
-          '烹羊宰牛且为乐，会须一饮三百杯。',
-          '岑夫子，丹丘生，将进酒，杯莫停。',
-          '与君歌一曲，请君为我倾耳听。',
-          '钟鼓馔玉不足贵，但愿长醉不愿醒。',
-          '古来圣贤皆寂寞，惟有饮者留其名。',
           '五花马，千金裘，呼儿将出换美酒，与尔同销万古愁。',
         ],
       },
@@ -603,9 +569,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         type: { id: 17, name: '乐府诗' },
         content: [
           '噫吁嚱，危乎高哉！蜀道之难，难于上青天！',
-          '西当太白有鸟道，可以横绝峨眉巅。',
-          '地崩山摧壮士死，然后天梯石栈相钩连。',
-          '上有六龙回日之高标，下有冲波逆折之回川。',
+          '蚕丛及鱼凫，开国何茫然！',
           '蜀道之难，难于上青天，使人听此凋朱颜！',
         ],
       },
@@ -629,10 +593,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         content: [
           '花间一壶酒，独酌无相亲。',
           '举杯邀明月，对影成三人。',
-          '月既不解饮，影徒随我身。',
-          '暂伴月将影，行乐须及春。',
-          '醒时同交欢，醉后各分散。',
-          '永结无情游，相期邈云汉。',
         ],
       },
       {
@@ -643,23 +603,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         type: { id: 17, name: '乐府诗' },
         content: [
           '金樽清酒斗十千，玉盘珍羞直万钱。',
-          '停杯投箸不能食，拔剑四顾心茫然。',
-          '欲渡黄河冰塞川，将登太行雪满山。',
-          '行路难，行路难，多歧路，今安在？',
           '长风破浪会有时，直挂云帆济沧海。',
-        ],
-      },
-      {
-        id: 310007,
-        title: '梦游天姥吟留别',
-        author: { id: 2045, name: '李白' },
-        dynasty: { id: 6, name: '唐' },
-        type: { id: 16, name: '七言古诗' },
-        content: [
-          '海客谈瀛洲，烟涛微茫信难求；',
-          '越人语天姥，云霞明灭或可睹。',
-          '天姥连天向天横，势拔五岳掩赤城。',
-          '安能摧眉折腰事权贵，使我不得开心颜！',
         ],
       },
       {
@@ -693,30 +637,6 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         ],
       },
       {
-        id: 310014,
-        title: '清平调 其一',
-        author: { id: 2045, name: '李白' },
-        dynasty: { id: 6, name: '唐' },
-        type: { id: 12, name: '七言绝句' },
-        content: [
-          '云想衣裳花想容，春风拂槛露华浓。',
-          '若非群玉山头见，会向瑶台月下逢。',
-        ],
-      },
-      {
-        id: 310020,
-        title: '渡荆门送别',
-        author: { id: 2045, name: '李白' },
-        dynasty: { id: 6, name: '唐' },
-        type: { id: 13, name: '五言律诗' },
-        content: [
-          '渡远荆门外，来从楚国游。',
-          '山随平野尽，江入大荒流。',
-          '月下飞天镜，云生结海楼。',
-          '仍怜故乡水，万里送行舟。',
-        ],
-      },
-      {
         id: 310022,
         title: '望天门山',
         author: { id: 2045, name: '李白' },
@@ -738,56 +658,131 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
           '十步杀一人，千里不留行。事了拂衣去，深藏身与名。',
         ],
       },
+    ],
+  },
+  {
+    id: 3911,
+    name: '杜甫',
+    dynasty: { id: 6, name: '唐' },
+    titleBadge: '诗圣',
+    description: '字子美，自号少陵野老，唐代伟大的现实主义诗人，其诗沉郁顿挫，悲悯苍生。',
+    poemCount: 10,
+    poems: [
       {
-        id: 310024,
-        title: '夜宿山寺',
-        author: { id: 2045, name: '李白' },
+        id: 343366,
+        title: '登高',
+        author: { id: 3911, name: '杜甫' },
         dynasty: { id: 6, name: '唐' },
-        type: { id: 11, name: '五言绝句' },
-        content: ['危楼高百尺，手可摘星辰。', '不敢高声语，恐惊天上人。'],
-      },
-      {
-        id: 310025,
-        title: '关山月',
-        author: { id: 2045, name: '李白' },
-        dynasty: { id: 6, name: '唐' },
-        type: { id: 17, name: '乐府诗' },
+        type: { id: 14, name: '七言律诗' },
         content: [
-          '明月出天山，苍茫云海间。长风几万里，吹度玉门关。',
+          '风急天高猿啸哀，渚清沙白鸟飞回。',
+          '无边落木萧萧下，不尽长江滚滚来。',
+          '万里悲秋常作客，百年多病独登台。',
+          '艰难苦恨繁霜鬓，潦倒新停浊酒杯。',
         ],
       },
       {
-        id: 310026,
-        title: '春夜洛城闻笛',
-        author: { id: 2045, name: '李白' },
+        id: 343367,
+        title: '春望',
+        author: { id: 3911, name: '杜甫' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 13, name: '五言律诗' },
+        content: [
+          '国破山河在，城春草木深。',
+          '感时花溅泪，恨别鸟惊心。',
+          '烽火连三月，家书抵万金。',
+          '白头搔更短，浑欲不胜簪。',
+        ],
+      },
+      {
+        id: 343368,
+        title: '绝句二首 其一',
+        author: { id: 3911, name: '杜甫' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 12, name: '七言绝句' },
-        content: [
-          '谁家玉笛暗飞声，散入春风满洛城。',
-          '此夜曲中闻折柳，何人不起故园情。',
-        ],
+        content: ['两个黄鹂鸣翠柳，一行白鹭上青天。', '窗含西岭千秋雪，门泊东吴万里船。'],
       },
       {
-        id: 310027,
-        title: '长干行二首 其一',
-        author: { id: 2045, name: '李白' },
+        id: 343369,
+        title: '茅屋为秋风所破歌',
+        author: { id: 3911, name: '杜甫' },
         dynasty: { id: 6, name: '唐' },
-        type: { id: 17, name: '乐府诗' },
-        content: [
-          '妾发初覆额，折花门前剧。郎骑竹马来，绕床弄青梅。',
-          '同居长干里，两小无嫌猜。十四为君妇，羞颜未尝开。',
-        ],
+        type: { id: 16, name: '七言古诗' },
+        content: ['安得广厦千万间，大庇天下寒士俱欢颜！风雨不动安如山。'],
       },
       {
-        id: 310028,
-        title: '古朗月行',
-        author: { id: 2045, name: '李白' },
+        id: 343370,
+        title: '望岳',
+        author: { id: 3911, name: '杜甫' },
         dynasty: { id: 6, name: '唐' },
-        type: { id: 17, name: '乐府诗' },
-        content: [
-          '小时不识月，呼作白玉盘。',
-          '又疑瑶台镜，飞在青云端。',
-        ],
+        type: { id: 15, name: '五言古诗' },
+        content: ['岱宗夫如何？齐鲁青未了。', '会当凌绝顶，一览众山小。'],
+      },
+      {
+        id: 343371,
+        title: '春夜喜雨',
+        author: { id: 3911, name: '杜甫' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 13, name: '五言律诗' },
+        content: ['好雨知时节，当春乃发生。', '随风潜入夜，润物细无声。'],
+      },
+    ],
+  },
+  {
+    id: 9057,
+    name: '白居易',
+    dynasty: { id: 6, name: '唐' },
+    titleBadge: '诗魔',
+    description: '字乐天，号香山居士，唐代伟大的现实主义诗人。',
+    poemCount: 8,
+    poems: [
+      {
+        id: 269310,
+        title: '赋得古原草送别',
+        author: { id: 9057, name: '白居易' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 13, name: '五言律诗' },
+        content: ['离离原上草，一岁一枯荣。', '野火烧不尽，春风吹又生。', '远芳侵古道，晴翠接荒城。', '又送王孙去，萋萋满别情。'],
+      },
+      {
+        id: 269311,
+        title: '问刘十九',
+        author: { id: 9057, name: '白居易' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 11, name: '五言绝句' },
+        content: ['绿蚁新醅酒，红泥小火炉。', '晚来天欲雪，能饮一杯无？'],
+      },
+      {
+        id: 269312,
+        title: '钱塘湖春行',
+        author: { id: 9057, name: '白居易' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 14, name: '七言律诗' },
+        content: ['孤山寺北贾亭西，水面初平云脚低。', '几处早莺争暖树，谁家新燕啄春泥。', '乱花渐欲迷人眼，浅草才能没马蹄。', '最爱湖东行不足，绿杨阴里白沙堤。'],
+      },
+      {
+        id: 269313,
+        title: '大林寺桃花',
+        author: { id: 9057, name: '白居易' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 12, name: '七言绝句' },
+        content: ['人间四月芳菲尽，山寺桃花始盛开。', '长恨春归无觅处，不知转入此中来。'],
+      },
+      {
+        id: 269314,
+        title: '暮江吟',
+        author: { id: 9057, name: '白居易' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 12, name: '七言绝句' },
+        content: ['一道残阳铺水中，半江瑟瑟半江红。', '可怜九月初三夜，露似真珠月似弓。'],
+      },
+      {
+        id: 269315,
+        title: '忆江南·江南好',
+        author: { id: 9057, name: '白居易' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 21, name: '五代词' },
+        content: ['江南好，风景旧曾谙。', '日出江花红胜火，春来江水绿如蓝。', '能不忆江南？'],
       },
     ],
   },
@@ -796,8 +791,8 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     name: '王维',
     dynasty: { id: 6, name: '唐' },
     titleBadge: '诗佛',
-    description: '字摩诘，号摩诘居士，唐代著名诗人、画家。精通诗书画乐，以山水田园诗著称。',
-    poemCount: 10,
+    description: '字摩诘，号摩诘居士，唐代著名诗人、画家。',
+    poemCount: 8,
     poems: [
       {
         id: 300149,
@@ -866,56 +861,308 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     ],
   },
   {
-    id: 3911,
-    name: '杜甫',
+    id: 3596,
+    name: '李商隐',
     dynasty: { id: 6, name: '唐' },
-    titleBadge: '诗圣',
-    description: '字子美，自号少陵野老，唐代伟大的现实主义诗人。其诗沉郁顿挫，悲悯苍生。',
-    poemCount: 10,
+    titleBadge: '玉谿生',
+    description: '字义山，号玉谿生，晚唐著名诗人，与杜牧并称“小李杜”。',
+    poemCount: 6,
     poems: [
       {
-        id: 343366,
-        title: '登高',
-        author: { id: 3911, name: '杜甫' },
+        id: 359601,
+        title: '锦瑟',
+        author: { id: 3596, name: '李商隐' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 14, name: '七言律诗' },
-        content: ['风急天高猿啸哀，渚清沙白鸟飞回。', '无边落木萧萧下，不尽长江滚滚来。'],
+        content: [
+          '锦瑟无端五十弦，一弦一柱思华年。',
+          '庄生晓梦迷蝴蝶，望帝春心托杜鹃。',
+          '沧海月明珠有泪，蓝田日暖玉生烟。',
+          '此情可待成追忆？只是当时已惘然。',
+        ],
       },
       {
-        id: 343367,
-        title: '春望',
-        author: { id: 3911, name: '杜甫' },
-        dynasty: { id: 6, name: '唐' },
-        type: { id: 13, name: '五言律诗' },
-        content: ['国破山河在，城春草木深。', '感时花溅泪，恨别鸟惊心。', '烽火连三月，家书抵万金。'],
-      },
-      {
-        id: 343368,
-        title: '绝句二首 其一',
-        author: { id: 3911, name: '杜甫' },
+        id: 359602,
+        title: '夜雨寄北',
+        author: { id: 3596, name: '李商隐' },
         dynasty: { id: 6, name: '唐' },
         type: { id: 12, name: '七言绝句' },
-        content: ['两个黄鹂鸣翠柳，一行白鹭上青天。', '窗含西岭千秋雪，门泊东吴万里船。'],
+        content: [
+          '君问归期未有期，巴山夜雨涨秋池。',
+          '何当共剪西窗烛，却话巴山夜雨时。',
+        ],
       },
       {
-        id: 343369,
-        title: '茅屋为秋风所破歌',
-        author: { id: 3911, name: '杜甫' },
+        id: 359603,
+        title: '无题·相见时难别亦难',
+        author: { id: 3596, name: '李商隐' },
         dynasty: { id: 6, name: '唐' },
-        type: { id: 16, name: '七言古诗' },
-        content: ['安得广厦千万间，大庇天下寒士俱欢颜！风雨不动安如山。'],
+        type: { id: 14, name: '七言律诗' },
+        content: [
+          '相见时难别亦难，东风无力百花残。',
+          '春蚕到死丝方尽，蜡炬成灰泪始干。',
+          '晓镜但愁云鬓改，夜吟应觉月光寒。',
+          '蓬山此去无多路，青鸟殷勤为探看。',
+        ],
       },
       {
-        id: 343370,
-        title: '望岳',
-        author: { id: 3911, name: '杜甫' },
+        id: 359604,
+        title: '无题·昨夜星辰昨夜风',
+        author: { id: 3596, name: '李商隐' },
         dynasty: { id: 6, name: '唐' },
-        type: { id: 15, name: '五言古诗' },
-        content: ['会当凌绝顶，一览众山小。'],
+        type: { id: 14, name: '七言律诗' },
+        content: [
+          '昨夜星辰昨夜风，画楼西畔桂堂东。',
+          '身无彩凤双飞翼，心有灵犀一点通。',
+        ],
+      },
+      {
+        id: 359605,
+        title: '乐游原',
+        author: { id: 3596, name: '李商隐' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 11, name: '五言绝句' },
+        content: ['向晚意不适，驱车登古原。', '夕阳无限好，只是近黄昏。'],
+      },
+      {
+        id: 359606,
+        title: '嫦娥',
+        author: { id: 3596, name: '李商隐' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 12, name: '七言绝句' },
+        content: ['云母屏风烛影深，长河渐落晓星沉。', '嫦娥应悔偷灵药，碧海青天夜夜心。'],
       },
     ],
   },
-  // ==================== 五代：南唐后主 · 五代词 ====================
+  {
+    id: 3587,
+    name: '杜牧',
+    dynasty: { id: 6, name: '唐' },
+    titleBadge: '樊川居士',
+    description: '字牧之，号樊川居士，晚唐杰出诗人，与李商隐并称“小李杜”。',
+    poemCount: 6,
+    poems: [
+      {
+        id: 358701,
+        title: '清明',
+        author: { id: 3587, name: '杜牧' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 12, name: '七言绝句' },
+        content: ['清明时节雨纷纷，路上行人欲断魂。', '借问酒家何处有？牧童遥指杏花村。'],
+      },
+      {
+        id: 358702,
+        title: '山行',
+        author: { id: 3587, name: '杜牧' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 12, name: '七言绝句' },
+        content: ['远上寒山石径斜，白云生处有人家。', '停车坐爱枫林晚，霜叶红于二月花。'],
+      },
+      {
+        id: 358703,
+        title: '泊秦淮',
+        author: { id: 3587, name: '杜牧' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 12, name: '七言绝句' },
+        content: ['烟笼寒水月笼沙，夜泊秦淮近酒家。', '商女不知亡国恨，隔江犹唱后庭花。'],
+      },
+      {
+        id: 358704,
+        title: '江南春',
+        author: { id: 3587, name: '杜牧' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 12, name: '七言绝句' },
+        content: ['千里莺啼绿映红，水村山郭酒旗风。', '南朝四百八十寺，多少楼台烟雨中。'],
+      },
+      {
+        id: 358705,
+        title: '赤壁',
+        author: { id: 3587, name: '杜牧' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 12, name: '七言绝句' },
+        content: ['折戟沉沙铁未销，自将磨洗认前朝。', '东风不与周郎便，铜雀春深锁二乔。'],
+      },
+      {
+        id: 358706,
+        title: '过华清宫绝句三首 其一',
+        author: { id: 3587, name: '杜牧' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 12, name: '七言绝句' },
+        content: ['长安回望绣成堆，山顶千门次第开。', '一骑红尘妃子笑，无人知是荔枝来。'],
+      },
+    ],
+  },
+  {
+    id: 3401,
+    name: '孟浩然',
+    dynasty: { id: 6, name: '唐' },
+    titleBadge: '孟襄阳',
+    description: '唐代著名山水田园诗人，与王维并称“王孟”。',
+    poemCount: 5,
+    poems: [
+      {
+        id: 340101,
+        title: '春晓',
+        author: { id: 3401, name: '孟浩然' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 11, name: '五言绝句' },
+        content: ['春眠不觉晓，处处闻啼鸟。', '夜来风雨声，花落知多少。'],
+      },
+      {
+        id: 340102,
+        title: '宿建德江',
+        author: { id: 3401, name: '孟浩然' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 11, name: '五言绝句' },
+        content: ['移舟泊烟渚，日暮客愁新。', '野旷天低树，江清月近人。'],
+      },
+      {
+        id: 340103,
+        title: '过故人庄',
+        author: { id: 3401, name: '孟浩然' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 13, name: '五言律诗' },
+        content: [
+          '故人具鸡黍，邀我至田家。',
+          '绿树村边合，青山郭外斜。',
+          '开轩面场圃，把酒话桑麻。',
+          '待到重阳日，还来就菊花。',
+        ],
+      },
+      {
+        id: 340104,
+        title: '望洞庭湖赠张丞相',
+        author: { id: 3401, name: '孟浩然' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 13, name: '五言律诗' },
+        content: [
+          '八月湖水平，涵虚混太清。',
+          '气蒸云梦泽，波撼岳阳城。',
+          '欲济无舟楫，端居耻圣明。',
+          '坐观垂钓者，徒有羡鱼情。',
+        ],
+      },
+      {
+        id: 340105,
+        title: '早寒江上有怀',
+        author: { id: 3401, name: '孟浩然' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 13, name: '五言律诗' },
+        content: [
+          '木落雁南度，北风江上寒。',
+          '我家襄水曲，遥隔楚云端。',
+        ],
+      },
+    ],
+  },
+  {
+    id: 3402,
+    name: '柳宗元',
+    dynasty: { id: 6, name: '唐' },
+    titleBadge: '河东先生',
+    description: '字子厚，世称柳河东，“唐宋八大家”之一。',
+    poemCount: 4,
+    poems: [
+      {
+        id: 340201,
+        title: '江雪',
+        author: { id: 3402, name: '柳宗元' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 11, name: '五言绝句' },
+        content: ['千山鸟飞绝，万径人踪灭。', '孤舟蓑笠翁，独钓寒江雪。'],
+      },
+      {
+        id: 340202,
+        title: '渔翁',
+        author: { id: 3402, name: '柳宗元' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 16, name: '七言古诗' },
+        content: [
+          '渔翁夜傍西岩宿，晓汲清湘燃楚竹。',
+          '烟销日出不见人，欸乃一声山水绿。',
+        ],
+      },
+      {
+        id: 340203,
+        title: '溪居',
+        author: { id: 3402, name: '柳宗元' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 13, name: '五言律诗' },
+        content: [
+          '久为簪组累，幸此南夷谪。',
+          '闲依农圃邻，偶似山林客。',
+        ],
+      },
+      {
+        id: 340204,
+        title: '登柳州城楼寄漳汀封连四州刺史',
+        author: { id: 3402, name: '柳宗元' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 14, name: '七言律诗' },
+        content: [
+          '城上高楼接大荒，海天愁思正茫茫。',
+          '惊风乱飐芙蓉水，密雨斜侵薜荔墙。',
+        ],
+      },
+    ],
+  },
+  {
+    id: 3403,
+    name: '王勃',
+    dynasty: { id: 6, name: '唐' },
+    titleBadge: '初唐四杰之首',
+    description: '字子安，“初唐四杰”之首。',
+    poemCount: 4,
+    poems: [
+      {
+        id: 340301,
+        title: '送杜少府之任蜀州',
+        author: { id: 3403, name: '王勃' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 13, name: '五言律诗' },
+        content: [
+          '城阙辅三秦，风烟望五津。',
+          '与君离别意，同是宦游人。',
+          '海内存知己，天涯若比邻。',
+          '无为在歧路，儿女共沾巾。',
+        ],
+      },
+      {
+        id: 340302,
+        title: '滕王阁诗',
+        author: { id: 3403, name: '王勃' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 14, name: '七言律诗' },
+        content: [
+          '滕王高阁临江渚，佩玉鸣鸾罢歌舞。',
+          '画栋朝飞南浦云，珠帘暮卷西山雨。',
+          '闲云潭影日悠悠，物换星移几度秋。',
+          '阁中帝子今何在？槛外长江空自流。',
+        ],
+      },
+      {
+        id: 340303,
+        title: '山中',
+        author: { id: 3403, name: '王勃' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 11, name: '五言绝句' },
+        content: ['长江悲已滞，万里念将归。', '况属高风晚，山山黄叶飞。'],
+      },
+      {
+        id: 340312,
+        title: '滕王阁序 (名句)',
+        author: { id: 3403, name: '王勃' },
+        dynasty: { id: 6, name: '唐' },
+        type: { id: 99, name: '其他' },
+        content: [
+          '落霞与孤鹜齐飞，秋水共长天一色。',
+          '老当益壮，宁移白首之心？穷且益坚，不坠青云之志。',
+        ],
+      },
+    ],
+  },
+
+  // ==================== 五代：李煜 ====================
   {
     id: 9055,
     name: '李煜',
@@ -959,6 +1206,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       },
     ],
   },
+
   // ==================== 宋代：苏轼 · 陆游 · 李清照 · 辛弃疾 ====================
   {
     id: 11678,
@@ -966,7 +1214,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     dynasty: { id: 8, name: '宋' },
     titleBadge: '东坡居士',
     description: '字子瞻，号东坡居士，北宋文学家、书画家，“唐宋八大家”之一。',
-    poemCount: 6,
+    poemCount: 10,
     poems: [
       {
         id: 194966,
@@ -976,6 +1224,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         type: { id: 20, name: '宋词' },
         content: [
           '明月几时有？把酒问青天。不知天上宫阙，今夕是何年。',
+          '我欲乘风归去，又恐琼楼玉宇，高处不胜寒。起舞弄清影，何似在人间。',
           '人有悲欢离合，月有阴晴圆缺，此事古难全。但愿人长久，千里共婵娟。',
         ],
       },
@@ -986,8 +1235,8 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         dynasty: { id: 8, name: '宋' },
         type: { id: 20, name: '宋词' },
         content: [
-          '竹杖芒鞋轻胜马，谁怕？一蓑烟雨任平生。',
-          '回首向来萧瑟处，归去，也无风雨也无晴。',
+          '莫听穿林打叶声，何妨吟啸且徐行。竹杖芒鞋轻胜马，谁怕？一蓑烟雨任平生。',
+          '料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。',
         ],
       },
       {
@@ -997,7 +1246,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         dynasty: { id: 8, name: '宋' },
         type: { id: 20, name: '宋词' },
         content: [
-          '大江东去，浪淘尽，千古风流人物。',
+          '大江东去，浪淘尽，千古风流人物。故垒西边，人道是，三国周郎赤壁。',
           '江山如画，一时多少豪杰。人生如梦，一尊还酹江月。',
         ],
       },
@@ -1023,6 +1272,17 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
           '不识庐山真面目，只缘身在此山中。',
         ],
       },
+      {
+        id: 194971,
+        title: '江城子·乙卯正月二十日夜记梦',
+        author: { id: 11678, name: '苏轼' },
+        dynasty: { id: 8, name: '宋' },
+        type: { id: 20, name: '宋词' },
+        content: [
+          '十年生死两茫茫，不思量，自难忘。千里孤坟，无处话凄凉。',
+          '相顾无言，惟有泪千行。',
+        ],
+      },
     ],
   },
   {
@@ -1030,8 +1290,8 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     name: '陆游',
     dynasty: { id: 8, name: '宋' },
     titleBadge: '放翁',
-    description: '字务观，号放翁，南宋著名爱国诗人。',
-    poemCount: 6,
+    description: '字务观，号放翁，南宋著名爱国诗人、词人。',
+    poemCount: 8,
     poems: [
       {
         id: 388001,
@@ -1053,6 +1313,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         content: [
           '莫笑农家腊酒浑，丰年留客足鸡豚。',
           '山重水复疑无路，柳暗花明又一村。',
+          '箫鼓追随春社近，衣冠简朴古风存。',
         ],
       },
       {
@@ -1063,11 +1324,24 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         type: { id: 20, name: '宋词' },
         content: [
           '红酥手，黄縢酒，满城春色宫墙柳。',
-          '错、错、错。春如旧，人空瘦，泪痕红浥鲛绡透。',
+          '东风恶，欢情薄。一怀愁绪，几年离索。错、错、错。',
+          '春如旧，人空瘦，泪痕红浥鲛绡透。山盟虽在，锦书难托。莫、莫、莫！',
         ],
       },
       {
         id: 388004,
+        title: '卜算子·咏梅',
+        author: { id: 3880, name: '陆游' },
+        dynasty: { id: 8, name: '宋' },
+        type: { id: 20, name: '宋词' },
+        content: [
+          '驿外断桥边，寂寞开无主。',
+          '已是黄昏独自愁，更著风和雨。',
+          '无意苦争春，一任群芳妒。零落成泥碾作尘，只有香如故。',
+        ],
+      },
+      {
+        id: 388006,
         title: '十一月四日风雨大作二首 其二',
         author: { id: 3880, name: '陆游' },
         dynasty: { id: 8, name: '宋' },
@@ -1078,14 +1352,15 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         ],
       },
       {
-        id: 388005,
-        title: '卜算子·咏梅',
+        id: 388015,
+        title: '书愤五首 其一',
         author: { id: 3880, name: '陆游' },
         dynasty: { id: 8, name: '宋' },
-        type: { id: 20, name: '宋词' },
+        type: { id: 14, name: '七言律诗' },
         content: [
-          '驿外断桥边，寂寞开无主。',
-          '零落成泥碾作尘，只有香如故。',
+          '早岁那知世事艰，中原北望气如山。',
+          '楼船夜雪瓜洲渡，铁马秋风大散关。',
+          '出师一表真名世，千载谁堪伯仲间！',
         ],
       },
     ],
@@ -1096,7 +1371,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     dynasty: { id: 8, name: '宋' },
     titleBadge: '易安居士',
     description: '号易安居士，宋代女词人，婉约词派代表。',
-    poemCount: 5,
+    poemCount: 6,
     poems: [
       {
         id: 245942,
@@ -1105,6 +1380,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         dynasty: { id: 8, name: '宋' },
         type: { id: 20, name: '宋词' },
         content: [
+          '天接云涛连晓雾，星河欲转千帆舞。',
           '九万里风鹏正举。风休住，蓬舟吹取三山去！',
         ],
       },
@@ -1116,7 +1392,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         type: { id: 20, name: '宋词' },
         content: [
           '寻寻觅觅，冷冷清清，凄凄惨惨戚戚。',
-          '梧桐更兼细雨，到黄昏、点点滴滴。这次第，怎一个愁字了得！',
+          '这次第，怎一个愁字了得！',
         ],
       },
       {
@@ -1126,7 +1402,30 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         dynasty: { id: 8, name: '宋' },
         type: { id: 20, name: '宋词' },
         content: [
+          '昨夜雨疏风骤，浓睡不消残酒。',
           '试问卷帘人，却道海棠依旧。知否，知否？应是绿肥红瘦。',
+        ],
+      },
+      {
+        id: 245945,
+        title: '如梦令·常记溪亭日暮',
+        author: { id: 11433, name: '李清照' },
+        dynasty: { id: 8, name: '宋' },
+        type: { id: 20, name: '宋词' },
+        content: [
+          '常记溪亭日暮，沉醉不知归路。兴尽晚回舟，误入藕花深处。',
+          '争渡，争渡，惊起一滩鸥鹭。',
+        ],
+      },
+      {
+        id: 245946,
+        title: '一剪梅·红藕香残玉簟秋',
+        author: { id: 11433, name: '李清照' },
+        dynasty: { id: 8, name: '宋' },
+        type: { id: 20, name: '宋词' },
+        content: [
+          '花自飘零水自流。一种相思，两处闲愁。',
+          '此情无计可消除，才下眉头，却上心头。',
         ],
       },
       {
@@ -1135,9 +1434,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         author: { id: 11433, name: '李清照' },
         dynasty: { id: 8, name: '宋' },
         type: { id: 12, name: '七言绝句' },
-        content: [
-          '生当作人杰，死亦为鬼雄。至今思项羽，不肯过江东。',
-        ],
+        content: ['生当作人杰，死亦为鬼雄。', '至今思项羽，不肯过江东。'],
       },
     ],
   },
@@ -1146,8 +1443,8 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     name: '辛弃疾',
     dynasty: { id: 8, name: '宋' },
     titleBadge: '稼轩居士',
-    description: '字幼安，号稼轩，南宋豪放派词人。',
-    poemCount: 4,
+    description: '字幼安，号稼轩，南宋豪放派词人、将领。',
+    poemCount: 6,
     poems: [
       {
         id: 71065,
@@ -1157,6 +1454,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         type: { id: 20, name: '宋词' },
         content: [
           '醉里挑灯看剑，梦回吹角连营。',
+          '八百里分麾下炙，五十弦翻塞外声。沙场秋点兵。',
           '了却君王天下事，赢得生前身后名。可怜白发生！',
         ],
       },
@@ -1167,11 +1465,56 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         dynasty: { id: 8, name: '宋' },
         type: { id: 20, name: '宋词' },
         content: [
+          '东风夜放花千树。更吹落、星如雨。',
           '众里寻他千百度。蓦然回首，那人却在，灯火阑珊处。',
+        ],
+      },
+      {
+        id: 71068,
+        title: '永遇乐·京口北固亭怀古',
+        author: { id: 8618, name: '辛弃疾' },
+        dynasty: { id: 8, name: '宋' },
+        type: { id: 20, name: '宋词' },
+        content: [
+          '千古江山，英雄无觅孙仲谋处。舞榭歌台，风流总被雨打风吹去。',
+          '想当年，金戈铁马，气吞万里如虎。凭谁问：廉颇老矣，尚能饭否？',
+        ],
+      },
+      {
+        id: 71070,
+        title: '丑奴儿·书博山道中壁',
+        author: { id: 8618, name: '辛弃疾' },
+        dynasty: { id: 8, name: '宋' },
+        type: { id: 20, name: '宋词' },
+        content: [
+          '少年不识愁滋味，爱上层楼。爱上层楼。为赋新词强说愁。',
+          '而今识尽愁滋味，欲说还休。欲说还休。却道天凉好个秋。',
+        ],
+      },
+      {
+        id: 71071,
+        title: '西江月·夜行黄沙道中',
+        author: { id: 8618, name: '辛弃疾' },
+        dynasty: { id: 8, name: '宋' },
+        type: { id: 20, name: '宋词' },
+        content: [
+          '明月别枝惊鹊，清风半夜鸣蝉。稻花香里说丰年，听取蛙声一片。',
+        ],
+      },
+      {
+        id: 71073,
+        title: '清平乐·村居',
+        author: { id: 8618, name: '辛弃疾' },
+        dynasty: { id: 8, name: '宋' },
+        type: { id: 20, name: '宋词' },
+        content: [
+          '茅檐低小，溪上青青草。醉里吴音相媚好，白发谁家翁媪？',
+          '最喜小儿亡赖，溪头卧剥莲蓬。',
         ],
       },
     ],
   },
+
   // ==================== 元代：元曲四大家 ====================
   {
     id: 9090,
@@ -1179,28 +1522,17 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
     dynasty: { id: 9, name: '元' },
     titleBadge: '曲状元',
     description: '字千里，号东篱，“元曲四大家”之一。',
-    poemCount: 3,
+    poemCount: 2,
     poems: [
       {
         id: 909001,
         title: '天净沙·秋思',
         author: { id: 9090, name: '马致远' },
         dynasty: { id: 9, name: '元' },
-        type: { id: 22, name: '元曲' },
+        type: { id: 30, name: '元曲' },
         content: [
           '枯藤老树昏鸦，小桥流水人家，古道西风瘦马。',
           '夕阳西下，断肠人在天涯。',
-        ],
-      },
-      {
-        id: 909002,
-        title: '寿阳曲·远浦帆归',
-        author: { id: 9090, name: '马致远' },
-        dynasty: { id: 9, name: '元' },
-        type: { id: 22, name: '元曲' },
-        content: [
-          '夕阳下，酒旆风，半边岸草枯萎。',
-          '一行白鹭从容下，极目水云重叠。',
         ],
       },
     ],
@@ -1218,7 +1550,7 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         title: '山坡羊·潼关怀古',
         author: { id: 9091, name: '张养浩' },
         dynasty: { id: 9, name: '元' },
-        type: { id: 22, name: '元曲' },
+        type: { id: 30, name: '元曲' },
         content: [
           '峰峦如聚，波涛如怒，山河表里潼关路。',
           '望西都，意踌躇。伤心秦汉经行处，宫阙万间都做了土。',
@@ -1227,13 +1559,14 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
       },
     ],
   },
+
   // ==================== 清代：纳兰性德 · 龚自珍 ====================
   {
     id: 3074,
     name: '纳兰性德',
     dynasty: { id: 10, name: '清' },
     titleBadge: '饮水词人',
-    description: '字容若，清代著名词人。',
+    description: '原名成德，字容若，清代著名词人。',
     poemCount: 4,
     poems: [
       {
@@ -1256,6 +1589,17 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
         content: [
           '山一程，水一程，身向榆关那畔行，夜深千帐灯。',
           '风一更，雪一更，聒碎乡心梦不成，故园无此声。',
+        ],
+      },
+      {
+        id: 910003,
+        title: '浣溪沙·谁念西风独自凉',
+        author: { id: 3074, name: '纳兰性德' },
+        dynasty: { id: 10, name: '清' },
+        type: { id: 20, name: '宋词' },
+        content: [
+          '谁念西风独自凉，萧萧黄叶闭疏窗，沉思往事立残阳。',
+          '当时只道是寻常。',
         ],
       },
     ],
@@ -1287,9 +1631,10 @@ export const FAMOUS_POETS_DIRECTORY: FamousPoetProfile[] = [
  * Find poet by name
  */
 export function findPoetByName(name: string): FamousPoetProfile | undefined {
+  if (!name) return undefined;
   const clean = name.trim().toLowerCase();
   return FAMOUS_POETS_DIRECTORY.find(
-    (p) => p.name.toLowerCase().includes(clean) || clean.includes(p.name.toLowerCase())
+    (p) => p.name.toLowerCase() === clean || p.name.toLowerCase().includes(clean) || clean.includes(p.name.toLowerCase())
   );
 }
 

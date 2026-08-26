@@ -135,7 +135,7 @@ export const AuthorsPage: React.FC = () => {
     setSearchParams(new URLSearchParams());
   };
 
-  const authors = authorsRes?.data || [];
+  const authors: Author[] = (authorsRes?.data as Author[]) || [];
   const pagination = authorsRes?.pagination;
   const hasMore = pagination?.hasMore ?? (authors.length === pageSize);
   const totalCount = (authorsRes as any)?.totalCount;
