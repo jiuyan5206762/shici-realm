@@ -7,6 +7,7 @@ interface BgmState {
   title: string;
   artist: string;
   audioElement: HTMLAudioElement | null;
+  autoplayPending: boolean;
 
   // Actions
   initAudio: () => void;
@@ -20,8 +21,11 @@ interface BgmState {
 
 const STORAGE_KEY_VOLUME = 'shici_bgm_volume';
 
-// 所有可触发播放的交互事件（包含 mousemove 以便最轻微的操作即可触发）
-const INTERACTION_EVENTS = ['click', 'touchstart', 'keydown', 'scroll', 'pointerdown', 'mousemove'] as const;
+// 有效的浏览器手势激活事件（必须是真实的交互手势）
+const GESTURE_EVENTS = ['pointerdown', 'touchstart', 'click', 'keydown'] as const;
+
+let audioInstance: HTMLAudioElement | null = null;
+let gestureListenersAttached = false;
 
 export const useBgmStore = create<BgmState>((set, get) => ({
   isPlaying: false,
@@ -33,69 +37,84 @@ export const useBgmStore = create<BgmState>((set, get) => ({
   title: '春江花月夜',
   artist: '古筝名曲',
   audioElement: null,
+  autoplayPending: false,
 
   initAudio: () => {
-    if (get().audioElement) return;
+    if (audioInstance) {
+      if (!get().audioElement) {
+        set({ audioElement: audioInstance });
+      }
+      return;
+    }
 
     const audio = new Audio('/audio/chunjianghuayueye.mp3');
     audio.loop = true;
     audio.preload = 'auto';
     audio.volume = get().volume;
 
-    audio.addEventListener('play', () => set({ isPlaying: true }));
+    audio.addEventListener('play', () => set({ isPlaying: true, autoplayPending: false }));
     audio.addEventListener('pause', () => set({ isPlaying: false }));
     audio.addEventListener('ended', () => set({ isPlaying: false }));
+    audio.addEventListener('error', (e) => console.error('Audio load error:', e));
 
+    audioInstance = audio;
     set({ audioElement: audio });
   },
 
   autoPlayOnEntry: () => {
     const { initAudio, play } = get();
-    if (!get().audioElement) {
-      initAudio();
-    }
+    initAudio();
 
-    // 立即尝试自动播放
+    // 1. 尝试直接自动播放（若用户此前访问过或浏览器策略允许，则直接进入播放）
     play().catch(() => {
-      // 浏览器拦截了自动播放（需要用户手势），
-      // 监听任意轻微交互（含 mousemove），第一次触发即开始播放
-      const startOnInteraction = () => {
-        get().play().catch(() => {});
-        INTERACTION_EVENTS.forEach((evt) => {
-          window.removeEventListener(evt, startOnInteraction);
-        });
+      set({ autoplayPending: true });
+
+      if (gestureListenersAttached) return;
+      gestureListenersAttached = true;
+
+      // 2. 若浏览器策略拦截了零手势播放，则在页面任意真实手势（点击/轻触/按键）时无缝启动
+      const handleUserGesture = async () => {
+        try {
+          await get().play();
+          // 播放成功后才解绑事件监听
+          gestureListenersAttached = false;
+          GESTURE_EVENTS.forEach((evt) => {
+            window.removeEventListener(evt, handleUserGesture, true);
+            document.removeEventListener(evt, handleUserGesture, true);
+          });
+        } catch (e) {
+          console.warn('Gesture playback retry pending next interaction:', e);
+        }
       };
 
-      INTERACTION_EVENTS.forEach((evt) => {
-        window.addEventListener(evt, startOnInteraction, { once: true, passive: true });
+      GESTURE_EVENTS.forEach((evt) => {
+        window.addEventListener(evt, handleUserGesture, { capture: true, passive: true });
+        document.addEventListener(evt, handleUserGesture, { capture: true, passive: true });
       });
     });
   },
 
   play: async () => {
-    const { audioElement, initAudio, volume } = get();
-    let audio = audioElement;
-    if (!audio) {
+    const { initAudio, volume } = get();
+    if (!audioInstance) {
       initAudio();
-      audio = get().audioElement;
     }
+    const audio = audioInstance;
     if (!audio) return;
 
+    audio.volume = get().isMuted ? 0 : volume;
     try {
-      audio.volume = volume;
       await audio.play();
-      set({ isPlaying: true });
+      set({ isPlaying: true, autoplayPending: false });
     } catch (e) {
-      console.warn('BGM autoplay blocked by browser, waiting for user interaction...', e);
       set({ isPlaying: false });
       throw e;
     }
   },
 
   pause: () => {
-    const { audioElement } = get();
-    if (audioElement) {
-      audioElement.pause();
+    if (audioInstance) {
+      audioInstance.pause();
       set({ isPlaying: false });
     }
   },
@@ -111,9 +130,8 @@ export const useBgmStore = create<BgmState>((set, get) => ({
 
   setVolume: (vol: number) => {
     const clamped = Math.max(0, Math.min(1, vol));
-    const { audioElement } = get();
-    if (audioElement) {
-      audioElement.volume = clamped;
+    if (audioInstance) {
+      audioInstance.volume = clamped;
     }
     set({ volume: clamped, isMuted: clamped === 0 });
     localStorage.setItem(STORAGE_KEY_VOLUME, String(clamped));

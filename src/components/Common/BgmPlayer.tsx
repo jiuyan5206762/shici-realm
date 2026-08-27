@@ -6,6 +6,7 @@ import { SealBadge } from './SealBadge';
 export const BgmPlayer: React.FC = () => {
   const {
     isPlaying,
+    autoplayPending,
     volume,
     isMuted,
     title,
@@ -93,9 +94,11 @@ export const BgmPlayer: React.FC = () => {
         {/* Spinning Disc / Play-Pause Icon */}
         <button
           onClick={handleToggle}
-          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-xs ${
+          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-xs relative ${
             isPlaying
               ? 'bg-chinese-cinnabar text-white ring-2 ring-chinese-cinnabar/30'
+              : autoplayPending
+              ? 'bg-chinese-cinnabar/90 text-white animate-pulse'
               : 'bg-paper-200 dark:bg-ink-800 text-ink-600 dark:text-ink-300 hover:bg-chinese-cinnabar hover:text-white'
           }`}
           title={isPlaying ? '暂停古筝曲《春江花月夜》' : '播放古筝曲《春江花月夜》'}
@@ -109,7 +112,13 @@ export const BgmPlayer: React.FC = () => {
 
         {/* Music Meta Text */}
         <div
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => {
+            if (!isPlaying) {
+              togglePlay();
+            } else {
+              setIsExpanded(!isExpanded);
+            }
+          }}
           className="flex flex-col cursor-pointer max-w-[130px] sm:max-w-[160px]"
         >
           <div className="flex items-center gap-1">
@@ -125,7 +134,7 @@ export const BgmPlayer: React.FC = () => {
             )}
           </div>
           <span className="text-[10px] font-serif text-ink-400 truncate">
-            {isPlaying ? '悠扬古筝演奏中' : artist}
+            {isPlaying ? '悠扬古筝演奏中' : autoplayPending ? '点击任意处开始伴读' : artist}
           </span>
         </div>
 
