@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Sun, Type, RotateCcw, ShieldCheck, Volume2, Trash2, Check } from 'lucide-react';
+import { Sun, Type, RotateCcw, ShieldCheck, Volume2, Trash2, Check, Music, Play, Pause, VolumeX } from 'lucide-react';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useThemeStore } from '@/store/themeStore';
+import { useBgmStore } from '@/store/bgmStore';
 import { SealBadge } from '@/components/Common/SealBadge';
 import { guqinAudio } from '@/services/audio/guqinAudio';
 import { clearApiCache } from '@/api/client';
@@ -9,6 +10,7 @@ import { clearApiCache } from '@/api/client';
 export const SettingsPage: React.FC = () => {
   const { settings, updateSettings, resetSettings } = useSettingsStore();
   const { theme, setTheme } = useThemeStore();
+  const { isPlaying, volume, isMuted, togglePlay, setVolume, toggleMute } = useBgmStore();
   const [soundEnabled, setSoundEnabled] = useState(guqinAudio.isEnabled());
   const [cacheCleared, setCacheCleared] = useState(false);
 
@@ -38,7 +40,7 @@ export const SettingsPage: React.FC = () => {
           </h1>
         </div>
         <p className="text-xs sm:text-sm text-ink-500 dark:text-ink-400 font-serif">
-          定制专属于您的东方古典排版、宣纸质感底色与交互音效
+          定制专属于您的东方古典排版、古筝雅乐背景音律与交互音效
         </p>
       </div>
 
@@ -80,7 +82,65 @@ export const SettingsPage: React.FC = () => {
           </div>
         </section>
 
-        {/* 2. Guqin & Chime Audio System */}
+        {/* 2. Classical BGM Music Player Section */}
+        <section className="xuan-card rounded-3xl p-6 sm:p-8 space-y-5 border border-paper-400/40 shadow-oriental">
+          <div className="flex items-center justify-between">
+            <h3 className="font-serif font-bold text-lg text-ink-900 dark:text-ink-50 flex items-center gap-2">
+              <Music className="w-5 h-5 text-chinese-gold" />
+              <span>古筝背景音律（名曲《春江花月夜》）</span>
+            </h3>
+            <button
+              onClick={() => {
+                guqinAudio.playChime();
+                togglePlay();
+              }}
+              className={`px-4 py-1.5 rounded-xl text-xs font-serif font-bold transition-all flex items-center gap-1.5 ${
+                isPlaying
+                  ? 'bg-chinese-cinnabar text-white shadow-xs'
+                  : 'bg-paper-200 dark:bg-ink-800 text-ink-600 dark:text-ink-300 hover:bg-chinese-cinnabar hover:text-white'
+              }`}
+            >
+              {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              <span>{isPlaying ? '暂停演奏' : '开始演奏'}</span>
+            </button>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-paper-100/80 dark:bg-ink-800/60 border border-paper-300/60 dark:border-ink-700 space-y-3">
+            <div className="flex items-center justify-between text-xs font-serif">
+              <span className="text-ink-600 dark:text-ink-300">
+                曲目：古筝独奏名曲《春江花月夜》· 循环伴读
+              </span>
+              <span className="font-mono text-ink-400">
+                音量: {Math.round(volume * 100)}%
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleMute}
+                className="text-ink-500 hover:text-chinese-cinnabar transition-colors"
+                title={isMuted ? '恢复音量' : '静音'}
+              >
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="w-4 h-4 text-red-500" />
+                ) : (
+                  <Volume2 className="w-4 h-4 text-chinese-celadon" />
+                )}
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={(e) => setVolume(parseFloat(e.target.value))}
+                className="w-full h-2 bg-paper-300 dark:bg-ink-700 rounded-lg appearance-none cursor-pointer accent-chinese-cinnabar"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* 3. Guqin & Chime Audio System */}
         <section className="xuan-card rounded-3xl p-6 sm:p-8 space-y-5 border border-paper-400/40 shadow-oriental">
           <div className="flex items-center justify-between">
             <h3 className="font-serif font-bold text-lg text-ink-900 dark:text-ink-50 flex items-center gap-2">
@@ -104,7 +164,7 @@ export const SettingsPage: React.FC = () => {
           </p>
         </section>
 
-        {/* 3. Reading Typography Defaults */}
+        {/* 4. Reading Typography Defaults */}
         <section className="xuan-card rounded-3xl p-6 sm:p-8 space-y-6 border border-paper-400/40 shadow-oriental">
           <div className="flex items-center justify-between">
             <h3 className="font-serif font-bold text-lg text-ink-900 dark:text-ink-50 flex items-center gap-2">
@@ -161,7 +221,7 @@ export const SettingsPage: React.FC = () => {
           </div>
         </section>
 
-        {/* 4. Cache & Performance Management */}
+        {/* 5. Cache & Performance Management */}
         <section className="xuan-card rounded-3xl p-6 sm:p-8 space-y-4 border border-paper-400/40 shadow-oriental">
           <div className="flex items-center justify-between">
             <h3 className="font-serif font-bold text-lg text-ink-900 dark:text-ink-50 flex items-center gap-2">

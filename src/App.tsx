@@ -3,6 +3,7 @@ import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/Common/Navbar';
 import { Footer } from '@/components/Common/Footer';
 import { MobileTabBar } from '@/components/Common/MobileTabBar';
+import { BgmPlayer } from '@/components/Common/BgmPlayer';
 import { HomePage } from '@/pages/Home/HomePage';
 import { PoemsPage } from '@/pages/Poems/PoemsPage';
 import { PoemDetailPage } from '@/pages/PoemDetail/PoemDetailPage';
@@ -80,6 +81,9 @@ export const App: React.FC = () => {
           <Route path="*" element={<HomePage />} />
         </Routes>
       </main>
+
+      {/* Background Music Floating Player */}
+      <BgmPlayer />
 
       {/* Desktop Footer */}
       <Footer />
