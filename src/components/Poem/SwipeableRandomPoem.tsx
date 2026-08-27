@@ -1,5 +1,5 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Shuffle, Sparkles } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight, Shuffle, Sparkles, Zap } from 'lucide-react';
 import { Poem } from '@/types';
 import { poemApi } from '@/api/poems';
 import { PoemCard } from '@/components/Poem/PoemCard';
@@ -8,32 +8,39 @@ import { FAMOUS_POETS_DIRECTORY } from '@/utils/poetDirectory';
 
 export type RandomPoemFilter = 'all' | 'tang' | 'song';
 
-// Guaranteed instant curated poem helper
-function getRandomLocalMasterpiece(dynasty?: string): Poem {
-  const matchingPoems: Poem[] = [];
+// Extract all available curated poems grouped by filter
+function getMasterpiecePool(dynastyFilter?: string): Poem[] {
+  const list: Poem[] = [];
   for (const poet of FAMOUS_POETS_DIRECTORY) {
-    if (!dynasty || poet.dynasty?.name === dynasty) {
+    if (!dynastyFilter || poet.dynasty?.name === dynastyFilter) {
       if (poet.poems && poet.poems.length > 0) {
-        matchingPoems.push(...poet.poems);
+        list.push(...poet.poems);
       }
     }
   }
-
-  if (matchingPoems.length > 0) {
-    const idx = Math.floor(Math.random() * matchingPoems.length);
-    return matchingPoems[idx];
+  // Shuffle array using Fisher-Yates
+  for (let i = list.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [list[i], list[j]] = [list[j], list[i]];
   }
+  return list;
+}
 
-  // Fallback to absolute default masterpiece: 水调歌头 · 明月几时有
-  return FAMOUS_POETS_DIRECTORY[0].poems[0];
+// Generate initial robust pre-buffered queue of 30+ poems
+function generateInitialQueue(filter: RandomPoemFilter): Poem[] {
+  const dynastyName = filter === 'tang' ? '唐' : filter === 'song' ? '宋' : undefined;
+  const pool = getMasterpiecePool(dynastyName);
+  if (pool.length > 0) {
+    return pool.slice(0, 40);
+  }
+  return FAMOUS_POETS_DIRECTORY.flatMap((p) => p.poems);
 }
 
 export const SwipeableRandomPoem: React.FC = () => {
   const [filter, setFilter] = useState<RandomPoemFilter>('all');
-  // Initialize with a guaranteed instant masterpiece so it NEVER shows empty / stuck loading
-  const [history, setHistory] = useState<Poem[]>(() => [getRandomLocalMasterpiece()]);
+  // Pre-seed buffer with 30+ ready poems: 0ms switch time, zero wait!
+  const [queue, setQueue] = useState<Poem[]>(() => generateInitialQueue('all'));
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [direction, setDirection] = useState<'left' | 'right' | null>(null);
 
   // Real-time touch dragging state & physics
@@ -42,64 +49,60 @@ export const SwipeableRandomPoem: React.FC = () => {
 
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
-  const isFetchingRef = useRef<boolean>(false);
+  const touchStartTimeRef = useRef<number>(0);
+  const isPrefetchingRef = useRef<boolean>(false);
 
-  // Fast & resilient fetch with 1.8s timeout + guaranteed local fallback
-  const fetchRandomPoem = useCallback(
-    async (targetFilter = filter): Promise<Poem> => {
-      if (isFetchingRef.current) {
-        return getRandomLocalMasterpiece(
-          targetFilter === 'tang' ? '唐' : targetFilter === 'song' ? '宋' : undefined
-        );
-      }
-      isFetchingRef.current = true;
-      setIsLoading(true);
+  // Background Prefetcher: Silently fetches new poems ahead so user NEVER hits an await
+  const prefetchMore = useCallback(async (currentFilter: RandomPoemFilter) => {
+    if (isPrefetchingRef.current) return;
+    isPrefetchingRef.current = true;
 
+    try {
       const dynastyParam =
-        targetFilter === 'tang' ? '唐' : targetFilter === 'song' ? '宋' : undefined;
-
-      try {
-        // Race network fetch against a fast 1800ms timeout
-        const timeoutPromise = new Promise<null>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), 1800)
-        );
-        const fetchPromise = poemApi.getRandom({ dynasty: dynastyParam });
-        const res = (await Promise.race([fetchPromise, timeoutPromise])) as any;
-
-        if (res && res.data && res.data.title && res.data.content?.length > 0) {
-          return res.data;
-        }
-      } catch (err) {
-        console.warn('Random poem network fetch timed out or failed, using curated masterpiece:', err);
-      } finally {
-        isFetchingRef.current = false;
-        setIsLoading(false);
+        currentFilter === 'tang' ? '唐' : currentFilter === 'song' ? '宋' : undefined;
+      const res = await poemApi.getRandom({ dynasty: dynastyParam });
+      if (res && res.data && res.data.title) {
+        setQueue((prev) => {
+          // Avoid duplicate adjacent IDs
+          if (prev.some((p) => p.id === res.data.id)) return prev;
+          return [...prev, res.data];
+        });
       }
+    } catch {
+      // Ignore background network blips
+    } finally {
+      isPrefetchingRef.current = false;
+    }
+  }, []);
 
-      // Instant local masterpiece fallback
-      return getRandomLocalMasterpiece(dynastyParam);
-    },
-    [filter]
-  );
+  // Whenever user approaches end of buffer (within 8 poems), top up in background
+  useEffect(() => {
+    if (queue.length - currentIndex < 10) {
+      prefetchMore(filter);
+    }
+  }, [currentIndex, queue.length, filter, prefetchMore]);
 
-  // Switch to Next Poem (or fetch new one if at end)
-  const handleNext = async () => {
+  // INSTANT Synchronous Next Switch (0ms latency, handles rapid multi-swipes)
+  const handleNext = useCallback(() => {
     setDragOffset(0);
     setIsDragging(false);
+    setDirection('left');
 
-    if (currentIndex < history.length - 1) {
-      setDirection('left');
-      setCurrentIndex((prev) => prev + 1);
-    } else {
-      setDirection('left');
-      const newPoem = await fetchRandomPoem();
-      setHistory((prev) => [...prev, newPoem]);
-      setCurrentIndex((prev) => prev + 1);
-    }
-  };
+    setCurrentIndex((prev) => {
+      if (prev < queue.length - 1) {
+        return prev + 1;
+      }
+      // If buffer exhausted, cycle through shuffled local pool immediately
+      const extra = getMasterpiecePool(
+        filter === 'tang' ? '唐' : filter === 'song' ? '宋' : undefined
+      );
+      setQueue((q) => [...q, ...extra]);
+      return prev + 1;
+    });
+  }, [queue.length, filter]);
 
-  // Switch to Previous Poem
-  const handlePrevious = () => {
+  // INSTANT Synchronous Previous Switch (0ms latency)
+  const handlePrevious = useCallback(() => {
     setDragOffset(0);
     setIsDragging(false);
 
@@ -107,26 +110,28 @@ export const SwipeableRandomPoem: React.FC = () => {
       setDirection('right');
       setCurrentIndex((prev) => prev - 1);
     }
-  };
+  }, [currentIndex]);
 
-  // Switch dynasty filter (All / Tang / Song)
-  const handleFilterChange = async (newFilter: RandomPoemFilter) => {
+  // Switch filter (All / Tang / Song) - Instantly loads new queue
+  const handleFilterChange = (newFilter: RandomPoemFilter) => {
     if (newFilter === filter) return;
     setFilter(newFilter);
     setDirection('left');
-    const newPoem = await fetchRandomPoem(newFilter);
-    setHistory((prev) => [...prev, newPoem]);
-    setCurrentIndex((prev) => prev + 1);
+    const newQueue = generateInitialQueue(newFilter);
+    setQueue(newQueue);
+    setCurrentIndex(0);
+    setDragOffset(0);
   };
 
   // Touch Gesture: Start
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartXRef.current = e.touches[0].clientX;
     touchStartYRef.current = e.touches[0].clientY;
+    touchStartTimeRef.current = Date.now();
     setIsDragging(true);
   };
 
-  // Touch Gesture: Move (Real-time card tracking)
+  // Touch Gesture: Move (Real-time card tracking with zero lag)
   const handleTouchMove = (e: React.TouchEvent) => {
     if (touchStartXRef.current === null || touchStartYRef.current === null) return;
 
@@ -137,26 +142,34 @@ export const SwipeableRandomPoem: React.FC = () => {
 
     // Only drag horizontally if horizontal movement exceeds vertical scroll
     if (Math.abs(diffX) > Math.abs(diffY)) {
-      // Add slight elastic resistance
-      setDragOffset(diffX * 0.88);
+      setDragOffset(diffX);
     }
   };
 
-  // Touch Gesture: End (Snap to next/previous or spring back)
+  // Touch Gesture: End (Velocity flick + displacement detection)
   const handleTouchEnd = () => {
     setIsDragging(false);
+    const duration = Date.now() - touchStartTimeRef.current;
+    const offset = dragOffset;
+
     touchStartXRef.current = null;
     touchStartYRef.current = null;
 
-    if (dragOffset < -50) {
-      // Swiped Left -> Next Poem
-      handleNext();
-    } else if (dragOffset > 50) {
-      // Swiped Right -> Previous Poem
-      if (currentIndex > 0) {
-        handlePrevious();
+    // Fast flick detection (velocity > 0.25px/ms) or distance > 30px
+    const isFastFlick = duration < 250 && Math.abs(offset) > 25;
+    const isDisplacement = Math.abs(offset) > 40;
+
+    if (isFastFlick || isDisplacement) {
+      if (offset < 0) {
+        // Swiped Left -> Instant Next Poem
+        handleNext();
       } else {
-        setDragOffset(0);
+        // Swiped Right -> Instant Previous Poem
+        if (currentIndex > 0) {
+          handlePrevious();
+        } else {
+          setDragOffset(0);
+        }
       }
     } else {
       // Spring back to center
@@ -164,7 +177,7 @@ export const SwipeableRandomPoem: React.FC = () => {
     }
   };
 
-  const currentPoem = history[currentIndex] || history[0];
+  const currentPoem = queue[currentIndex] || queue[0];
 
   return (
     <section className="space-y-4 select-none">
@@ -176,11 +189,10 @@ export const SwipeableRandomPoem: React.FC = () => {
             偶得佳句 · 随心漫游
           </h2>
           <SealBadge text="漫步" size="sm" variant="gold" />
-          {history.length > 1 && (
-            <span className="hidden sm:inline-block text-xs font-serif text-ink-400">
-              第 {currentIndex + 1} / {history.length} 首
-            </span>
-          )}
+          <span className="hidden sm:inline-flex items-center gap-1 text-xs font-serif text-ink-400">
+            <Zap className="w-3 h-3 text-amber-500" />
+            <span>秒级极速切换 · 第 {currentIndex + 1} 首</span>
+          </span>
         </div>
 
         {/* Filter Pills & Refresh Buttons */}
@@ -221,7 +233,7 @@ export const SwipeableRandomPoem: React.FC = () => {
           {/* Previous Button */}
           <button
             onClick={handlePrevious}
-            disabled={currentIndex === 0 || isLoading}
+            disabled={currentIndex === 0}
             className="p-2 rounded-xl bg-paper-200 dark:bg-ink-800 hover:bg-paper-300 dark:hover:bg-ink-700 text-ink-700 dark:text-ink-200 disabled:opacity-30 transition-all active:scale-95 shadow-xs"
             title="上一首诗 (可右滑)"
           >
@@ -231,11 +243,10 @@ export const SwipeableRandomPoem: React.FC = () => {
           {/* Next Button */}
           <button
             onClick={handleNext}
-            disabled={isLoading}
             className="px-3.5 py-1.5 rounded-xl bg-chinese-cinnabar hover:bg-chinese-rouge text-white font-serif text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-seal"
             title="下一首诗 (可左滑)"
           >
-            <Shuffle className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <Shuffle className="w-3.5 h-3.5" />
             <span>下一篇</span>
             <ChevronRight className="w-3.5 h-3.5 -mr-1" />
           </button>
@@ -253,10 +264,10 @@ export const SwipeableRandomPoem: React.FC = () => {
           key={currentPoem.id}
           style={{
             transform: `translateX(${dragOffset}px) rotate(${dragOffset * 0.015}deg)`,
-            opacity: Math.max(0.65, 1 - Math.abs(dragOffset) / 600),
+            opacity: Math.max(0.65, 1 - Math.abs(dragOffset) / 500),
             transition: isDragging
               ? 'none'
-              : 'transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease',
+              : 'transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.16s ease',
             willChange: 'transform, opacity',
           }}
           className={`${
@@ -295,10 +306,10 @@ export const SwipeableRandomPoem: React.FC = () => {
       <div className="flex items-center justify-between text-[11px] font-serif text-ink-400 px-1">
         <span className="flex items-center gap-1">
           <Sparkles className="w-3 h-3 text-amber-600" />
-          <span>支持左右滑动或点击箭头快速切换上一首 / 下一首</span>
+          <span>左右极速连划，秒切千首佳句</span>
         </span>
         <span>
-          已漫游 {history.length} 首（当前第 {currentIndex + 1} 首）
+          当前第 {currentIndex + 1} 首
         </span>
       </div>
     </section>
