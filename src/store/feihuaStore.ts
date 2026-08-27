@@ -4,7 +4,6 @@ import {
   FeihuaService,
   FEIHUA_PERSONAS,
 } from '@/api/feihuaService';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export interface DuelMessage {
   sender: 'user' | 'ai';
@@ -64,7 +63,6 @@ export const useFeihuaStore = create<FeihuaState>((set, get) => ({
     const { currentKeyword } = get();
     if (!currentKeyword) return;
 
-    guqinAudio.playChime();
     set({
       status: 'playing',
       playerTurn: true,
@@ -88,9 +86,6 @@ export const useFeihuaStore = create<FeihuaState>((set, get) => ({
       set({ timeLeft: 0 });
       get().endGame('ai', '30秒应令超时');
     } else {
-      if (timeLeft <= 6) {
-        guqinAudio.playTick();
-      }
       set({ timeLeft: timeLeft - 1 });
     }
   },
@@ -102,13 +97,11 @@ export const useFeihuaStore = create<FeihuaState>((set, get) => ({
     const validation = FeihuaService.validateVerse(verseText, currentKeyword, usedVerses);
 
     if (!validation.valid) {
-      guqinAudio.playMutedError();
       set({ errorMessage: validation.reason || '诗句不符合飞花令规则' });
       return false;
     }
 
     const matchedVerse = validation.match!;
-    guqinAudio.playGuqinPluck();
 
     const newStreak = streak + 1;
     const addedScore = 10 + newStreak * 2;
@@ -153,8 +146,6 @@ export const useFeihuaStore = create<FeihuaState>((set, get) => ({
       return;
     }
 
-    guqinAudio.playChime();
-
     const newMsg: DuelMessage = {
       sender: 'ai',
       verse: aiVerse.line,
@@ -172,12 +163,6 @@ export const useFeihuaStore = create<FeihuaState>((set, get) => ({
   },
 
   endGame: (winner, reason) => {
-    if (winner === 'user') {
-      guqinAudio.playVictory();
-    } else {
-      guqinAudio.playMutedError();
-    }
-
     set({
       status: 'gameover',
       winner,

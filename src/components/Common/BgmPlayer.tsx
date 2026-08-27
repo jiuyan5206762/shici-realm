@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Play, Volume2, VolumeX, Disc3, ChevronUp, ChevronDown } from 'lucide-react';
 import { useBgmStore } from '@/store/bgmStore';
 import { SealBadge } from './SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const BgmPlayer: React.FC = () => {
   const {
@@ -36,7 +35,6 @@ export const BgmPlayer: React.FC = () => {
   }, []);
 
   const handleToggle = () => {
-    guqinAudio.playChime();
     togglePlay();
   };
 

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X, History, Sparkles, Flame } from 'lucide-react';
 import { useSearchHistoryStore } from '@/store/searchHistoryStore';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 interface SearchBarProps {
   initialValue?: string;
@@ -54,14 +53,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     e.preventDefault();
     const trimmed = query.trim();
     if (!trimmed) return;
-    guqinAudio.playChime();
     addSearch(trimmed);
     setIsFocused(false);
     onSearch(trimmed);
   };
 
   const handleSelectSuggestion = (text: string) => {
-    guqinAudio.playChime();
     setQuery(text);
     addSearch(text);
     setIsFocused(false);
@@ -69,7 +66,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const handleClear = () => {
-    guqinAudio.playChime();
     setQuery('');
     if (inputRef.current) inputRef.current.focus();
   };

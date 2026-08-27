@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { RotateCcw, Compass, Layers, User, Search } from 'lucide-react';
 import { Dynasty, PoemType } from '@/types';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 interface FilterPanelProps {
   dynasties: Dynasty[];
@@ -53,7 +52,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
   const handleAuthorSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    guqinAudio.playChime();
     onSelectAuthor(authorInput.trim() || undefined);
   };
 
@@ -75,7 +73,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         {hasActiveFilters && (
           <button
             onClick={() => {
-              guqinAudio.playChime();
               setAuthorInput('');
               onReset();
             }}
@@ -97,7 +94,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           {selectedDynasty && (
             <button
               onClick={() => {
-                guqinAudio.playChime();
                 onSelectDynasty(undefined);
               }}
               className="text-chinese-cinnabar hover:underline text-xs font-serif"
@@ -110,7 +106,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => {
-              guqinAudio.playChime();
               onSelectDynasty(undefined);
             }}
             className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
@@ -128,7 +123,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
               <button
                 key={dynasty.id}
                 onClick={() => {
-                  guqinAudio.playChime();
                   onSelectDynasty(isSelected ? undefined : dynasty.name);
                 }}
                 className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
@@ -154,7 +148,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           {selectedType && (
             <button
               onClick={() => {
-                guqinAudio.playChime();
                 onSelectType(undefined);
               }}
               className="text-chinese-cinnabar hover:underline text-xs font-serif"
@@ -167,7 +160,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => {
-              guqinAudio.playChime();
               onSelectType(undefined);
             }}
             className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
@@ -185,7 +177,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
               <button
                 key={type.id}
                 onClick={() => {
-                  guqinAudio.playChime();
                   onSelectType(isSelected ? undefined : type.name);
                 }}
                 className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
@@ -211,7 +202,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           {selectedAuthor && (
             <button
               onClick={() => {
-                guqinAudio.playChime();
                 setAuthorInput('');
                 onSelectAuthor(undefined);
               }}
@@ -248,7 +238,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
               <button
                 key={poet}
                 onClick={() => {
-                  guqinAudio.playChime();
                   if (isSelected) {
                     setAuthorInput('');
                     onSelectAuthor(undefined);

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useFeihuaStore } from '@/store/feihuaStore';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 import { SealBadge } from '@/components/Common/SealBadge';
 
 export const FeihuaArena: React.FC = () => {
@@ -165,7 +164,6 @@ export const FeihuaArena: React.FC = () => {
           <button
             type="submit"
             disabled={!inputVerse.trim() || !playerTurn || status !== 'playing'}
-            onClick={() => guqinAudio.playGuqinPluck()}
             className="px-5 py-3 rounded-2xl bg-chinese-cinnabar hover:bg-chinese-rouge disabled:opacity-50 text-white font-serif font-bold text-sm flex items-center gap-1.5 shadow-xs transition-all interactive-tap flex-shrink-0"
           >
             <Send className="w-4 h-4" />

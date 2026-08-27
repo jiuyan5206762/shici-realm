@@ -3,12 +3,6 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, BookOpen } from 'lucide-react';
 import { Author } from '@/types';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
-
-interface AuthorCardProps {
-  author: Author;
-  className?: string;
-}
 
 export const AuthorCard: React.FC<AuthorCardProps> = ({ author, className = '' }) => {
   const firstChar = author.name.charAt(0);
@@ -27,7 +21,6 @@ export const AuthorCard: React.FC<AuthorCardProps> = ({ author, className = '' }
           <div className="flex-1 min-w-0">
             <Link
               to={`/authors/${author.id}?name=${encodeURIComponent(author.name)}&dynasty=${encodeURIComponent(author.dynasty?.name || '')}`}
-              onClick={() => guqinAudio.playChime()}
               className="block group-hover:text-chinese-cinnabar transition-colors"
             >
               <h3 className="font-serif font-bold text-lg sm:text-xl text-ink-900 dark:text-ink-50 truncate">
@@ -51,7 +44,6 @@ export const AuthorCard: React.FC<AuthorCardProps> = ({ author, className = '' }
       <div className="pt-4 mt-3 border-t border-paper-300/60 dark:border-ink-800 flex items-center justify-between text-xs font-serif">
         <Link
           to={`/authors/${author.id}?name=${encodeURIComponent(author.name)}&dynasty=${encodeURIComponent(author.dynasty?.name || '')}`}
-          onClick={() => guqinAudio.playChime()}
           className="text-ink-500 dark:text-ink-400 hover:text-chinese-cinnabar transition-colors"
         >
           名家传略
@@ -59,7 +51,6 @@ export const AuthorCard: React.FC<AuthorCardProps> = ({ author, className = '' }
 
         <Link
           to={`/poems?author=${encodeURIComponent(author.name)}`}
-          onClick={() => guqinAudio.playChime()}
           className="inline-flex items-center gap-1 font-bold text-chinese-cinnabar hover:underline group-hover:translate-x-0.5 transition-transform"
         >
           <BookOpen className="w-3 h-3" />
@@ -70,3 +61,8 @@ export const AuthorCard: React.FC<AuthorCardProps> = ({ author, className = '' }
     </div>
   );
 };
+
+interface AuthorCardProps {
+  author: Author;
+  className?: string;
+}

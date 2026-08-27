@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { RotateCcw, Share2, Check } from 'lucide-react';
 import { useFeihuaStore } from '@/store/feihuaStore';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const FeihuaResultModal: React.FC = () => {
   const {
@@ -26,7 +25,6 @@ export const FeihuaResultModal: React.FC = () => {
   const playerVersesCount = history.filter((h) => h.sender === 'user').length;
 
   const handleCopyShare = () => {
-    guqinAudio.playChime();
     const shareText = `【飞花令状 · 诗境】
 令字：【${currentKeyword}】
 对决先贤：${selectedPersona.name}
@@ -95,10 +93,7 @@ export const FeihuaResultModal: React.FC = () => {
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-3 pt-2">
           <button
-            onClick={() => {
-              guqinAudio.playChime();
-              startGame();
-            }}
+            onClick={() => startGame()}
             className="h-12 rounded-2xl bg-chinese-cinnabar hover:bg-chinese-rouge text-white font-serif font-bold text-sm flex items-center justify-center gap-2 shadow-xs transition-all interactive-tap"
           >
             <RotateCcw className="w-4 h-4" />
@@ -116,10 +111,7 @@ export const FeihuaResultModal: React.FC = () => {
 
         <div>
           <button
-            onClick={() => {
-              guqinAudio.playChime();
-              resetGame();
-            }}
+            onClick={() => resetGame()}
             className="text-xs font-serif text-ink-400 hover:text-chinese-cinnabar transition-colors"
           >
             返回飞花大厅

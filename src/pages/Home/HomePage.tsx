@@ -17,7 +17,6 @@ import { PoemCard } from '@/components/Poem/PoemCard';
 import { VerticalPoemView } from '@/components/Poem/VerticalPoemView';
 import { SealBadge } from '@/components/Common/SealBadge';
 import { useFavoriteStore } from '@/store/favoriteStore';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 const MASTER_POETS = [
   { name: '李白', dynasty: '唐', title: '诗仙', quote: '天生我材必有用，千金散尽还复来。', id: 2045 },
@@ -34,6 +33,7 @@ export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { isFavorite, addFavorite, removeFavorite } = useFavoriteStore();
   const [dailyViewMode, setDailyViewMode] = useState<'horizontal' | 'vertical'>('horizontal');
+  const [randomFilter, setRandomFilter] = useState<'all' | 'tang' | 'song'>('all');
 
   // 1. Fetch Dynasties
   const { data: dynastiesRes } = useQuery({
@@ -60,18 +60,19 @@ export const HomePage: React.FC = () => {
     staleTime: 24 * 60 * 60 * 1000,
   });
 
-  // 5. Random Poem Explorer
-  const [randomFilter, setRandomFilter] = useState<'all' | 'tang' | 'song'>('all');
+  // 4. Random Discovery Poem
   const {
     data: randomPoemRes,
     refetch: refetchRandom,
     isFetching: isFetchingRandom,
   } = useQuery({
-    queryKey: ['randomPoem', randomFilter],
+    queryKey: ['randomPoemHome', randomFilter],
     queryFn: async () => {
       const dynastyParam = randomFilter === 'tang' ? '唐' : randomFilter === 'song' ? '宋' : undefined;
-      return poemApi.getRandom({ dynasty: dynastyParam });
+      const res = await poemApi.getRandom({ dynasty: dynastyParam });
+      return res;
     },
+    staleTime: 5 * 60 * 1000,
   });
 
   const dailyPoem = dailyPoemRes?.data;
@@ -80,13 +81,11 @@ export const HomePage: React.FC = () => {
   const types = typesRes?.data || [];
 
   const handleRandomRefresh = () => {
-    guqinAudio.playChime();
     refetchRandom();
   };
 
   const handleDailyFavorite = () => {
     if (!dailyPoem) return;
-    guqinAudio.playGuqinPluck();
     if (isFavorite(dailyPoem.id)) {
       removeFavorite(dailyPoem.id);
     } else {
@@ -121,7 +120,6 @@ export const HomePage: React.FC = () => {
           <SearchBar
             placeholder="输入诗句、篇名或诗人（如：将进酒、李白、春风又绿）"
             onSearch={(q) => {
-              guqinAudio.playChime();
               navigate(`/search?q=${encodeURIComponent(q)}`);
             }}
           />
@@ -147,7 +145,6 @@ export const HomePage: React.FC = () => {
 
           <Link
             to="/feihua"
-            onClick={() => guqinAudio.playChime()}
             className="flex-shrink-0 px-8 py-3.5 rounded-2xl bg-chinese-cinnabar hover:bg-chinese-rouge text-white font-serif font-bold text-sm flex items-center gap-2 shadow-lg shadow-chinese-cinnabar/25 transition-all interactive-tap"
           >
             <Sword className="w-4 h-4 text-chinese-gold" />
@@ -172,7 +169,6 @@ export const HomePage: React.FC = () => {
               {/* Layout switcher */}
               <button
                 onClick={() => {
-                  guqinAudio.playChime();
                   setDailyViewMode(dailyViewMode === 'horizontal' ? 'vertical' : 'horizontal');
                 }}
                 className="text-xs font-serif text-chinese-cinnabar px-3 py-1.5 rounded-xl border border-chinese-cinnabar/30 hover:bg-chinese-cinnabar/10 transition-colors"
@@ -215,7 +211,6 @@ export const HomePage: React.FC = () => {
 
           <Link
             to="/authors"
-            onClick={() => guqinAudio.playChime()}
             className="text-xs font-serif text-ink-500 hover:text-chinese-cinnabar flex items-center gap-0.5 transition-colors"
           >
             <span>览尽历代百家</span>
@@ -228,7 +223,6 @@ export const HomePage: React.FC = () => {
             <Link
               key={poet.name}
               to={`/authors?q=${encodeURIComponent(poet.name)}`}
-              onClick={() => guqinAudio.playChime()}
               className="xuan-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between space-y-3 hover:-translate-y-1 transition-all duration-300 border border-paper-400/40 group"
             >
               <div>
@@ -269,7 +263,6 @@ export const HomePage: React.FC = () => {
               <Link
                 key={d.id}
                 to={`/dynasties`}
-                onClick={() => guqinAudio.playChime()}
                 className="py-2.5 px-3 rounded-xl bg-paper-100 dark:bg-ink-800/80 hover:bg-chinese-cinnabar/10 hover:text-chinese-cinnabar border border-paper-300/60 dark:border-ink-700/60 font-serif text-xs font-bold text-center transition-all"
               >
                 {d.name}
@@ -294,7 +287,6 @@ export const HomePage: React.FC = () => {
               <Link
                 key={t.id}
                 to={`/types`}
-                onClick={() => guqinAudio.playChime()}
                 className="py-2.5 px-3 rounded-xl bg-paper-100 dark:bg-ink-800/80 hover:bg-chinese-celadon/10 hover:text-chinese-celadon border border-paper-300/60 dark:border-ink-700/60 font-serif text-xs font-bold text-center transition-all"
               >
                 {t.name}

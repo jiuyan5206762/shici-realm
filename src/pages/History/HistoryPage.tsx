@@ -5,7 +5,6 @@ import { useHistoryStore } from '@/store/historyStore';
 import { groupHistoryByDate, formatRelativeTime } from '@/utils/formatters';
 import { EmptyState } from '@/components/Common/EmptyState';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const HistoryPage: React.FC = () => {
   const navigate = useNavigate();
@@ -13,7 +12,6 @@ export const HistoryPage: React.FC = () => {
 
   const handleClearAll = () => {
     if (window.confirm('确定要清空全部浏览足迹吗？')) {
-      guqinAudio.playChime();
       clearHistory();
     }
   };
@@ -77,7 +75,6 @@ export const HistoryPage: React.FC = () => {
                   >
                     <Link
                       to={`/poems/${item.id}`}
-                      onClick={() => guqinAudio.playChime()}
                       className="flex-1 min-w-0 pr-4 block"
                     >
                       <div className="flex items-center gap-2.5">
@@ -102,10 +99,7 @@ export const HistoryPage: React.FC = () => {
                       </span>
 
                       <button
-                        onClick={() => {
-                          guqinAudio.playChime();
-                          removeHistory(item.id);
-                        }}
+                        onClick={() => removeHistory(item.id)}
                         className="p-2 text-ink-400 hover:text-red-500 rounded-lg hover:bg-paper-200 dark:hover:bg-ink-700 transition-colors"
                         title="删除此条记录"
                       >

@@ -10,6 +10,7 @@ interface BgmState {
 
   // Actions
   initAudio: () => void;
+  autoPlayOnEntry: () => void;
   play: () => Promise<void>;
   pause: () => void;
   togglePlay: () => Promise<void>;
@@ -17,8 +18,10 @@ interface BgmState {
   toggleMute: () => void;
 }
 
-const STORAGE_KEY_PLAYING = 'shici_bgm_playing';
 const STORAGE_KEY_VOLUME = 'shici_bgm_volume';
+
+// 所有可触发播放的交互事件（包含 mousemove 以便最轻微的操作即可触发）
+const INTERACTION_EVENTS = ['click', 'touchstart', 'keydown', 'scroll', 'pointerdown', 'mousemove'] as const;
 
 export const useBgmStore = create<BgmState>((set, get) => ({
   isPlaying: false,
@@ -46,6 +49,29 @@ export const useBgmStore = create<BgmState>((set, get) => ({
     set({ audioElement: audio });
   },
 
+  autoPlayOnEntry: () => {
+    const { initAudio, play } = get();
+    if (!get().audioElement) {
+      initAudio();
+    }
+
+    // 立即尝试自动播放
+    play().catch(() => {
+      // 浏览器拦截了自动播放（需要用户手势），
+      // 监听任意轻微交互（含 mousemove），第一次触发即开始播放
+      const startOnInteraction = () => {
+        get().play().catch(() => {});
+        INTERACTION_EVENTS.forEach((evt) => {
+          window.removeEventListener(evt, startOnInteraction);
+        });
+      };
+
+      INTERACTION_EVENTS.forEach((evt) => {
+        window.addEventListener(evt, startOnInteraction, { once: true, passive: true });
+      });
+    });
+  },
+
   play: async () => {
     const { audioElement, initAudio, volume } = get();
     let audio = audioElement;
@@ -59,10 +85,10 @@ export const useBgmStore = create<BgmState>((set, get) => ({
       audio.volume = volume;
       await audio.play();
       set({ isPlaying: true });
-      localStorage.setItem(STORAGE_KEY_PLAYING, 'true');
     } catch (e) {
-      console.warn('Audio autoplay blocked or failed:', e);
+      console.warn('BGM autoplay blocked by browser, waiting for user interaction...', e);
       set({ isPlaying: false });
+      throw e;
     }
   },
 
@@ -71,7 +97,6 @@ export const useBgmStore = create<BgmState>((set, get) => ({
     if (audioElement) {
       audioElement.pause();
       set({ isPlaying: false });
-      localStorage.setItem(STORAGE_KEY_PLAYING, 'false');
     }
   },
 
@@ -80,7 +105,7 @@ export const useBgmStore = create<BgmState>((set, get) => ({
     if (isPlaying) {
       pause();
     } else {
-      await play();
+      await play().catch(() => {});
     }
   },
 

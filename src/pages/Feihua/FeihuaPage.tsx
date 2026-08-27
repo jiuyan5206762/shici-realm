@@ -3,8 +3,6 @@ import {
   Swords,
   BookOpen,
   HelpCircle,
-  Volume2,
-  VolumeX,
 } from 'lucide-react';
 import { useFeihuaStore } from '@/store/feihuaStore';
 import { FEIHUA_DEFAULT_KEYWORDS, FEIHUA_PERSONAS } from '@/api/feihuaService';
@@ -12,7 +10,6 @@ import { FeihuaScoreBoard } from '@/components/Feihua/FeihuaScoreBoard';
 import { FeihuaArena } from '@/components/Feihua/FeihuaArena';
 import { FeihuaResultModal } from '@/components/Feihua/FeihuaResultModal';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const FeihuaPage: React.FC = () => {
   const {
@@ -27,22 +24,11 @@ export const FeihuaPage: React.FC = () => {
 
   const [customKeywordInput, setCustomKeywordInput] = useState('');
   const [showRules, setShowRules] = useState(false);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(guqinAudio.isEnabled());
-
-  const handleToggleAudio = () => {
-    const next = !isAudioEnabled;
-    guqinAudio.setEnabled(next);
-    setIsAudioEnabled(next);
-    if (next) {
-      guqinAudio.playGuqinPluck();
-    }
-  };
 
   const handleCustomKeywordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!customKeywordInput.trim()) return;
     const char = customKeywordInput.trim().charAt(0);
-    guqinAudio.playChime();
     setKeyword(char);
     setCustomKeywordInput('');
   };
@@ -65,21 +51,9 @@ export const FeihuaPage: React.FC = () => {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
-          {/* Sound toggle */}
-          <button
-            onClick={handleToggleAudio}
-            className="p-2.5 rounded-2xl bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 text-ink-600 dark:text-ink-300 hover:text-chinese-cinnabar transition-colors"
-            title={isAudioEnabled ? '关闭古琴音效' : '开启古琴音效'}
-          >
-            {isAudioEnabled ? <Volume2 className="w-4 h-4 text-chinese-celadon" /> : <VolumeX className="w-4 h-4 text-ink-400" />}
-          </button>
-
           {/* Rules modal trigger */}
           <button
-            onClick={() => {
-              guqinAudio.playChime();
-              setShowRules(!showRules);
-            }}
+            onClick={() => setShowRules(!showRules)}
             className="px-3.5 py-2 rounded-2xl bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 text-xs font-serif text-ink-700 dark:text-ink-300 hover:bg-paper-200 flex items-center gap-1.5 transition-colors"
           >
             <HelpCircle className="w-3.5 h-3.5 text-chinese-cinnabar" />
@@ -154,10 +128,7 @@ export const FeihuaPage: React.FC = () => {
                 return (
                   <button
                     key={kw}
-                    onClick={() => {
-                      guqinAudio.playGuqinPluck();
-                      setKeyword(kw);
-                    }}
+                    onClick={() => setKeyword(kw)}
                     className={`h-14 rounded-2xl font-serif text-xl font-bold flex items-center justify-center transition-all duration-200 interactive-tap ${
                       isSelected
                         ? 'bg-chinese-cinnabar text-white shadow-seal scale-105 ring-2 ring-chinese-cinnabar/30'
@@ -188,10 +159,7 @@ export const FeihuaPage: React.FC = () => {
                 return (
                   <div
                     key={persona.id}
-                    onClick={() => {
-                      guqinAudio.playGuqinPluck();
-                      setPersona(persona);
-                    }}
+                    onClick={() => setPersona(persona)}
                     className={`cursor-pointer rounded-2xl p-4 flex flex-col justify-between transition-all duration-200 interactive-tap ${
                       isSelected
                         ? 'bg-chinese-cinnabar/10 border-2 border-chinese-cinnabar ring-1 ring-chinese-cinnabar/30'
@@ -243,10 +211,7 @@ export const FeihuaPage: React.FC = () => {
           {/* 3. Start Battle CTA */}
           <div className="text-center pt-2">
             <button
-              onClick={() => {
-                guqinAudio.playVictory();
-                startGame();
-              }}
+              onClick={() => startGame()}
               className="px-10 py-4 rounded-3xl bg-chinese-cinnabar hover:bg-chinese-rouge text-white font-serif font-black text-lg sm:text-xl shadow-seal hover:scale-102 transition-all flex items-center gap-3 mx-auto interactive-tap"
             >
               <Swords className="w-5 h-5 text-chinese-gold" />
@@ -272,10 +237,7 @@ export const FeihuaPage: React.FC = () => {
                   3. 超时或重出诗句将判定本局告负。
                 </p>
                 <button
-                  onClick={() => {
-                    guqinAudio.playChime();
-                    resetGame();
-                  }}
+                  onClick={() => resetGame()}
                   className="text-chinese-cinnabar hover:underline pt-2 block"
                 >
                   认输并退出对决

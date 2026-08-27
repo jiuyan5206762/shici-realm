@@ -21,7 +21,6 @@ import { Pagination } from '@/components/Common/Pagination';
 import { ErrorState } from '@/components/Common/ErrorState';
 import { filterPoemsByCriteria } from '@/utils/poetDirectory';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const PoemsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -59,7 +58,6 @@ export const PoemsPage: React.FC = () => {
     author?: string | null;
     page?: number | null;
   }) => {
-    guqinAudio.playChime();
     const nextParams = new URLSearchParams(searchParams);
 
     if (updates.dynasty !== undefined) {
@@ -89,7 +87,6 @@ export const PoemsPage: React.FC = () => {
   };
 
   const handleResetFilters = () => {
-    guqinAudio.playChime();
     setSearchParams(new URLSearchParams());
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

@@ -2,7 +2,6 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, BookOpen, Users, Bookmark, Sword } from 'lucide-react';
 import { useFavoriteStore } from '@/store/favoriteStore';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const MobileTabBar: React.FC = () => {
   const favorites = useFavoriteStore((state) => state.favorites);
@@ -27,7 +26,6 @@ export const MobileTabBar: React.FC = () => {
           <NavLink
             key={tab.path}
             to={tab.path}
-            onClick={() => guqinAudio.playChime()}
             className={({ isActive }) =>
               `relative flex flex-col items-center justify-center flex-1 h-full py-1 text-[11px] font-serif transition-all ${
                 isActive

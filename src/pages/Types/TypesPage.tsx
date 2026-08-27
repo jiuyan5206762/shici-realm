@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { typeApi } from '@/api/types';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const TypesPage: React.FC = () => {
   const { data: typesRes } = useQuery({
@@ -61,7 +60,6 @@ export const TypesPage: React.FC = () => {
               <span className="text-ink-400">韵律与格律规范</span>
               <Link
                 to={`/poems?type=${encodeURIComponent(type.name)}`}
-                onClick={() => guqinAudio.playChime()}
                 className="inline-flex items-center gap-1 text-chinese-celadon font-bold hover:underline"
               >
                 <BookOpen className="w-3.5 h-3.5" />

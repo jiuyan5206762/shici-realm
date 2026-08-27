@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Search, BookOpen, ArrowRight } from 'lucide-react';
+import { BookOpen, ArrowRight } from 'lucide-react';
 import { searchApi } from '@/api/search';
 import { poemApi } from '@/api/poems';
 import { SearchBar } from '@/components/Search/SearchBar';
@@ -10,7 +10,6 @@ import { Pagination } from '@/components/Common/Pagination';
 import { ErrorState } from '@/components/Common/ErrorState';
 import { findPoetByName } from '@/utils/poetDirectory';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,7 +19,6 @@ export const SearchPage: React.FC = () => {
   const pageSize = 20;
 
   const handleSearch = (newQuery: string) => {
-    guqinAudio.playChime();
     const nextParams = new URLSearchParams();
     if (newQuery.trim()) {
       nextParams.set('q', newQuery.trim());
@@ -30,7 +28,6 @@ export const SearchPage: React.FC = () => {
   };
 
   const handlePageChange = (nextPage: number) => {
-    guqinAudio.playChime();
     const nextParams = new URLSearchParams(searchParams);
     if (nextPage > 1) {
       nextParams.set('page', String(nextPage));
@@ -120,7 +117,6 @@ export const SearchPage: React.FC = () => {
 
             <Link
               to={`/poems?author=${encodeURIComponent(q)}`}
-              onClick={() => guqinAudio.playChime()}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-chinese-cinnabar hover:bg-chinese-rouge text-white text-xs font-serif font-bold shadow-xs transition-all interactive-tap"
             >
               <BookOpen className="w-3.5 h-3.5" />
@@ -138,61 +134,38 @@ export const SearchPage: React.FC = () => {
           {poetSample && (
             <div className="p-4 sm:p-5 rounded-2xl bg-paper-100/70 dark:bg-ink-800/60 border border-paper-300/60 dark:border-ink-700/60 text-center space-y-1.5">
               <div className="text-xs font-serif text-chinese-cinnabar">代表名篇赏析</div>
-              <Link to={`/poems/${poetSample.id}`}>
-                <h4 className="text-base sm:text-lg font-serif font-bold text-ink-900 dark:text-ink-50 hover:text-chinese-cinnabar transition-colors">
-                  《{poetSample.title}》
-                </h4>
-              </Link>
-              <div className="font-serif text-ink-800 dark:text-ink-200 text-sm sm:text-base leading-relaxed py-1">
-                {(poetSample.content || []).slice(0, 4).map((line, idx) => (
-                  <p key={idx}>{line}</p>
-                ))}
-              </div>
+              <h4 className="text-base font-serif font-bold text-ink-900 dark:text-ink-50">
+                《{poetSample.title}》
+              </h4>
+              <p className="text-sm font-serif text-ink-700 dark:text-ink-200">
+                {poetSample.content.slice(0, 2).join('，')}。
+              </p>
             </div>
           )}
         </div>
       )}
 
-      {/* Main Search Results Area */}
-      <div className="max-w-4xl mx-auto">
-        {!q.trim() ? (
-          <div className="text-center py-16 space-y-4">
-            <div className="w-16 h-16 rounded-full bg-paper-200 dark:bg-ink-800 flex items-center justify-center mx-auto text-ink-400">
-              <Search className="w-7 h-7" />
-            </div>
-            <p className="text-sm font-serif text-ink-400">
-              在上方搜索框输入关键词，开始查阅
-            </p>
-          </div>
-        ) : isError ? (
-          <ErrorState onRetry={() => refetch()} />
-        ) : (
-          <div className="space-y-8">
-            <div className="flex items-center justify-between text-xs font-serif text-ink-500 pb-2 border-b border-paper-300/60 dark:border-ink-800">
-              <span>检索关键词：「<strong className="text-chinese-cinnabar">{q}</strong>」</span>
-              {poems.length > 0 && <span>共检索到相关诗词结果</span>}
-            </div>
+      {/* Results List */}
+      {q.trim() && (
+        <div className="space-y-6">
+          <PoemList
+            poems={poems}
+            isLoading={isLoading}
+            isError={isError}
+            onRetry={refetch}
+            emptyMessage={`未找到与「${q}」相关的诗篇，可尝试减少关键词`}
+          />
 
-            <PoemList
-              poems={poems}
-              isLoading={isLoading}
-              onResetFilter={() => handleSearch('')}
+          {!isLoading && !isError && poems.length > 0 && (
+            <Pagination
+              currentPage={page}
+              hasMore={hasMore}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
             />
-
-            {/* Pagination */}
-            {!isLoading && poems.length > 0 && (
-              <div className="pt-6 border-t border-paper-300/80 dark:border-ink-800">
-                <Pagination
-                  currentPage={page}
-                  hasMore={hasMore}
-                  pageSize={pageSize}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

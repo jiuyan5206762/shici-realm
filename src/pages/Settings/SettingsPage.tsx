@@ -4,26 +4,15 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { useThemeStore } from '@/store/themeStore';
 import { useBgmStore } from '@/store/bgmStore';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 import { clearApiCache } from '@/api/client';
 
 export const SettingsPage: React.FC = () => {
   const { settings, updateSettings, resetSettings } = useSettingsStore();
   const { theme, setTheme } = useThemeStore();
   const { isPlaying, volume, isMuted, togglePlay, setVolume, toggleMute } = useBgmStore();
-  const [soundEnabled, setSoundEnabled] = useState(guqinAudio.isEnabled());
   const [cacheCleared, setCacheCleared] = useState(false);
 
-  const handleSoundToggle = (enabled: boolean) => {
-    guqinAudio.setEnabled(enabled);
-    setSoundEnabled(enabled);
-    if (enabled) {
-      guqinAudio.playChime();
-    }
-  };
-
   const handleClearCache = () => {
-    guqinAudio.playChime();
     clearApiCache();
     setCacheCleared(true);
     setTimeout(() => setCacheCleared(false), 2000);
@@ -40,7 +29,7 @@ export const SettingsPage: React.FC = () => {
           </h1>
         </div>
         <p className="text-xs sm:text-sm text-ink-500 dark:text-ink-400 font-serif">
-          定制专属于您的东方古典排版、古筝雅乐背景音律与交互音效
+          定制专属于您的东方古典排版、宣纸底色与古筝名曲背景伴读
         </p>
       </div>
 
@@ -61,10 +50,7 @@ export const SettingsPage: React.FC = () => {
             ].map((t) => (
               <button
                 key={t.id}
-                onClick={() => {
-                  guqinAudio.playChime();
-                  setTheme(t.id as any);
-                }}
+                onClick={() => setTheme(t.id as any)}
                 className={`p-4 rounded-2xl border text-left transition-all interactive-tap ${
                   theme === t.id
                     ? 'border-chinese-cinnabar bg-chinese-cinnabar/10 ring-1 ring-chinese-cinnabar'
@@ -90,10 +76,7 @@ export const SettingsPage: React.FC = () => {
               <span>古筝背景音律（名曲《春江花月夜》）</span>
             </h3>
             <button
-              onClick={() => {
-                guqinAudio.playChime();
-                togglePlay();
-              }}
+              onClick={() => togglePlay()}
               className={`px-4 py-1.5 rounded-xl text-xs font-serif font-bold transition-all flex items-center gap-1.5 ${
                 isPlaying
                   ? 'bg-chinese-cinnabar text-white shadow-xs'
@@ -108,7 +91,7 @@ export const SettingsPage: React.FC = () => {
           <div className="p-4 rounded-2xl bg-paper-100/80 dark:bg-ink-800/60 border border-paper-300/60 dark:border-ink-700 space-y-3">
             <div className="flex items-center justify-between text-xs font-serif">
               <span className="text-ink-600 dark:text-ink-300">
-                曲目：古筝独奏名曲《春江花月夜》· 循环伴读
+                曲目：古筝独奏名曲《春江花月夜》· 进入网址自动伴读
               </span>
               <span className="font-mono text-ink-400">
                 音量: {Math.round(volume * 100)}%
@@ -140,31 +123,7 @@ export const SettingsPage: React.FC = () => {
           </div>
         </section>
 
-        {/* 3. Guqin & Chime Audio System */}
-        <section className="xuan-card rounded-3xl p-6 sm:p-8 space-y-5 border border-paper-400/40 shadow-oriental">
-          <div className="flex items-center justify-between">
-            <h3 className="font-serif font-bold text-lg text-ink-900 dark:text-ink-50 flex items-center gap-2">
-              <Volume2 className="w-5 h-5 text-chinese-celadon" />
-              <span>古琴与编钟交互音效 (Web Audio 实时合成)</span>
-            </h3>
-            <button
-              onClick={() => handleSoundToggle(!soundEnabled)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-serif font-bold transition-all ${
-                soundEnabled
-                  ? 'bg-chinese-celadon text-white shadow-xs'
-                  : 'bg-paper-200 dark:bg-ink-800 text-ink-500'
-              }`}
-            >
-              {soundEnabled ? '已开启音效' : '已静音'}
-            </button>
-          </div>
-
-          <p className="text-xs font-serif text-ink-500 leading-relaxed">
-            操作点击、飞花令应令、典藏及第均采用 W3C Web Audio API 纯程序化实时振荡合成（0KB 静态文件、0 版权风险），为您带来沉浸式古风交互质感。
-          </p>
-        </section>
-
-        {/* 4. Reading Typography Defaults */}
+        {/* 3. Reading Typography Defaults */}
         <section className="xuan-card rounded-3xl p-6 sm:p-8 space-y-6 border border-paper-400/40 shadow-oriental">
           <div className="flex items-center justify-between">
             <h3 className="font-serif font-bold text-lg text-ink-900 dark:text-ink-50 flex items-center gap-2">
@@ -173,10 +132,7 @@ export const SettingsPage: React.FC = () => {
             </h3>
 
             <button
-              onClick={() => {
-                guqinAudio.playChime();
-                resetSettings();
-              }}
+              onClick={() => resetSettings()}
               className="text-xs font-serif text-chinese-cinnabar hover:underline flex items-center gap-1"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -221,7 +177,7 @@ export const SettingsPage: React.FC = () => {
           </div>
         </section>
 
-        {/* 5. Cache & Performance Management */}
+        {/* 4. Cache & Performance Management */}
         <section className="xuan-card rounded-3xl p-6 sm:p-8 space-y-4 border border-paper-400/40 shadow-oriental">
           <div className="flex items-center justify-between">
             <h3 className="font-serif font-bold text-lg text-ink-900 dark:text-ink-50 flex items-center gap-2">

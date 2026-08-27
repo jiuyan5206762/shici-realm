@@ -17,9 +17,9 @@ import { HistoryPage } from '@/pages/History/HistoryPage';
 import { SettingsPage } from '@/pages/Settings/SettingsPage';
 import { FeihuaPage } from '@/pages/Feihua/FeihuaPage';
 import { useThemeStore } from '@/store/themeStore';
+import { useBgmStore } from '@/store/bgmStore';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { poemApi } from '@/api/poems';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 // Scroll to top helper component
 const ScrollToTop: React.FC = () => {
@@ -33,18 +33,19 @@ const ScrollToTop: React.FC = () => {
 export const App: React.FC = () => {
   const navigate = useNavigate();
   const initTheme = useThemeStore((state) => state.initTheme);
+  const autoPlayOnEntry = useBgmStore((state) => state.autoPlayOnEntry);
 
-  // Initialize theme on mount
+  // Initialize theme & autoplay background music on entry
   useEffect(() => {
     initTheme();
-  }, [initTheme]);
+    autoPlayOnEntry();
+  }, [initTheme, autoPlayOnEntry]);
 
   // Global keyboard shortcuts
   useKeyboardShortcuts({
     onSearchFocus: () => navigate('/search'),
     onRandomPoem: async () => {
       try {
-        guqinAudio.playChime();
         const res = await poemApi.getRandom();
         if (res.data?.id) {
           navigate(`/poems/${res.data.id}`);

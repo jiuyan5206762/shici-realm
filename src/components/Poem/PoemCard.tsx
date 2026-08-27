@@ -5,7 +5,6 @@ import { Poem } from '@/types';
 import { useFavoriteStore } from '@/store/favoriteStore';
 import { useSharePoem } from '@/hooks/useSharePoem';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 interface PoemCardProps {
   poem: Poem;
@@ -22,7 +21,6 @@ export const PoemCard: React.FC<PoemCardProps> = ({ poem, onShare, className = '
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    guqinAudio.playGuqinPluck();
     if (favorite) {
       removeFavorite(poem.id);
     } else {
@@ -33,7 +31,6 @@ export const PoemCard: React.FC<PoemCardProps> = ({ poem, onShare, className = '
   const handleCopy = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    guqinAudio.playChime();
     const contentText = `${poem.title}\n〔${poem.dynasty?.name || '古'}〕${poem.author?.name || '佚名'}\n\n${(poem.content || []).join('\n')}`;
     navigator.clipboard.writeText(contentText);
     setCopied(true);
@@ -43,7 +40,6 @@ export const PoemCard: React.FC<PoemCardProps> = ({ poem, onShare, className = '
   const handleShareClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    guqinAudio.playChime();
     if (onShare) {
       onShare(poem);
     } else {

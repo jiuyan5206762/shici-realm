@@ -21,7 +21,6 @@ import { PoemShareModal } from './PoemShareModal';
 import { AiAnalysisDrawer } from './AiAnalysisDrawer';
 import { SealBadge } from '@/components/Common/SealBadge';
 import { VerticalPoemView } from './VerticalPoemView';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 interface PoemReaderProps {
   poem: Poem;
@@ -41,7 +40,6 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
   const favorite = isFavorite(poem.id);
 
   const handleFavoriteToggle = () => {
-    guqinAudio.playGuqinPluck();
     if (favorite) {
       removeFavorite(poem.id);
     } else {
@@ -58,20 +56,20 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
 
   const sizeClass =
     settings.fontSize === 'sm'
-      ? 'text-lg sm:text-xl'
+      ? 'text-base sm:text-lg'
       : settings.fontSize === 'base'
-      ? 'text-xl sm:text-2xl'
+      ? 'text-lg sm:text-xl'
       : settings.fontSize === 'lg'
-      ? 'text-2xl sm:text-3xl'
+      ? 'text-xl sm:text-2xl'
       : settings.fontSize === 'xl'
-      ? 'text-3xl sm:text-4xl'
-      : 'text-4xl sm:text-5xl';
+      ? 'text-2xl sm:text-3xl'
+      : 'text-3xl sm:text-4xl';
 
   const lineSpacingClass =
     settings.lineHeight === 'normal'
+      ? 'leading-normal space-y-2 sm:space-y-3'
+      : settings.lineHeight === 'relaxed'
       ? 'leading-relaxed space-y-3 sm:space-y-4'
-      : settings.lineHeight === 'loose'
-      ? 'leading-[2.6] space-y-5 sm:space-y-7'
       : 'leading-[2.2] space-y-4 sm:space-y-5';
 
   const alignClass = settings.textAlign === 'left' ? 'text-left' : 'text-center';
@@ -86,10 +84,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
         </div>
 
         <button
-          onClick={() => {
-            guqinAudio.playChime();
-            setIsVerticalView(!isVerticalView);
-          }}
+          onClick={() => setIsVerticalView(!isVerticalView)}
           className="text-xs font-serif text-chinese-cinnabar px-3 py-1.5 rounded-xl border border-chinese-cinnabar/30 hover:bg-chinese-cinnabar/10 transition-colors"
         >
           {isVerticalView ? '切换现代横排版式' : '切换传统竖排古卷'}
@@ -99,66 +94,66 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
       {isVerticalView ? (
         <VerticalPoemView poem={poem} />
       ) : (
-        /* Main Poem Reading Canvas */
-        <div className="relative xuan-card rounded-3xl p-6 sm:p-14 shadow-oriental transition-all border border-paper-400/50">
-          {/* Top Typography & Customization Strip */}
-          <div className="flex flex-wrap items-center justify-between pb-5 mb-6 border-b border-paper-300/80 dark:border-ink-800/80 gap-3">
-            {/* Metadata */}
-            <div className="flex items-center gap-2 text-sm text-ink-600 dark:text-ink-300 font-serif">
-              <span>〔{poem.dynasty?.name || '古'}〕</span>
-              <span className="font-bold text-ink-900 dark:text-ink-100">
-                {poem.author?.name || '佚名'}
-              </span>
-              {poem.type?.name && (
-                <>
-                  <span className="text-paper-400 dark:text-ink-700">·</span>
-                  <span>{poem.type.name}</span>
-                </>
+        /* Traditional Horizontal Xuan Paper Reader Canvas */
+        <div className="relative xuan-card rounded-3xl p-6 sm:p-14 border border-paper-400/50 shadow-2xl overflow-hidden animate-fade-in">
+          {/* Top Decorative Floating Seals & Quick Layout Controls */}
+          <div className="flex items-center justify-between pb-6 mb-6 border-b border-paper-300/80 dark:border-ink-800/80 text-xs font-serif">
+            <div className="flex items-center gap-2">
+              <SealBadge text={poem.type?.name || '古体'} size="sm" variant="bamboo" />
+              {poem.dynasty && (
+                <span className="text-ink-400">朝代：{poem.dynasty.name}</span>
               )}
             </div>
 
-            {/* Typography Controls */}
-            <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-ink-700 dark:text-ink-300 font-serif">
-              {/* Font Size decrease */}
+            {/* Quick Typography Controls Bar */}
+            <div className="flex items-center gap-1 sm:gap-2 text-xs text-ink-500">
+              {/* Font toggle */}
               <button
                 onClick={() => {
-                  const sizes: ('sm' | 'base' | 'lg' | 'xl' | '2xl')[] = ['sm', 'base', 'lg', 'xl', '2xl'];
-                  const idx = sizes.indexOf(settings.fontSize);
-                  if (idx > 0) updateSettings({ fontSize: sizes[idx - 1] });
+                  const nextFont =
+                    settings.fontFamily === 'serif'
+                      ? 'kaiti'
+                      : settings.fontFamily === 'kaiti'
+                      ? 'sans'
+                      : 'serif';
+                  updateSettings({ fontFamily: nextFont });
                 }}
-                className="px-2.5 py-1 rounded-lg border border-paper-300 dark:border-ink-700 hover:bg-paper-200 dark:hover:bg-ink-800"
-                title="缩小字号"
+                className="px-2.5 py-1 rounded-lg border border-paper-300 dark:border-ink-700 hover:bg-paper-200 dark:hover:bg-ink-800 flex items-center gap-1 font-serif"
+                title="切换字体 (宋体 / 楷体 / 黑体)"
               >
-                A-
+                <Type className="w-3 h-3 text-chinese-cinnabar" />
+                <span className="hidden sm:inline">
+                  {settings.fontFamily === 'serif' ? '宋体' : settings.fontFamily === 'kaiti' ? '楷体' : '黑体'}
+                </span>
               </button>
 
-              {/* Font Size increase */}
-              <button
-                onClick={() => {
-                  const sizes: ('sm' | 'base' | 'lg' | 'xl' | '2xl')[] = ['sm', 'base', 'lg', 'xl', '2xl'];
-                  const idx = sizes.indexOf(settings.fontSize);
-                  if (idx < sizes.length - 1) updateSettings({ fontSize: sizes[idx + 1] });
-                }}
-                className="px-2.5 py-1 rounded-lg border border-paper-300 dark:border-ink-700 hover:bg-paper-200 dark:hover:bg-ink-800"
-                title="放大字号"
-              >
-                A+
-              </button>
+              {/* Font Size decrease / increase */}
+              <div className="flex items-center border border-paper-300 dark:border-ink-700 rounded-lg overflow-hidden bg-paper-100 dark:bg-ink-800">
+                <button
+                  onClick={() => {
+                    const sizes: Array<typeof settings.fontSize> = ['sm', 'base', 'lg', 'xl', '2xl'];
+                    const currentIdx = sizes.indexOf(settings.fontSize);
+                    if (currentIdx > 0) updateSettings({ fontSize: sizes[currentIdx - 1] });
+                  }}
+                  className="px-2 py-1 hover:bg-paper-200 dark:hover:bg-ink-700 text-xs font-bold"
+                  title="缩小字号"
+                >
+                  A-
+                </button>
+                <button
+                  onClick={() => {
+                    const sizes: Array<typeof settings.fontSize> = ['sm', 'base', 'lg', 'xl', '2xl'];
+                    const currentIdx = sizes.indexOf(settings.fontSize);
+                    if (currentIdx < sizes.length - 1) updateSettings({ fontSize: sizes[currentIdx + 1] });
+                  }}
+                  className="px-2 py-1 hover:bg-paper-200 dark:hover:bg-ink-700 text-xs font-bold border-l border-paper-300 dark:border-ink-700"
+                  title="放大字号"
+                >
+                  A+
+                </button>
+              </div>
 
-              {/* Font switcher */}
-              <button
-                onClick={() => {
-                  const next =
-                    settings.fontFamily === 'serif' ? 'kaiti' : settings.fontFamily === 'kaiti' ? 'sans' : 'serif';
-                  updateSettings({ fontFamily: next });
-                }}
-                className="p-1.5 rounded-lg border border-paper-300 dark:border-ink-700 hover:bg-paper-200 dark:hover:bg-ink-800"
-                title="切换字体 (宋体/楷体/黑体)"
-              >
-                <Type className="w-3.5 h-3.5" />
-              </button>
-
-              {/* Alignment */}
+              {/* Align toggle */}
               <button
                 onClick={() =>
                   updateSettings({
@@ -166,7 +161,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
                   })
                 }
                 className="p-1.5 rounded-lg border border-paper-300 dark:border-ink-700 hover:bg-paper-200 dark:hover:bg-ink-800"
-                title="切换排版对齐方式"
+                title={settings.textAlign === 'center' ? '改为左对齐' : '改为居中排版'}
               >
                 {settings.textAlign === 'center' ? (
                   <AlignLeft className="w-3.5 h-3.5" />
@@ -177,10 +172,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
 
               {/* Zen Fullscreen */}
               <button
-                onClick={() => {
-                  guqinAudio.playChime();
-                  setIsZenOpen(true);
-                }}
+                onClick={() => setIsZenOpen(true)}
                 className="px-3 py-1 rounded-lg border border-paper-300 dark:border-ink-700 hover:bg-paper-200 dark:hover:bg-ink-800 flex items-center gap-1 font-medium"
                 title="进入全屏禅意阅读"
               >
@@ -235,10 +227,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
 
               {/* AI Analysis Button */}
               <button
-                onClick={() => {
-                  guqinAudio.playChime();
-                  setIsAiDrawerOpen(true);
-                }}
+                onClick={() => setIsAiDrawerOpen(true)}
                 className="h-11 flex items-center justify-center gap-2 px-4 rounded-xl text-xs sm:text-sm font-serif font-medium bg-chinese-celadon/15 hover:bg-chinese-celadon/25 text-chinese-celadon transition-all active:scale-95 shadow-xs"
               >
                 <Sparkles className="w-4 h-4" />
@@ -247,10 +236,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
 
               {/* Share Card Button */}
               <button
-                onClick={() => {
-                  guqinAudio.playChime();
-                  setIsShareModalOpen(true);
-                }}
+                onClick={() => setIsShareModalOpen(true)}
                 className="h-11 flex items-center justify-center gap-2 px-4 rounded-xl text-xs sm:text-sm font-serif font-medium bg-paper-200 dark:bg-ink-800 hover:bg-paper-300 dark:hover:bg-ink-700 text-ink-700 dark:text-ink-200 transition-colors"
               >
                 <Share2 className="w-4 h-4" />
@@ -259,10 +245,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
 
               {/* Copy Full Text */}
               <button
-                onClick={() => {
-                  guqinAudio.playChime();
-                  copyPoemText(poem);
-                }}
+                onClick={() => copyPoemText(poem)}
                 className="h-11 flex items-center justify-center gap-2 px-4 rounded-xl text-xs sm:text-sm font-serif font-medium bg-paper-200 dark:bg-ink-800 hover:bg-paper-300 dark:hover:bg-ink-700 text-ink-700 dark:text-ink-200 transition-colors"
               >
                 {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
@@ -273,10 +256,7 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
             {/* Random Next Button */}
             {onRandomNext && (
               <button
-                onClick={() => {
-                  guqinAudio.playChime();
-                  onRandomNext();
-                }}
+                onClick={() => onRandomNext()}
                 className="w-full sm:w-auto h-11 flex items-center justify-center gap-2 px-5 rounded-xl text-xs sm:text-sm font-serif font-medium border border-paper-300 dark:border-ink-700 hover:bg-paper-200 dark:hover:bg-ink-800 text-ink-700 dark:text-ink-200 transition-colors"
               >
                 <Shuffle className="w-4 h-4" />
@@ -287,25 +267,14 @@ export const PoemReader: React.FC<PoemReaderProps> = ({ poem, onRandomNext }) =>
         </div>
       )}
 
-      {/* Modals & Drawers */}
-      <ZenReadingMode
-        poem={poem}
-        isOpen={isZenOpen}
-        onClose={() => setIsZenOpen(false)}
-        onOpenAiAnalysis={() => setIsAiDrawerOpen(true)}
-      />
+      {/* Zen Fullscreen Modal */}
+      <ZenReadingMode isOpen={isZenOpen} poem={poem} onClose={() => setIsZenOpen(false)} />
 
-      <PoemShareModal
-        poem={poem}
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-      />
+      {/* Share Image Modal */}
+      <PoemShareModal isOpen={isShareModalOpen} poem={poem} onClose={() => setIsShareModalOpen(false)} />
 
-      <AiAnalysisDrawer
-        poem={poem}
-        isOpen={isAiDrawerOpen}
-        onClose={() => setIsAiDrawerOpen(false)}
-      />
+      {/* AI Analysis Drawer */}
+      <AiAnalysisDrawer isOpen={isAiDrawerOpen} poem={poem} onClose={() => setIsAiDrawerOpen(false)} />
     </div>
   );
 };

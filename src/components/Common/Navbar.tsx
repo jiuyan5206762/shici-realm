@@ -13,7 +13,6 @@ import {
 import { useThemeStore } from '@/store/themeStore';
 import { poemApi } from '@/api/poems';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
@@ -33,7 +32,6 @@ export const Navbar: React.FC = () => {
   const handleRandomPoem = async () => {
     try {
       setIsRandomLoading(true);
-      guqinAudio.playChime();
       const res = await poemApi.getRandom();
       if (res.data?.id) {
         navigate(`/poems/${res.data.id}`);
@@ -52,7 +50,6 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center gap-3">
           <Link
             to="/"
-            onClick={() => guqinAudio.playChime()}
             className="flex items-center gap-2 group"
           >
             <div className="w-9 h-9 rounded-2xl bg-chinese-cinnabar text-white font-serif font-bold text-lg flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
@@ -84,7 +81,6 @@ export const Navbar: React.FC = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                onClick={() => guqinAudio.playChime()}
                 className={`relative px-4 py-1.5 rounded-full text-xs font-serif font-medium transition-all duration-200 flex items-center gap-1.5 ${
                   isActive
                     ? 'bg-chinese-cinnabar text-white shadow-xs'
@@ -108,7 +104,6 @@ export const Navbar: React.FC = () => {
           {/* Quick Search */}
           <Link
             to="/search"
-            onClick={() => guqinAudio.playChime()}
             className="p-2 rounded-full text-ink-600 dark:text-ink-300 hover:text-chinese-cinnabar hover:bg-paper-200 dark:hover:bg-ink-800 transition-colors"
             title="搜索诗词 (Ctrl+K)"
           >
@@ -129,7 +124,6 @@ export const Navbar: React.FC = () => {
           {/* Favorites */}
           <Link
             to="/favorites"
-            onClick={() => guqinAudio.playChime()}
             className="p-2 rounded-full text-ink-600 dark:text-ink-300 hover:text-chinese-cinnabar hover:bg-paper-200 dark:hover:bg-ink-800 transition-colors"
             title="典藏"
           >
@@ -139,7 +133,6 @@ export const Navbar: React.FC = () => {
           {/* History */}
           <Link
             to="/history"
-            onClick={() => guqinAudio.playChime()}
             className="hidden sm:flex p-2 rounded-full text-ink-600 dark:text-ink-300 hover:text-chinese-cinnabar hover:bg-paper-200 dark:hover:bg-ink-800 transition-colors"
             title="足迹"
           >
@@ -148,10 +141,7 @@ export const Navbar: React.FC = () => {
 
           {/* Theme Toggle */}
           <button
-            onClick={() => {
-              guqinAudio.playChime();
-              toggleTheme();
-            }}
+            onClick={() => toggleTheme()}
             className="p-2 rounded-full text-ink-600 dark:text-ink-300 hover:text-chinese-cinnabar hover:bg-paper-200 dark:hover:bg-ink-800 transition-colors"
             title="切换昼夜主题"
           >
@@ -165,7 +155,6 @@ export const Navbar: React.FC = () => {
           {/* Settings */}
           <Link
             to="/settings"
-            onClick={() => guqinAudio.playChime()}
             className="p-2 rounded-full text-ink-600 dark:text-ink-300 hover:text-chinese-cinnabar hover:bg-paper-200 dark:hover:bg-ink-800 transition-colors"
             title="偏好设置"
           >

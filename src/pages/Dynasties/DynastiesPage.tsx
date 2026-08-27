@@ -5,7 +5,6 @@ import { ArrowRight, BookOpen, Users } from 'lucide-react';
 import { dynastyApi } from '@/api/dynasties';
 import { formatYearRange } from '@/utils/formatters';
 import { SealBadge } from '@/components/Common/SealBadge';
-import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const DynastiesPage: React.FC = () => {
   const { data: dynastiesRes } = useQuery({
@@ -71,7 +70,6 @@ export const DynastiesPage: React.FC = () => {
               <div className="pt-5 mt-3 border-t border-paper-300/60 dark:border-ink-800 flex items-center justify-between text-xs font-serif">
                 <Link
                   to={`/authors?dynasty=${encodeURIComponent(dynasty.name)}`}
-                  onClick={() => guqinAudio.playChime()}
                   className="text-ink-500 hover:text-chinese-cinnabar flex items-center gap-1"
                 >
                   <Users className="w-3.5 h-3.5" />
@@ -80,7 +78,6 @@ export const DynastiesPage: React.FC = () => {
 
                 <Link
                   to={`/poems?dynasty=${encodeURIComponent(dynasty.name)}`}
-                  onClick={() => guqinAudio.playChime()}
                   className="inline-flex items-center gap-1 text-chinese-cinnabar font-bold hover:underline"
                 >
                   <BookOpen className="w-3.5 h-3.5" />
