@@ -62,8 +62,7 @@ export const SearchPage: React.FC = () => {
         return { data: [], pagination: { page: 1, pageSize, hasMore: false }, lang: 'zh-Hans' };
       }
 
-      const queryToSend = q.trim().length < 3 ? `${q.trim()} 诗` : q.trim();
-      const res = await searchApi.search({ q: queryToSend, page, pageSize });
+      const res = await searchApi.search({ q: q.trim(), page, pageSize });
       return res;
     },
     enabled: Boolean(q.trim()),

@@ -11,7 +11,6 @@ import {
   TYPE_TOTAL_COUNTS,
   AUTHOR_TOTAL_COUNTS,
 } from '@/api/poems';
-import { searchApi } from '@/api/search';
 import { dynastyApi } from '@/api/dynasties';
 import { typeApi } from '@/api/types';
 import { PoemList } from '@/components/Poem/PoemList';
@@ -22,11 +21,15 @@ import { ErrorState } from '@/components/Common/ErrorState';
 import { filterPoemsByCriteria } from '@/utils/poetDirectory';
 import { SealBadge } from '@/components/Common/SealBadge';
 
+import { SearchBar } from '@/components/Search/SearchBar';
+import { smartSearchPoems } from '@/utils/searchEngine';
+
 export const PoemsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   // Extract query parameters from URL
+  const q = searchParams.get('q') || '';
   const dynasty = searchParams.get('dynasty') || undefined;
   const type = searchParams.get('type') || undefined;
   const author = searchParams.get('author') || undefined;
@@ -49,16 +52,22 @@ export const PoemsPage: React.FC = () => {
   const dynasties = dynastiesRes?.data || [];
   const types = typesRes?.data || [];
 
-  const activeFilterCount = (dynasty ? 1 : 0) + (type ? 1 : 0) + (author ? 1 : 0);
+  const activeFilterCount = (q ? 1 : 0) + (dynasty ? 1 : 0) + (type ? 1 : 0) + (author ? 1 : 0);
 
   // Update URL SearchParams helper
   const updateFilter = (updates: {
+    q?: string | null;
     dynasty?: string | null;
     type?: string | null;
     author?: string | null;
     page?: number | null;
   }) => {
     const nextParams = new URLSearchParams(searchParams);
+
+    if (updates.q !== undefined) {
+      if (updates.q) nextParams.set('q', updates.q);
+      else nextParams.delete('q');
+    }
 
     if (updates.dynasty !== undefined) {
       if (updates.dynasty) nextParams.set('dynasty', updates.dynasty);
@@ -91,15 +100,28 @@ export const PoemsPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 2. Fetch Poems with multi-level cache & smart fallback
+  // 2. Fetch Poems with smart hybrid search engine & multi-level ranking
   const {
     data: poemsRes,
     isLoading,
     isError,
     refetch,
   } = useQuery({
-    queryKey: ['poems', { page, pageSize, dynasty, type, author }],
+    queryKey: ['poems', { q, page, pageSize, dynasty, type, author }],
     queryFn: async () => {
+      // If user typed a search keyword, use high-precision smartSearch engine
+      if (q.trim()) {
+        const smartRes = await smartSearchPoems({
+          q: q.trim(),
+          page,
+          pageSize,
+          dynasty,
+          type,
+          author,
+        });
+        return smartRes;
+      }
+
       const dynastyId = dynasty ? DYNASTY_NAME_TO_ID[dynasty] : undefined;
       const typeId = type ? TYPE_NAME_TO_ID[type] : undefined;
       const authorId = author ? AUTHOR_NAME_TO_ID[author] : undefined;
@@ -145,35 +167,9 @@ export const PoemsPage: React.FC = () => {
         };
       }
 
-      // If author is not indexed by ID in remote API
+      // If author is not indexed by ID in remote API, search with smart hybrid search
       if (author) {
-        const localFiltered = filterPoemsByCriteria(dynasty, type, author, page, pageSize);
-        if (localFiltered.totalCount > 0) {
-          return {
-            data: localFiltered.poems,
-            pagination: {
-              page,
-              pageSize,
-              hasMore: localFiltered.hasMore,
-            },
-            totalCount: localFiltered.totalCount,
-            lang: 'zh-Hans',
-          };
-        }
-
-        try {
-          if (author.length >= 2) {
-            const searchRes = await searchApi.search({ q: author, page, pageSize });
-            if (searchRes.data && searchRes.data.length > 0) {
-              return {
-                data: searchRes.data,
-                pagination: searchRes.pagination || { page, pageSize, hasMore: false },
-                totalCount: searchRes.data.length,
-                lang: 'zh-Hans',
-              };
-            }
-          }
-        } catch {}
+        return smartSearchPoems({ q: author, page, pageSize, dynasty, type });
       }
 
       const localFiltered = filterPoemsByCriteria(dynasty, type, author, page, pageSize);
@@ -198,7 +194,7 @@ export const PoemsPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 animate-fade-in">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-paper-300 dark:border-ink-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-paper-300 dark:border-ink-800">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl sm:text-4xl font-serif font-black text-ink-900 dark:text-ink-50">
@@ -209,6 +205,16 @@ export const PoemsPage: React.FC = () => {
           <p className="text-xs sm:text-sm text-ink-500 dark:text-ink-400 font-serif">
             多维联动朝代、体裁与名家，品读千载文脉风华
           </p>
+        </div>
+
+        {/* Quick In-Library Search */}
+        <div className="w-full md:max-w-md">
+          <SearchBar
+            initialValue={q}
+            onSearch={(newQ) => updateFilter({ q: newQ || null, page: 1 })}
+            placeholder="在诗库中精准检索名句、篇名、诗人..."
+            showSuggestions={false}
+          />
         </div>
 
         {/* Mobile Filter Trigger Button */}
@@ -242,6 +248,18 @@ export const PoemsPage: React.FC = () => {
       {activeFilterCount > 0 && (
         <div className="flex items-center gap-2 flex-wrap p-3.5 rounded-2xl bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 text-xs font-serif">
           <span className="text-ink-500 dark:text-ink-400">已选条件：</span>
+
+          {q && (
+            <span className="inline-flex items-center bg-chinese-cinnabar/10 text-chinese-cinnabar px-3 py-1 rounded-xl border border-chinese-cinnabar/30 gap-1.5 shadow-xs font-bold">
+              <span>关键词 · {q}</span>
+              <button
+                onClick={() => updateFilter({ q: null })}
+                className="text-chinese-cinnabar hover:text-red-700 font-bold ml-1"
+              >
+                ×
+              </button>
+            </span>
+          )}
 
           {dynasty && (
             <span className="inline-flex items-center bg-paper-50 dark:bg-ink-900 text-ink-800 dark:text-ink-100 px-3 py-1 rounded-xl border border-paper-300 dark:border-ink-700 gap-1.5 shadow-xs">
