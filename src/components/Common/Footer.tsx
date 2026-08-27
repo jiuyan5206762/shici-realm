@@ -5,7 +5,7 @@ import { SealBadge } from '@/components/Common/SealBadge';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="mt-16 sm:mt-24 border-t border-paper-300 dark:border-ink-800 bg-paper-100/50 dark:bg-ink-900/50 backdrop-blur-xs font-serif">
+    <footer className="mt-16 sm:mt-24 border-t border-paper-300 dark:border-ink-800 bg-paper-100/50 dark:bg-[#131316]/90 backdrop-blur-xs font-serif transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Info */}

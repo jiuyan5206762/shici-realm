@@ -57,7 +57,7 @@ export const App: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen flex flex-col justify-between selection:bg-chinese-cinnabar/20 selection:text-chinese-cinnabar">
+    <div className="min-h-screen flex flex-col justify-between bg-paper-100 dark:bg-[#131316] text-ink-900 dark:text-ink-50 selection:bg-chinese-cinnabar/20 selection:text-chinese-cinnabar transition-colors">
       <ScrollToTop />
       
       {/* Top Navigation */}

@@ -112,7 +112,7 @@ export interface AiChatMessage {
   timestamp: number;
 }
 
-export type ThemePalette = 'paper' | 'dark' | 'sepia';
+export type ThemePalette = 'paper' | 'dark';
 export type FontSize = 'sm' | 'base' | 'lg' | 'xl' | '2xl';
 export type LineHeight = 'normal' | 'relaxed' | 'loose';
 export type TextFont = 'serif' | 'sans' | 'kaiti';

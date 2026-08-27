@@ -20,7 +20,7 @@ export const MobileTabBar: React.FC = () => {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-paper-50/95 dark:bg-ink-900/95 backdrop-blur-xl border-t border-paper-300/80 dark:border-ink-800 pb-[env(safe-area-inset-bottom)] shadow-2xl transition-colors">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-paper-50/95 dark:bg-[#131316]/95 backdrop-blur-xl border-t border-paper-300/80 dark:border-ink-800 pb-[env(safe-area-inset-bottom)] shadow-2xl transition-colors">
       <div className="flex items-center justify-around h-15 px-1">
         {tabs.map((tab) => (
           <NavLink

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, Sparkles, Monitor } from 'lucide-react';
+import { Sun, Moon, Monitor } from 'lucide-react';
 import { useThemeStore, AppTheme } from '@/store/themeStore';
 
 export const ThemeToggle: React.FC = () => {
@@ -19,7 +19,6 @@ export const ThemeToggle: React.FC = () => {
 
   const options: { value: AppTheme; label: string; icon: React.ReactNode }[] = [
     { value: 'light', label: '宣纸暖白', icon: <Sun className="w-4 h-4 text-amber-600" /> },
-    { value: 'sepia', label: '复古竹简', icon: <Sparkles className="w-4 h-4 text-yellow-700" /> },
     { value: 'dark', label: '玄青夜读', icon: <Moon className="w-4 h-4 text-indigo-400" /> },
     { value: 'system', label: '跟随系统', icon: <Monitor className="w-4 h-4 text-stone-500" /> },
   ];
@@ -28,8 +27,6 @@ export const ThemeToggle: React.FC = () => {
     switch (theme) {
       case 'light':
         return <Sun className="w-5 h-5 text-amber-600" />;
-      case 'sepia':
-        return <Sparkles className="w-5 h-5 text-yellow-700" />;
       case 'dark':
         return <Moon className="w-5 h-5 text-indigo-400" />;
       default:

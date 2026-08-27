@@ -41,10 +41,9 @@ export const SettingsPage: React.FC = () => {
             <span>宣纸底色与配色主题</span>
           </h3>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             {[
               { id: 'light', label: '澄心宣纸', desc: '米白温润，古朴优雅' },
-              { id: 'sepia', label: '复古竹简', desc: '雅致茶褐，护眼宁静' },
               { id: 'dark', label: '玄青夜读', desc: '深沉水墨，夜间舒适' },
               { id: 'system', label: '跟随系统', desc: '依据设备偏好自动切换' },
             ].map((t) => (

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-export type AppTheme = 'light' | 'dark' | 'sepia' | 'system';
+export type AppTheme = 'light' | 'dark' | 'system';
 
 interface ThemeState {
   theme: AppTheme;
@@ -26,14 +26,12 @@ const applyThemeToDOM = (theme: AppTheme): boolean => {
   } else if (theme === 'dark') {
     root.classList.add('dark');
     isDarkMode = true;
-  } else if (theme === 'sepia') {
-    root.classList.add('sepia');
   }
 
   // Update theme-color meta tag
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');
   if (metaThemeColor) {
-    metaThemeColor.setAttribute('content', isDarkMode ? '#161618' : theme === 'sepia' ? '#F3EBDD' : '#F8F5EF');
+    metaThemeColor.setAttribute('content', isDarkMode ? '#131316' : '#FAF6EE');
   }
 
   return isDarkMode;

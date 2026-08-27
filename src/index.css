@@ -24,13 +24,6 @@
     background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
     background-size: 24px 24px;
   }
-
-  html.sepia body {
-    background-color: #F3EBDD;
-    color: #382E25;
-    background-image: radial-gradient(rgba(140, 94, 53, 0.05) 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
 }
 
 /* Xuan Paper Card & Borders */

@@ -44,7 +44,7 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-paper-50/85 dark:bg-ink-950/85 border-b border-paper-300/80 dark:border-ink-800/80 transition-colors">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-paper-50/90 dark:bg-[#131316]/90 border-b border-paper-300/80 dark:border-ink-800/80 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand Logo & Seal */}
         <div className="flex items-center gap-3">
