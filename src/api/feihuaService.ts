@@ -1,4 +1,5 @@
 // Flying Flower Duel Classical Poetry Database & Matching Engine (飞花令对诗引擎)
+import { FAMOUS_POETS_DIRECTORY } from '@/utils/poetDirectory';
 
 export interface FeihuaVerse {
   line: string;
@@ -144,7 +145,6 @@ export const FEIHUA_VERSES_DB: Record<string, FeihuaVerse[]> = {
     { line: '野火烧不尽，春风吹又生', author: '白居易', dynasty: '唐', title: '赋得古原草送别' },
     { line: '相见时难别亦难，东风无力百花残', author: '李商隐', dynasty: '唐', title: '无题' },
     { line: '风急天高猿啸哀，渚清沙白鸟飞回', author: '杜甫', dynasty: '唐', title: '登高' },
-    { line: '山回路转不见君，雪上空留马行处', author: '岑参', dynasty: '唐', title: '白雪歌送武判官归京' },
     { line: '古道西风瘦马，夕阳西下，断肠人在天涯', author: '马致远', dynasty: '元', title: '天净沙·秋思' },
   ],
   '夜': [
@@ -200,7 +200,6 @@ export const FEIHUA_VERSES_DB: Record<string, FeihuaVerse[]> = {
     { line: '万里悲秋常作客，百年多病独登台', author: '杜甫', dynasty: '唐', title: '登高' },
     { line: '古道西风瘦马，夕阳西下，断肠人在天涯', author: '马致远', dynasty: '元', title: '天净沙·秋思' },
     { line: '落霞与孤鹜齐飞，秋水共长天一色', author: '王勃', dynasty: '唐', title: '滕王阁序' },
-    { line: '未觉池塘春草梦，阶前梧叶已秋声', author: '朱熹', dynasty: '宋', title: '偶成' },
   ],
   '云': [
     { line: '行到水穷处，坐看云起时', author: '王维', dynasty: '唐', title: '终南别业' },
@@ -221,7 +220,6 @@ export const FEIHUA_VERSES_DB: Record<string, FeihuaVerse[]> = {
     { line: '梅须逊雪三分白，雪却输梅一段香', author: '卢梅坡', dynasty: '宋', title: '雪梅' },
   ],
   '人': [
-    { line: '感时花溅泪，恨别鸟惊心', author: '杜甫', dynasty: '唐', title: '春望' },
     { line: '人生得意须尽欢，莫使金樽空对月', author: '李白', dynasty: '唐', title: '将进酒' },
     { line: '劝君更尽一杯酒，西出阳关无故人', author: '王维', dynasty: '唐', title: '送元二使安西' },
     { line: '人面不知何处去，桃花依旧笑春风', author: '崔护', dynasty: '唐', title: '题都城南庄' },
@@ -229,13 +227,109 @@ export const FEIHUA_VERSES_DB: Record<string, FeihuaVerse[]> = {
     { line: '同是天涯沦落人，相逢何必曾相识', author: '白居易', dynasty: '唐', title: '琵琶行' },
     { line: '生当作人杰，死亦为鬼雄', author: '李清照', dynasty: '宋', title: '夏日绝句' },
     { line: '千山鸟飞绝，万径人踪灭', author: '柳宗元', dynasty: '唐', title: '江雪' },
-  ]
+  ],
+  '江': [
+    { line: '无边落木萧萧下，不尽长江滚滚来', author: '杜甫', dynasty: '唐', title: '登高' },
+    { line: '孤帆远影碧空尽，唯见长江天际流', author: '李白', dynasty: '唐', title: '黄鹤楼送孟浩然之广陵' },
+    { line: '大江东去，浪淘尽，千古风流人物', author: '苏轼', dynasty: '宋', title: '念奴娇·赤壁怀古' },
+    { line: '春江潮水连海平，海上明月共潮生', author: '张若虚', dynasty: '唐', title: '春江花月夜' },
+    { line: '日出江花红胜火，春来江水绿如蓝', author: '白居易', dynasty: '唐', title: '忆江南' },
+    { line: '江畔何人初见月？江月何年初照人？', author: '张若虚', dynasty: '唐', title: '春江花月夜' },
+    { line: '野径云俱黑，江船火独明', author: '杜甫', dynasty: '唐', title: '春夜喜雨' },
+    { line: '竹外桃花三两枝，春江水暖鸭先知', author: '苏轼', dynasty: '宋', title: '惠崇春江晚景' },
+  ],
+  '雨': [
+    { line: '清明时节雨纷纷，路上行人欲断魂', author: '杜牧', dynasty: '唐', title: '清明' },
+    { line: '好雨知时节，当春乃发生', author: '杜甫', dynasty: '唐', title: '春夜喜雨' },
+    { line: '夜来风雨声，花落知多少', author: '孟浩然', dynasty: '唐', title: '春晓' },
+    { line: '君问归期未有期，巴山夜雨涨秋池', author: '李商隐', dynasty: '唐', title: '夜雨寄北' },
+    { line: '小楼一夜听春雨，深巷明朝卖杏花', author: '陆游', dynasty: '宋', title: '临安春雨初霁' },
+    { line: '水光潋滟晴方好，山色空蒙雨亦奇', author: '苏轼', dynasty: '宋', title: '饮湖上初晴后雨' },
+    { line: '空山新雨后，天气晚来秋', author: '王维', dynasty: '唐', title: '山居秋暝' },
+    { line: '一蓑烟雨任平生，也无风雨也无晴', author: '苏轼', dynasty: '宋', title: '定风波' },
+  ],
+  '归': [
+    { line: '白日放歌须纵酒，青春作伴好还乡', author: '杜甫', dynasty: '唐', title: '闻官军收河南河北' },
+    { line: '君问归期未有期，巴山夜雨涨秋池', author: '李商隐', dynasty: '唐', title: '夜雨寄北' },
+    { line: '大风起兮云飞扬，威加海内兮归故乡', author: '刘邦', dynasty: '两汉', title: '大风歌' },
+    { line: '儿童相见不相识，笑问客从何处来', author: '贺知章', dynasty: '唐', title: '回乡偶书' },
+    { line: '柴门闻犬吠，风雪夜归人', author: '刘长卿', dynasty: '唐', title: '逢雪宿芙蓉山主人' },
+    { line: '无可奈何花落去，似曾相识燕归来', author: '晏殊', dynasty: '宋', title: '浣溪沙' },
+    { line: '采薇采薇，薇亦作止。曰归曰归，岁亦莫止', author: '佚名', dynasty: '先秦', title: '采薇' },
+  ],
+  '思': [
+    { line: '举头望明月，低头思故乡', author: '李白', dynasty: '唐', title: '静夜思' },
+    { line: '红豆生南国，春来发几枝。愿君多采撷，此物最相思', author: '王维', dynasty: '唐', title: '相思' },
+    { line: '春蚕到死丝方尽，蜡炬成灰泪始干', author: '李商隐', dynasty: '唐', title: '无题' },
+    { line: '古道西风瘦马，夕阳西下，断肠人在天涯', author: '马致远', dynasty: '元', title: '天净沙·秋思' },
+    { line: '物是人非事事休，欲语泪先流', author: '李清照', dynasty: '宋', title: '武陵春' },
+    { line: '相思相见知何日？此时此夜难为情', author: '李白', dynasty: '唐', title: '三五七言' },
+  ],
 };
 
 // Default high-frequency keyword chips
-export const POPULAR_FEIHUA_CHARS = ['春', '花', '月', '风', '夜', '山', '水', '酒', '秋', '云', '雪', '人', '雨', '归', '思'];
+export const POPULAR_FEIHUA_CHARS = ['春', '花', '月', '风', '夜', '山', '水', '酒', '秋', '云', '雪', '人', '江', '雨', '归', '思'];
 
 export class FeihuaService {
+  /**
+   * Dynamically fetch or generate classical verses for ANY single Chinese character
+   */
+  public static getVersesForChar(targetChar: string): FeihuaVerse[] {
+    if (!targetChar) return [];
+    const char = targetChar.trim().charAt(0);
+    if (!char) return [];
+
+    // 1. Check pre-cached database
+    if (FEIHUA_VERSES_DB[char] && FEIHUA_VERSES_DB[char].length > 0) {
+      return FEIHUA_VERSES_DB[char];
+    }
+
+    // 2. Dynamically scan FAMOUS_POETS_DIRECTORY
+    const extractedVerses: FeihuaVerse[] = [];
+    const seenLines = new Set<string>();
+
+    for (const poet of FAMOUS_POETS_DIRECTORY) {
+      for (const poem of poet.poems) {
+        if (!poem.content || poem.content.length === 0) continue;
+
+        for (const rawLine of poem.content) {
+          // A content line might contain clauses separated by punctuation
+          const clauses = rawLine.split(/[，。！？；\n]/).map((s) => s.trim()).filter(Boolean);
+          for (const clause of clauses) {
+            if (clause.includes(char) && clause.length >= 4 && clause.length <= 16) {
+              if (!seenLines.has(clause)) {
+                seenLines.add(clause);
+                extractedVerses.push({
+                  line: clause,
+                  author: poem.author?.name || poet.name,
+                  dynasty: poem.dynasty?.name || poet.dynasty?.name || '唐',
+                  title: poem.title,
+                });
+              }
+            }
+          }
+
+          if (rawLine.includes(char) && rawLine.length >= 5 && rawLine.length <= 24) {
+            const cleanLine = rawLine.trim();
+            if (!seenLines.has(cleanLine)) {
+              seenLines.add(cleanLine);
+              extractedVerses.push({
+                line: cleanLine,
+                author: poem.author?.name || poet.name,
+                dynasty: poem.dynasty?.name || poet.dynasty?.name || '唐',
+                title: poem.title,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // Cache dynamic verses
+    FEIHUA_VERSES_DB[char] = extractedVerses;
+    return extractedVerses;
+  }
+
   // Validate candidate verse
   public static validateVerse(
     input: string,
@@ -243,13 +337,14 @@ export class FeihuaService {
     usedVerses: string[]
   ): { valid: boolean; reason?: string; match?: FeihuaVerse } {
     const cleanInput = input.trim().replace(/[，。！？、；：“”‘’]/g, '');
+    const char = targetChar.trim().charAt(0);
     
     if (!cleanInput) {
       return { valid: false, reason: '请输入诗句' };
     }
 
-    if (!cleanInput.includes(targetChar)) {
-      return { valid: false, reason: `诗句中必须包含令字「${targetChar}」` };
+    if (!cleanInput.includes(char)) {
+      return { valid: false, reason: `诗句中必须包含令字「${char}」` };
     }
 
     if (cleanInput.length < 4) {
@@ -266,8 +361,8 @@ export class FeihuaService {
       return { valid: false, reason: '本局中此句诗已被吟诵过，请换一句！' };
     }
 
-    // Try finding exact or partial match in DB
-    const dbList = FEIHUA_VERSES_DB[targetChar] || [];
+    // Try finding exact or partial match in DB or dynamic corpus
+    const dbList = FeihuaService.getVersesForChar(char);
     const matched = dbList.find((v) => {
       const cleanDB = v.line.replace(/[，。！？、；：“”‘’]/g, '');
       return cleanDB.includes(cleanInput) || cleanInput.includes(cleanDB);
@@ -278,8 +373,8 @@ export class FeihuaService {
       match: matched || {
         line: input.trim(),
         author: '诗友',
-        dynasty: '当代',
-        title: '飞花佳句',
+        dynasty: '古典',
+        title: '应令佳句',
       },
     };
   }
@@ -290,7 +385,8 @@ export class FeihuaService {
     usedVerses: string[],
     personaId: string
   ): FeihuaVerse | null {
-    const list = FEIHUA_VERSES_DB[targetChar] || [];
+    const char = targetChar.trim().charAt(0);
+    const list = FeihuaService.getVersesForChar(char);
     
     // Find un-used verses
     const candidates = list.filter((v) => {

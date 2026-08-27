@@ -23,14 +23,32 @@ export const FeihuaPage: React.FC = () => {
   } = useFeihuaStore();
 
   const [customKeywordInput, setCustomKeywordInput] = useState('');
+  const [customKeywordError, setCustomKeywordError] = useState<string | null>(null);
   const [showRules, setShowRules] = useState(false);
+
+  const handleCustomKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Only accept Chinese character, max 1 char
+    const raw = e.target.value;
+    const chineseOnly = raw.replace(/[^\u4e00-\u9fa5]/g, '');
+    const char = chineseOnly.slice(0, 1);
+    setCustomKeywordInput(char);
+    setCustomKeywordError(null);
+  };
 
   const handleCustomKeywordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!customKeywordInput.trim()) return;
-    const char = customKeywordInput.trim().charAt(0);
-    setKeyword(char);
+    const trimmed = customKeywordInput.trim();
+    if (!trimmed) {
+      setCustomKeywordError('请输入一个汉字');
+      return;
+    }
+    if (!/^[\u4e00-\u9fa5]$/.test(trimmed)) {
+      setCustomKeywordError('只允许输入单个汉字');
+      return;
+    }
+    setKeyword(trimmed);
     setCustomKeywordInput('');
+    setCustomKeywordError(null);
   };
 
   return (
@@ -78,10 +96,10 @@ export const FeihuaPage: React.FC = () => {
             </button>
           </div>
           <ul className="text-xs font-serif text-ink-600 dark:text-ink-300 space-y-1.5 list-disc list-inside leading-relaxed">
-            <li><strong>令字规定</strong>：双方轮流吟诵含有指定令字（如「春」、「花」、「月」）的传世古典名句。</li>
+            <li><strong>令字规定</strong>：双方轮流吟诵含有指定令字（如「春」、「花」、「月」或任意自定单字）的古典名句。</li>
             <li><strong>不可重出</strong>：单局对决内双方吟诵过的诗句不可重复出现。</li>
             <li><strong>限时应令</strong>：每回合限时 30 秒，超时或未能对出将判负。</li>
-            <li><strong>考据严谨</strong>：内置 1200+ 传世名篇精选绝句，自动校验诗句出处与诗人名讳。</li>
+            <li><strong>考据严谨</strong>：内置万首传世古典精选诗词，自动校验诗句出处与诗人名讳。</li>
           </ul>
         </div>
       )}
@@ -91,35 +109,55 @@ export const FeihuaPage: React.FC = () => {
         <div className="space-y-8">
           {/* 1. Keyword Selection Grid */}
           <div className="xuan-card rounded-3xl p-6 sm:p-8 space-y-5 border border-paper-400/40 shadow-oriental">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-lg font-serif font-bold text-ink-900 dark:text-ink-50 flex items-center gap-2">
                   <span>第一步：拣选飞花令字</span>
                 </h3>
                 <p className="text-xs font-serif text-ink-400 mt-0.5">
-                  精选华夏诗词最负盛名之意象，亦可自定义任意令字
+                  精选华夏诗词常见令字，亦可自定义任意单个汉字（如：梅、江、心、天）
                 </p>
               </div>
 
-              {/* Custom Keyword Input */}
-              <form onSubmit={handleCustomKeywordSubmit} className="flex items-center gap-2">
-                <input
-                  type="text"
-                  maxLength={1}
-                  value={customKeywordInput}
-                  onChange={(e) => setCustomKeywordInput(e.target.value)}
-                  placeholder="自定单字..."
-                  className="w-24 px-3 py-2 bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 rounded-xl text-center font-serif text-sm text-ink-900 dark:text-ink-50 focus:outline-hidden focus:border-chinese-cinnabar"
-                />
-                <button
-                  type="submit"
-                  disabled={!customKeywordInput.trim()}
-                  className="px-3.5 py-2 bg-paper-200 dark:bg-ink-700 hover:bg-chinese-cinnabar hover:text-white rounded-xl text-xs font-serif disabled:opacity-50 transition-colors"
-                >
-                  设定
-                </button>
-              </form>
+              {/* Custom Keyword Input with 1-char limit */}
+              <div className="flex flex-col items-end gap-1">
+                <form onSubmit={handleCustomKeywordSubmit} className="flex items-center gap-2">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      maxLength={1}
+                      value={customKeywordInput}
+                      onChange={handleCustomKeywordChange}
+                      placeholder="自定单字"
+                      className="w-24 px-3 py-2 bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 rounded-xl text-center font-serif text-base font-bold text-ink-900 dark:text-ink-50 focus:outline-hidden focus:border-chinese-cinnabar"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={!customKeywordInput.trim()}
+                    className="px-4 py-2 bg-chinese-cinnabar hover:bg-chinese-rouge text-white rounded-xl text-xs font-serif font-bold disabled:opacity-50 transition-colors shadow-xs"
+                  >
+                    设定令字
+                  </button>
+                </form>
+                {customKeywordError && (
+                  <span className="text-[11px] text-red-500 font-serif">{customKeywordError}</span>
+                )}
+              </div>
             </div>
+
+            {/* Custom Keyword Active Notification */}
+            {!FEIHUA_DEFAULT_KEYWORDS.includes(currentKeyword) && (
+              <div className="flex items-center gap-3 p-3.5 bg-chinese-cinnabar/10 border border-chinese-cinnabar/30 rounded-2xl animate-fade-in">
+                <span className="text-xs font-serif text-chinese-cinnabar font-bold">已启用自定义令字：</span>
+                <span className="w-10 h-10 rounded-xl bg-chinese-cinnabar text-white font-serif text-xl font-bold flex items-center justify-center shadow-seal">
+                  {currentKeyword}
+                </span>
+                <span className="text-xs font-serif text-ink-600 dark:text-ink-300">
+                  （已从经典诗库中智能匹配「{currentKeyword}」字所有名句）
+                </span>
+              </div>
+            )}
 
             {/* Default Keyword Chips */}
             <div className="grid grid-cols-4 sm:grid-cols-8 gap-2.5">
