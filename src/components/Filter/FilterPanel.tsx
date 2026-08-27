@@ -4,8 +4,8 @@ import { Dynasty, PoemType } from '@/types';
 import { SealBadge } from '@/components/Common/SealBadge';
 
 interface FilterPanelProps {
-  dynasties: Dynasty[];
-  types: PoemType[];
+  dynasties?: Dynasty[];
+  types?: PoemType[];
   selectedDynasty?: string;
   selectedType?: string;
   selectedAuthor?: string;
@@ -36,9 +36,36 @@ const FAMOUS_POETS = [
   '王勃',
 ];
 
+const DEFAULT_DYNASTIES: Dynasty[] = [
+  { id: 1, name: '先秦' },
+  { id: 2, name: '两汉' },
+  { id: 3, name: '魏晋' },
+  { id: 4, name: '南北朝' },
+  { id: 5, name: '隋' },
+  { id: 6, name: '唐' },
+  { id: 7, name: '五代' },
+  { id: 8, name: '宋' },
+  { id: 9, name: '元' },
+  { id: 10, name: '清' },
+];
+
+const DEFAULT_TYPES: PoemType[] = [
+  { id: 10, name: '唐诗' },
+  { id: 20, name: '宋词' },
+  { id: 11, name: '五言绝句' },
+  { id: 12, name: '七言绝句' },
+  { id: 13, name: '五言律诗' },
+  { id: 14, name: '七言律诗' },
+  { id: 15, name: '五言古诗' },
+  { id: 16, name: '七言古诗' },
+  { id: 17, name: '乐府诗' },
+  { id: 30, name: '元曲' },
+  { id: 70, name: '楚辞' },
+];
+
 export const FilterPanel: React.FC<FilterPanelProps> = ({
-  dynasties,
-  types,
+  dynasties = [],
+  types = [],
   selectedDynasty,
   selectedType,
   selectedAuthor,
@@ -50,6 +77,9 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 }) => {
   const [authorInput, setAuthorInput] = useState(selectedAuthor || '');
 
+  const effectiveDynasties = dynasties.length > 0 ? dynasties : DEFAULT_DYNASTIES;
+  const effectiveTypes = types.length > 0 ? types : DEFAULT_TYPES;
+
   const handleAuthorSearch = (e: React.FormEvent) => {
     e.preventDefault();
     onSelectAuthor(authorInput.trim() || undefined);
@@ -59,7 +89,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
   return (
     <div
-      className={`xuan-card rounded-3xl p-5 sm:p-6 shadow-oriental border border-paper-400/40 space-y-6 ${className}`}
+      className={`space-y-6 ${className || 'xuan-card rounded-3xl p-5 sm:p-6 shadow-oriental border border-paper-400/40'}`}
     >
       {/* Header & Reset */}
       <div className="flex items-center justify-between pb-3.5 border-b border-paper-300/80 dark:border-ink-800">
@@ -79,7 +109,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             className="flex items-center gap-1 text-xs font-serif text-chinese-cinnabar hover:underline transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>重置</span>
+            <span>重置条件</span>
           </button>
         )}
       </div>
@@ -105,30 +135,32 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
         <div className="flex flex-wrap gap-1.5">
           <button
+            type="button"
             onClick={() => {
               onSelectDynasty(undefined);
             }}
-            className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-serif transition-colors ${
               !selectedDynasty
                 ? 'bg-chinese-cinnabar text-white font-bold shadow-xs'
-                : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
+                : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700 border border-paper-300/60 dark:border-ink-700'
             }`}
           >
             全部
           </button>
 
-          {dynasties.map((dynasty) => {
+          {effectiveDynasties.map((dynasty) => {
             const isSelected = selectedDynasty === dynasty.name;
             return (
               <button
+                type="button"
                 key={dynasty.id}
                 onClick={() => {
                   onSelectDynasty(isSelected ? undefined : dynasty.name);
                 }}
-                className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-serif transition-colors ${
                   isSelected
                     ? 'bg-chinese-cinnabar text-white font-bold shadow-xs'
-                    : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
+                    : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700 border border-paper-300/60 dark:border-ink-700'
                 }`}
               >
                 {dynasty.name}
@@ -159,30 +191,32 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
         <div className="flex flex-wrap gap-1.5">
           <button
+            type="button"
             onClick={() => {
               onSelectType(undefined);
             }}
-            className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-serif transition-colors ${
               !selectedType
                 ? 'bg-chinese-celadon text-white font-bold shadow-xs'
-                : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
+                : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700 border border-paper-300/60 dark:border-ink-700'
             }`}
           >
             全部
           </button>
 
-          {types.map((type) => {
+          {effectiveTypes.map((type) => {
             const isSelected = selectedType === type.name;
             return (
               <button
+                type="button"
                 key={type.id}
                 onClick={() => {
                   onSelectType(isSelected ? undefined : type.name);
                 }}
-                className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-serif transition-colors ${
                   isSelected
                     ? 'bg-chinese-celadon text-white font-bold shadow-xs'
-                    : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
+                    : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700 border border-paper-300/60 dark:border-ink-700'
                 }`}
               >
                 {type.name}
@@ -212,14 +246,14 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           )}
         </div>
 
-        {/* Author Search Form - Safe Nested Icon Button (Zero overflow) */}
+        {/* Author Search Form */}
         <form onSubmit={handleAuthorSearch} className="relative w-full">
           <input
             type="text"
             value={authorInput}
             onChange={(e) => setAuthorInput(e.target.value)}
             placeholder="搜索诗人姓名 (如李白)..."
-            className="w-full pl-3.5 pr-10 py-2 text-xs bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 rounded-xl text-ink-900 dark:text-ink-100 focus:outline-hidden focus:border-chinese-cinnabar font-serif transition-colors"
+            className="w-full pl-3.5 pr-10 py-2.5 text-xs bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 rounded-xl text-ink-900 dark:text-ink-100 focus:outline-hidden focus:border-chinese-cinnabar font-serif transition-colors"
           />
           <button
             type="submit"
@@ -236,6 +270,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             const isSelected = selectedAuthor === poet;
             return (
               <button
+                type="button"
                 key={poet}
                 onClick={() => {
                   if (isSelected) {
@@ -246,10 +281,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                     onSelectAuthor(poet);
                   }
                 }}
-                className={`px-2.5 py-1 rounded-xl text-xs transition-colors font-serif ${
+                className={`px-2.5 py-1.5 rounded-xl text-xs transition-colors font-serif ${
                   isSelected
                     ? 'bg-chinese-cinnabar text-white font-bold shadow-xs'
-                    : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
+                    : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700 border border-paper-300/60 dark:border-ink-700'
                 }`}
               >
                 {poet}
