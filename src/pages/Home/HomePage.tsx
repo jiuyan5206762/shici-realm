@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Shuffle,
   Compass,
   Layers,
   Heart,
@@ -15,6 +14,7 @@ import { poemApi } from '@/api/poems';
 import { SearchBar } from '@/components/Search/SearchBar';
 import { PoemCard } from '@/components/Poem/PoemCard';
 import { VerticalPoemView } from '@/components/Poem/VerticalPoemView';
+import { SwipeableRandomPoem } from '@/components/Poem/SwipeableRandomPoem';
 import { SealBadge } from '@/components/Common/SealBadge';
 import { useFavoriteStore } from '@/store/favoriteStore';
 
@@ -33,7 +33,6 @@ export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { isFavorite, addFavorite, removeFavorite } = useFavoriteStore();
   const [dailyViewMode, setDailyViewMode] = useState<'horizontal' | 'vertical'>('horizontal');
-  const [randomFilter, setRandomFilter] = useState<'all' | 'tang' | 'song'>('all');
 
   // 1. Fetch Dynasties
   const { data: dynastiesRes } = useQuery({
@@ -60,29 +59,9 @@ export const HomePage: React.FC = () => {
     staleTime: 24 * 60 * 60 * 1000,
   });
 
-  // 4. Random Discovery Poem
-  const {
-    data: randomPoemRes,
-    refetch: refetchRandom,
-    isFetching: isFetchingRandom,
-  } = useQuery({
-    queryKey: ['randomPoemHome', randomFilter],
-    queryFn: async () => {
-      const dynastyParam = randomFilter === 'tang' ? '唐' : randomFilter === 'song' ? '宋' : undefined;
-      const res = await poemApi.getRandom({ dynasty: dynastyParam });
-      return res;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
   const dailyPoem = dailyPoemRes?.data;
-  const randomPoem = randomPoemRes?.data;
   const dynasties = dynastiesRes?.data || [];
   const types = typesRes?.data || [];
-
-  const handleRandomRefresh = () => {
-    refetchRandom();
-  };
 
   const handleDailyFavorite = () => {
     if (!dailyPoem) return;
@@ -296,58 +275,8 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 6. Random Discovery Section */}
-      <section className="space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-2.5 h-5 bg-amber-600 rounded-full" />
-            <h2 className="text-xl sm:text-2xl font-serif font-bold text-ink-900 dark:text-ink-50 tracking-wider">
-              偶得佳句 · 随心漫游
-            </h2>
-            <SealBadge text="漫步" size="sm" variant="gold" />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="flex bg-paper-200 dark:bg-ink-800 p-1 rounded-xl text-xs font-serif">
-              <button
-                onClick={() => setRandomFilter('all')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  randomFilter === 'all' ? 'bg-paper-50 dark:bg-ink-900 text-chinese-cinnabar font-bold shadow-xs' : 'text-ink-600'
-                }`}
-              >
-                全部
-              </button>
-              <button
-                onClick={() => setRandomFilter('tang')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  randomFilter === 'tang' ? 'bg-paper-50 dark:bg-ink-900 text-chinese-cinnabar font-bold shadow-xs' : 'text-ink-600'
-                }`}
-              >
-                唐诗
-              </button>
-              <button
-                onClick={() => setRandomFilter('song')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  randomFilter === 'song' ? 'bg-paper-50 dark:bg-ink-900 text-chinese-cinnabar font-bold shadow-xs' : 'text-ink-600'
-                }`}
-              >
-                宋词
-              </button>
-            </div>
-
-            <button
-              onClick={handleRandomRefresh}
-              disabled={isFetchingRandom}
-              className="px-3.5 py-1.5 rounded-xl bg-paper-200 dark:bg-ink-800 hover:bg-chinese-cinnabar hover:text-white font-serif text-xs font-bold transition-all flex items-center gap-1.5"
-            >
-              <Shuffle className={`w-3.5 h-3.5 ${isFetchingRandom ? 'animate-spin' : ''}`} />
-              <span>随心换一篇</span>
-            </button>
-          </div>
-        </div>
-
-        {randomPoem && <PoemCard poem={randomPoem} />}
-      </section>
+      {/* 6. Swipeable Random Discovery Section */}
+      <SwipeableRandomPoem />
     </div>
   );
 };
