@@ -148,21 +148,30 @@ export const SearchPage: React.FC = () => {
       {/* Results List */}
       {q.trim() && (
         <div className="space-y-6">
-          <PoemList
-            poems={poems}
-            isLoading={isLoading}
-            isError={isError}
-            onRetry={refetch}
-            emptyMessage={`未找到与「${q}」相关的诗篇，可尝试减少关键词`}
-          />
-
-          {!isLoading && !isError && poems.length > 0 && (
-            <Pagination
-              currentPage={page}
-              hasMore={hasMore}
-              pageSize={pageSize}
-              onPageChange={handlePageChange}
+          {isError ? (
+            <ErrorState
+              title="检索诗词失败"
+              message="可能网络波动或服务暂时不可用，请点击重试"
+              onRetry={() => refetch()}
             />
+          ) : (
+            <>
+              <PoemList
+                poems={poems}
+                isLoading={isLoading}
+                emptyTitle="未找到匹配诗篇"
+                emptyDescription={`未找到与「${q}」相关的诗篇，可尝试减少关键词`}
+              />
+
+              {!isLoading && poems.length > 0 && (
+                <Pagination
+                  currentPage={page}
+                  hasMore={hasMore}
+                  pageSize={pageSize}
+                  onPageChange={handlePageChange}
+                />
+              )}
+            </>
           )}
         </div>
       )}
