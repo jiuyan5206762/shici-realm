@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Timer, Flame } from 'lucide-react';
 import { useFeihuaStore } from '@/store/feihuaStore';
 import { SealBadge } from '@/components/Common/SealBadge';
 
 export const FeihuaScoreBoard: React.FC = () => {
   const {
+    status,
     currentKeyword,
     selectedPersona,
     playerScore,
@@ -13,7 +14,19 @@ export const FeihuaScoreBoard: React.FC = () => {
     timeLeft,
     streak,
     playerRank,
+    decrementTimer,
   } = useFeihuaStore();
+
+  // Active Countdown Timer Loop during user's turn
+  useEffect(() => {
+    if (status !== 'playing' || !playerTurn) return;
+
+    const timer = setInterval(() => {
+      decrementTimer();
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [status, playerTurn, decrementTimer]);
 
   const isUrgent = timeLeft <= 10;
 
@@ -46,7 +59,7 @@ export const FeihuaScoreBoard: React.FC = () => {
         >
           <Timer className={`w-4 h-4 ${isUrgent ? 'text-red-500 animate-spin' : 'text-chinese-cinnabar'}`} />
           <span className="font-mono font-black text-lg sm:text-xl">
-            {timeLeft}s
+            {playerTurn ? `${timeLeft}s` : '名家应令'}
           </span>
         </div>
       </div>
@@ -63,7 +76,7 @@ export const FeihuaScoreBoard: React.FC = () => {
         >
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-serif font-bold text-ink-800 dark:text-ink-200">
-              我方 (应令中)
+              我方 {playerTurn ? '(应令中)' : ''}
             </span>
             <span className="text-[10px] font-serif text-chinese-cinnabar font-bold">
               {playerRank}
@@ -92,7 +105,7 @@ export const FeihuaScoreBoard: React.FC = () => {
         >
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-serif font-bold text-ink-800 dark:text-ink-200">
-              {selectedPersona.name}
+              {selectedPersona.name} {!playerTurn ? '(沉吟中)' : ''}
             </span>
             <SealBadge text={selectedPersona.dynasty} size="sm" variant="bamboo" />
           </div>

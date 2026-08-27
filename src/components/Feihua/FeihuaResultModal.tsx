@@ -13,6 +13,7 @@ export const FeihuaResultModal: React.FC = () => {
     currentKeyword,
     history,
     playerRank,
+    gameoverReason,
     resetGame,
     startGame,
   } = useFeihuaStore();
@@ -29,7 +30,7 @@ export const FeihuaResultModal: React.FC = () => {
     const shareText = `【飞花令状 · 诗境】
 令字：【${currentKeyword}】
 对决先贤：${selectedPersona.name}
-对令战绩：${isPlayerWin ? '夺魁及第' : '憾负名家'}
+对令战绩：${isPlayerWin ? '夺魁及第' : '憾负名家'}${gameoverReason ? ` (${gameoverReason})` : ''}
 应令诗句：${playerVersesCount} 联
 御赐功名：【${playerRank}】
 得胜积分：${playerScore} 分
@@ -52,6 +53,11 @@ export const FeihuaResultModal: React.FC = () => {
               {isPlayerWin ? '恭喜夺魁 · 飞花及第' : '对决落幕 · 虽败犹荣'}
             </h2>
           </div>
+          {gameoverReason && (
+            <p className="text-xs font-serif text-chinese-cinnabar font-bold">
+              {gameoverReason}
+            </p>
+          )}
           <p className="text-xs font-serif text-ink-500">
             飞花令字【{currentKeyword}】· 鏖战 {history.length} 回合
           </p>
