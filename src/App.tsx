@@ -59,12 +59,11 @@ export const App: React.FC = () => {
     },
   });
 
-  // Minimalist / Zen Mode: pure full-screen search view
+  // Minimalist / Zen Mode: pure full-screen search view (only search bar & exit button)
   if (isZenMode) {
     return (
       <div className="min-h-screen bg-paper-100 dark:bg-[#131316] text-ink-900 dark:text-ink-50 selection:bg-chinese-cinnabar/20 selection:text-chinese-cinnabar transition-colors">
         <ZenSearchView />
-        <BgmPlayer />
       </div>
     );
   }

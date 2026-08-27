@@ -1,68 +1,91 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Shuffle, Sparkles } from 'lucide-react';
 import { Poem } from '@/types';
 import { poemApi } from '@/api/poems';
 import { PoemCard } from '@/components/Poem/PoemCard';
 import { SealBadge } from '@/components/Common/SealBadge';
+import { FAMOUS_POETS_DIRECTORY } from '@/utils/poetDirectory';
 
 export type RandomPoemFilter = 'all' | 'tang' | 'song';
 
+// Guaranteed instant curated poem helper
+function getRandomLocalMasterpiece(dynasty?: string): Poem {
+  const matchingPoems: Poem[] = [];
+  for (const poet of FAMOUS_POETS_DIRECTORY) {
+    if (!dynasty || poet.dynasty?.name === dynasty) {
+      if (poet.poems && poet.poems.length > 0) {
+        matchingPoems.push(...poet.poems);
+      }
+    }
+  }
+
+  if (matchingPoems.length > 0) {
+    const idx = Math.floor(Math.random() * matchingPoems.length);
+    return matchingPoems[idx];
+  }
+
+  // Fallback to absolute default masterpiece: 水调歌头 · 明月几时有
+  return FAMOUS_POETS_DIRECTORY[0].poems[0];
+}
+
 export const SwipeableRandomPoem: React.FC = () => {
   const [filter, setFilter] = useState<RandomPoemFilter>('all');
-  const [history, setHistory] = useState<Poem[]>([]);
+  // Initialize with a guaranteed instant masterpiece so it NEVER shows empty / stuck loading
+  const [history, setHistory] = useState<Poem[]>(() => [getRandomLocalMasterpiece()]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [direction, setDirection] = useState<'left' | 'right' | null>(null);
 
-  // Touch coordinates for gesture tracking
+  // Real-time touch dragging state & physics
+  const [dragOffset, setDragOffset] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const isFetchingRef = useRef<boolean>(false);
 
-  // Fetch a new random poem
+  // Fast & resilient fetch with 1.8s timeout + guaranteed local fallback
   const fetchRandomPoem = useCallback(
-    async (targetFilter = filter): Promise<Poem | null> => {
-      if (isFetchingRef.current) return null;
+    async (targetFilter = filter): Promise<Poem> => {
+      if (isFetchingRef.current) {
+        return getRandomLocalMasterpiece(
+          targetFilter === 'tang' ? '唐' : targetFilter === 'song' ? '宋' : undefined
+        );
+      }
       isFetchingRef.current = true;
       setIsLoading(true);
 
+      const dynastyParam =
+        targetFilter === 'tang' ? '唐' : targetFilter === 'song' ? '宋' : undefined;
+
       try {
-        const dynastyParam =
-          targetFilter === 'tang' ? '唐' : targetFilter === 'song' ? '宋' : undefined;
-        const res = await poemApi.getRandom({ dynasty: dynastyParam });
-        if (res.data) {
+        // Race network fetch against a fast 1800ms timeout
+        const timeoutPromise = new Promise<null>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 1800)
+        );
+        const fetchPromise = poemApi.getRandom({ dynasty: dynastyParam });
+        const res = (await Promise.race([fetchPromise, timeoutPromise])) as any;
+
+        if (res && res.data && res.data.title && res.data.content?.length > 0) {
           return res.data;
         }
-        return null;
       } catch (err) {
-        console.error('Failed to fetch random poem:', err);
-        return null;
+        console.warn('Random poem network fetch timed out or failed, using curated masterpiece:', err);
       } finally {
         isFetchingRef.current = false;
         setIsLoading(false);
       }
+
+      // Instant local masterpiece fallback
+      return getRandomLocalMasterpiece(dynastyParam);
     },
     [filter]
   );
 
-  // Initial load
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      const initialPoem = await fetchRandomPoem(filter);
-      if (isMounted && initialPoem) {
-        setHistory([initialPoem]);
-        setCurrentIndex(0);
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
   // Switch to Next Poem (or fetch new one if at end)
   const handleNext = async () => {
-    if (isLoading) return;
+    setDragOffset(0);
+    setIsDragging(false);
 
     if (currentIndex < history.length - 1) {
       setDirection('left');
@@ -70,64 +93,78 @@ export const SwipeableRandomPoem: React.FC = () => {
     } else {
       setDirection('left');
       const newPoem = await fetchRandomPoem();
-      if (newPoem) {
-        setHistory((prev) => [...prev, newPoem]);
-        setCurrentIndex((prev) => prev + 1);
-      }
-    }
-  };
-
-  // Switch to Previous Poem
-  const handlePrevious = () => {
-    if (currentIndex > 0 && !isLoading) {
-      setDirection('right');
-      setCurrentIndex((prev) => prev - 1);
-    }
-  };
-
-  // Switch filter (All / Tang / Song)
-  const handleFilterChange = async (newFilter: RandomPoemFilter) => {
-    if (newFilter === filter) return;
-    setFilter(newFilter);
-    setDirection('left');
-    const newPoem = await fetchRandomPoem(newFilter);
-    if (newPoem) {
       setHistory((prev) => [...prev, newPoem]);
       setCurrentIndex((prev) => prev + 1);
     }
   };
 
-  // Touch Gesture Handlers
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartXRef.current = e.touches[0].clientX;
-    touchStartYRef.current = e.touches[0].clientY;
-  };
+  // Switch to Previous Poem
+  const handlePrevious = () => {
+    setDragOffset(0);
+    setIsDragging(false);
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
-
-    const endX = e.changedTouches[0].clientX;
-    const endY = e.changedTouches[0].clientY;
-    const deltaX = endX - touchStartXRef.current;
-    const deltaY = endY - touchStartYRef.current;
-
-    // Reset touch refs
-    touchStartXRef.current = null;
-    touchStartYRef.current = null;
-
-    // Check if horizontal swipe gesture (at least 45px, more horizontal than vertical)
-    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
-      if (deltaX < 0) {
-        // Swiped Left -> Next Poem
-        handleNext();
-      } else {
-        // Swiped Right -> Previous Poem
-        handlePrevious();
-      }
+    if (currentIndex > 0) {
+      setDirection('right');
+      setCurrentIndex((prev) => prev - 1);
     }
   };
 
-  const currentPoem = history[currentIndex];
+  // Switch dynasty filter (All / Tang / Song)
+  const handleFilterChange = async (newFilter: RandomPoemFilter) => {
+    if (newFilter === filter) return;
+    setFilter(newFilter);
+    setDirection('left');
+    const newPoem = await fetchRandomPoem(newFilter);
+    setHistory((prev) => [...prev, newPoem]);
+    setCurrentIndex((prev) => prev + 1);
+  };
+
+  // Touch Gesture: Start
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchStartYRef.current = e.touches[0].clientY;
+    setIsDragging(true);
+  };
+
+  // Touch Gesture: Move (Real-time card tracking)
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const diffX = currentX - touchStartXRef.current;
+    const diffY = currentY - touchStartYRef.current;
+
+    // Only drag horizontally if horizontal movement exceeds vertical scroll
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      // Add slight elastic resistance
+      setDragOffset(diffX * 0.88);
+    }
+  };
+
+  // Touch Gesture: End (Snap to next/previous or spring back)
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+
+    if (dragOffset < -50) {
+      // Swiped Left -> Next Poem
+      handleNext();
+    } else if (dragOffset > 50) {
+      // Swiped Right -> Previous Poem
+      if (currentIndex > 0) {
+        handlePrevious();
+      } else {
+        setDragOffset(0);
+      }
+    } else {
+      // Spring back to center
+      setDragOffset(0);
+    }
+  };
+
+  const currentPoem = history[currentIndex] || history[0];
 
   return (
     <section className="space-y-4 select-none">
@@ -185,7 +222,7 @@ export const SwipeableRandomPoem: React.FC = () => {
           <button
             onClick={handlePrevious}
             disabled={currentIndex === 0 || isLoading}
-            className="p-2 rounded-xl bg-paper-200 dark:bg-ink-800 hover:bg-paper-300 dark:hover:bg-ink-700 text-ink-700 dark:text-ink-200 disabled:opacity-40 transition-all active:scale-95 shadow-xs"
+            className="p-2 rounded-xl bg-paper-200 dark:bg-ink-800 hover:bg-paper-300 dark:hover:bg-ink-700 text-ink-700 dark:text-ink-200 disabled:opacity-30 transition-all active:scale-95 shadow-xs"
             title="上一首诗 (可右滑)"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -205,31 +242,33 @@ export const SwipeableRandomPoem: React.FC = () => {
         </div>
       </div>
 
-      {/* Swipeable Container */}
+      {/* Swipeable Container with Real-Time Interactive Physics */}
       <div
         onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         className="relative group overflow-hidden rounded-3xl touch-pan-y"
       >
-        {currentPoem ? (
-          <div
-            key={currentPoem.id}
-            className={`${
-              direction === 'left'
-                ? 'animate-slide-in-left'
-                : direction === 'right'
-                ? 'animate-slide-in-right'
-                : 'animate-fade-in'
-            }`}
-          >
-            <PoemCard poem={currentPoem} />
-          </div>
-        ) : (
-          <div className="xuan-card rounded-3xl p-12 text-center text-ink-400 font-serif space-y-2">
-            <Shuffle className="w-6 h-6 mx-auto text-chinese-cinnabar animate-spin" />
-            <p>正在漫游寻觅佳句...</p>
-          </div>
-        )}
+        <div
+          key={currentPoem.id}
+          style={{
+            transform: `translateX(${dragOffset}px) rotate(${dragOffset * 0.015}deg)`,
+            opacity: Math.max(0.65, 1 - Math.abs(dragOffset) / 600),
+            transition: isDragging
+              ? 'none'
+              : 'transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease',
+            willChange: 'transform, opacity',
+          }}
+          className={`${
+            !isDragging && direction === 'left'
+              ? 'animate-slide-in-left'
+              : !isDragging && direction === 'right'
+              ? 'animate-slide-in-right'
+              : ''
+          }`}
+        >
+          <PoemCard poem={currentPoem} />
+        </div>
 
         {/* Desktop Left Float Arrow */}
         {currentIndex > 0 && (
