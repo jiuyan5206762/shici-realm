@@ -6,6 +6,7 @@ import { SealBadge } from './SealBadge';
 export const BgmPlayer: React.FC = () => {
   const {
     isPlaying,
+    isBuffering,
     autoplayPending,
     volume,
     isMuted,
@@ -134,7 +135,7 @@ export const BgmPlayer: React.FC = () => {
             )}
           </div>
           <span className="text-[10px] font-serif text-ink-400 truncate">
-            {isPlaying ? '悠扬古筝演奏中' : autoplayPending ? '点击任意处开始伴读' : artist}
+            {isBuffering ? '音律加载中...' : isPlaying ? '悠扬古筝演奏中' : autoplayPending ? '点击任意处开始伴读' : artist}
           </span>
         </div>
 

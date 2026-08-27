@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 interface BgmState {
   isPlaying: boolean;
+  isBuffering: boolean;
   volume: number; // 0 to 1
   isMuted: boolean;
   title: string;
@@ -20,15 +21,18 @@ interface BgmState {
 }
 
 const STORAGE_KEY_VOLUME = 'shici_bgm_volume';
-
-// 有效的浏览器手势激活事件（必须是真实的交互手势）
 const GESTURE_EVENTS = ['pointerdown', 'touchstart', 'click', 'keydown'] as const;
+const AUDIO_SRC = '/audio/chunjianghuayueye.mp3';
 
 let audioInstance: HTMLAudioElement | null = null;
 let gestureListenersAttached = false;
+let userWantsPlayback = false;
+let watchdogTimer: any = null;
+let autoRetryTimer: any = null;
 
 export const useBgmStore = create<BgmState>((set, get) => ({
   isPlaying: false,
+  isBuffering: false,
   volume: (() => {
     const saved = localStorage.getItem(STORAGE_KEY_VOLUME);
     return saved !== null ? Math.max(0, Math.min(1, parseFloat(saved))) : 0.35;
@@ -47,15 +51,105 @@ export const useBgmStore = create<BgmState>((set, get) => ({
       return;
     }
 
-    const audio = new Audio('/audio/chunjianghuayueye.mp3');
+    const audio = new Audio(AUDIO_SRC);
     audio.loop = true;
     audio.preload = 'auto';
-    audio.volume = get().volume;
+    audio.volume = get().isMuted ? 0 : get().volume;
 
-    audio.addEventListener('play', () => set({ isPlaying: true, autoplayPending: false }));
-    audio.addEventListener('pause', () => set({ isPlaying: false }));
-    audio.addEventListener('ended', () => set({ isPlaying: false }));
-    audio.addEventListener('error', (e) => console.error('Audio load error:', e));
+    // 1. Play & Playing State Handlers
+    audio.addEventListener('play', () => {
+      set({ isPlaying: true, isBuffering: false, autoplayPending: false });
+    });
+
+    audio.addEventListener('playing', () => {
+      set({ isPlaying: true, isBuffering: false });
+    });
+
+    // 2. Pause Handler (Distinguish deliberate pause from buffer underruns)
+    audio.addEventListener('pause', () => {
+      if (!userWantsPlayback) {
+        set({ isPlaying: false, isBuffering: false });
+      }
+    });
+
+    // 3. Seamless Loop Guard (Safeguard in case browser loop gets stuck on EOF)
+    audio.addEventListener('ended', () => {
+      if (userWantsPlayback) {
+        audio.currentTime = 0;
+        audio.play().catch((err) => console.warn('BGM loop restart note:', err));
+      } else {
+        set({ isPlaying: false });
+      }
+    });
+
+    // 4. Stalling / Waiting / Buffer Recovery
+    audio.addEventListener('waiting', () => {
+      if (userWantsPlayback) {
+        set({ isBuffering: true });
+      }
+    });
+
+    audio.addEventListener('canplay', () => {
+      set({ isBuffering: false });
+      if (userWantsPlayback && audio.paused) {
+        audio.play().catch(() => {});
+      }
+    });
+
+    audio.addEventListener('canplaythrough', () => {
+      set({ isBuffering: false });
+      if (userWantsPlayback && audio.paused) {
+        audio.play().catch(() => {});
+      }
+    });
+
+    audio.addEventListener('stalled', () => {
+      if (userWantsPlayback && audio.paused) {
+        if (autoRetryTimer) clearTimeout(autoRetryTimer);
+        autoRetryTimer = setTimeout(() => {
+          if (userWantsPlayback && audio.paused) {
+            audio.play().catch(() => {});
+          }
+        }, 1000);
+      }
+    });
+
+    // 5. Auto-Heal from Network or Decoder Errors
+    audio.addEventListener('error', (e) => {
+      console.warn('BGM stream encountered transient glitch, auto-healing:', e);
+      if (userWantsPlayback) {
+        set({ isBuffering: true });
+        if (autoRetryTimer) clearTimeout(autoRetryTimer);
+        autoRetryTimer = setTimeout(() => {
+          if (userWantsPlayback) {
+            const currentPos = audio.currentTime || 0;
+            audio.load();
+            audio.currentTime = currentPos;
+            audio.play().catch(() => {});
+          }
+        }, 1500);
+      }
+    });
+
+    // 6. Tab Visibility Change Auto-Resume (Prevent background freeze)
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && userWantsPlayback && audio.paused) {
+          audio.play().catch(() => {});
+        }
+      });
+    }
+
+    // 7. Active Watchdog Heartbeat (Checks every 3s to guarantee unbroken playback)
+    if (!watchdogTimer && typeof window !== 'undefined') {
+      watchdogTimer = setInterval(() => {
+        if (userWantsPlayback && audioInstance) {
+          if (audioInstance.paused && !get().autoplayPending) {
+            audioInstance.play().catch(() => {});
+          }
+        }
+      }, 3000);
+    }
 
     audioInstance = audio;
     set({ audioElement: audio });
@@ -64,19 +158,20 @@ export const useBgmStore = create<BgmState>((set, get) => ({
   autoPlayOnEntry: () => {
     const { initAudio, play } = get();
     initAudio();
+    userWantsPlayback = true;
 
-    // 1. 尝试直接自动播放（若用户此前访问过或浏览器策略允许，则直接进入播放）
+    // 1. Try immediate autoplay
     play().catch(() => {
       set({ autoplayPending: true });
 
       if (gestureListenersAttached) return;
       gestureListenersAttached = true;
 
-      // 2. 若浏览器策略拦截了零手势播放，则在页面任意真实手势（点击/轻触/按键）时无缝启动
+      // 2. Seamless gesture fallback (Trigger on first natural user interaction)
       const handleUserGesture = async () => {
         try {
+          userWantsPlayback = true;
           await get().play();
-          // 播放成功后才解绑事件监听
           gestureListenersAttached = false;
           GESTURE_EVENTS.forEach((evt) => {
             window.removeEventListener(evt, handleUserGesture, true);
@@ -96,6 +191,8 @@ export const useBgmStore = create<BgmState>((set, get) => ({
 
   play: async () => {
     const { initAudio, volume } = get();
+    userWantsPlayback = true;
+
     if (!audioInstance) {
       initAudio();
     }
@@ -105,17 +202,20 @@ export const useBgmStore = create<BgmState>((set, get) => ({
     audio.volume = get().isMuted ? 0 : volume;
     try {
       await audio.play();
-      set({ isPlaying: true, autoplayPending: false });
+      set({ isPlaying: true, isBuffering: false, autoplayPending: false });
     } catch (e) {
-      set({ isPlaying: false });
+      if (!gestureListenersAttached) {
+        set({ isPlaying: false });
+      }
       throw e;
     }
   },
 
   pause: () => {
+    userWantsPlayback = false;
     if (audioInstance) {
       audioInstance.pause();
-      set({ isPlaying: false });
+      set({ isPlaying: false, isBuffering: false, autoplayPending: false });
     }
   },
 
