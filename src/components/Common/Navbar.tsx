@@ -9,8 +9,10 @@ import {
   Sun,
   Moon,
   Swords,
+  Sparkles,
 } from 'lucide-react';
 import { useThemeStore } from '@/store/themeStore';
+import { useZenStore } from '@/store/zenStore';
 import { poemApi } from '@/api/poems';
 import { SealBadge } from '@/components/Common/SealBadge';
 
@@ -18,6 +20,7 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useThemeStore();
+  const { toggleZenMode } = useZenStore();
   const [isRandomLoading, setIsRandomLoading] = useState(false);
 
   const navLinks = [
@@ -150,6 +153,16 @@ export const Navbar: React.FC = () => {
             ) : (
               <Sun className="w-4 h-4 text-chinese-gold" />
             )}
+          </button>
+
+          {/* Zen / Minimalist Mode Button */}
+          <button
+            onClick={toggleZenMode}
+            className="flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-serif font-bold border border-chinese-cinnabar/40 text-chinese-cinnabar hover:bg-chinese-cinnabar hover:text-white transition-all interactive-tap shadow-xs bg-chinese-cinnabar/5"
+            title="进入极简纯粹搜索模式"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>极简</span>
           </button>
 
           {/* Settings */}

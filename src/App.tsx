@@ -4,6 +4,7 @@ import { Navbar } from '@/components/Common/Navbar';
 import { Footer } from '@/components/Common/Footer';
 import { MobileTabBar } from '@/components/Common/MobileTabBar';
 import { BgmPlayer } from '@/components/Common/BgmPlayer';
+import { ZenSearchView } from '@/components/Zen/ZenSearchView';
 import { HomePage } from '@/pages/Home/HomePage';
 import { PoemsPage } from '@/pages/Poems/PoemsPage';
 import { PoemDetailPage } from '@/pages/PoemDetail/PoemDetailPage';
@@ -18,6 +19,7 @@ import { SettingsPage } from '@/pages/Settings/SettingsPage';
 import { FeihuaPage } from '@/pages/Feihua/FeihuaPage';
 import { useThemeStore } from '@/store/themeStore';
 import { useBgmStore } from '@/store/bgmStore';
+import { useZenStore } from '@/store/zenStore';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { poemApi } from '@/api/poems';
 
@@ -34,6 +36,7 @@ export const App: React.FC = () => {
   const navigate = useNavigate();
   const initTheme = useThemeStore((state) => state.initTheme);
   const autoPlayOnEntry = useBgmStore((state) => state.autoPlayOnEntry);
+  const isZenMode = useZenStore((state) => state.isZenMode);
 
   // Initialize theme & autoplay background music on entry
   useEffect(() => {
@@ -55,6 +58,16 @@ export const App: React.FC = () => {
       }
     },
   });
+
+  // Minimalist / Zen Mode: pure full-screen search view
+  if (isZenMode) {
+    return (
+      <div className="min-h-screen bg-paper-100 dark:bg-[#131316] text-ink-900 dark:text-ink-50 selection:bg-chinese-cinnabar/20 selection:text-chinese-cinnabar transition-colors">
+        <ZenSearchView />
+        <BgmPlayer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-paper-100 dark:bg-[#131316] text-ink-900 dark:text-ink-50 selection:bg-chinese-cinnabar/20 selection:text-chinese-cinnabar transition-colors">
