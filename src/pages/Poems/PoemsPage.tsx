@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Filter, RotateCcw } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import {
   poemApi,
   DYNASTY_NAME_TO_ID,
@@ -55,13 +55,16 @@ export const PoemsPage: React.FC = () => {
   const activeFilterCount = (q ? 1 : 0) + (dynasty ? 1 : 0) + (type ? 1 : 0) + (author ? 1 : 0);
 
   // Update URL SearchParams helper
-  const updateFilter = (updates: {
-    q?: string | null;
-    dynasty?: string | null;
-    type?: string | null;
-    author?: string | null;
-    page?: number | null;
-  }) => {
+  const updateFilter = (
+    updates: {
+      q?: string | null;
+      dynasty?: string | null;
+      type?: string | null;
+      author?: string | null;
+      page?: number | null;
+    },
+    shouldScroll = false
+  ) => {
     const nextParams = new URLSearchParams(searchParams);
 
     if (updates.q !== undefined) {
@@ -92,7 +95,9 @@ export const PoemsPage: React.FC = () => {
     }
 
     setSearchParams(nextParams);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (shouldScroll) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleResetFilters = () => {
@@ -194,7 +199,7 @@ export const PoemsPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 animate-fade-in">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-paper-300 dark:border-ink-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 pb-6 border-b border-paper-300 dark:border-ink-800">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl sm:text-4xl font-serif font-black text-ink-900 dark:text-ink-50">
@@ -207,40 +212,32 @@ export const PoemsPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Quick In-Library Search */}
-        <div className="w-full md:max-w-md">
-          <SearchBar
-            initialValue={q}
-            onSearch={(newQ) => updateFilter({ q: newQ || null, page: 1 })}
-            placeholder="在诗库中精准检索名句、篇名、诗人..."
-            showSuggestions={false}
-          />
-        </div>
+        {/* In-Library Search & Filter Bar */}
+        <div className="flex items-center gap-2.5 w-full md:max-w-md">
+          <div className="flex-1">
+            <SearchBar
+              initialValue={q}
+              onSearch={(newQ) => updateFilter({ q: newQ || null, page: 1 }, true)}
+              placeholder="在诗库中精准检索名句、篇名..."
+              showSuggestions={false}
+            />
+          </div>
 
-        {/* Mobile Filter Trigger Button */}
-        <div className="flex items-center gap-2 md:hidden">
+          {/* Mobile Filter Trigger Button in Header */}
           <button
+            type="button"
             onClick={() => setIsMobileFilterOpen(true)}
-            className="flex-1 px-4 py-2.5 bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 rounded-2xl text-xs font-serif font-bold text-ink-800 dark:text-ink-200 flex items-center justify-center gap-2 shadow-xs"
+            className="md:hidden px-3.5 py-2.5 bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 hover:border-chinese-cinnabar rounded-2xl text-xs font-serif font-bold text-ink-800 dark:text-ink-200 flex items-center gap-1.5 shadow-xs flex-shrink-0 active:scale-95 transition-all"
+            title="打开筛选条件"
           >
-            <Filter className="w-3.5 h-3.5 text-chinese-cinnabar" />
-            <span>筛选条件</span>
+            <Filter className="w-4 h-4 text-chinese-cinnabar" />
+            <span>筛选</span>
             {activeFilterCount > 0 && (
-              <span className="px-2 py-0.5 bg-chinese-cinnabar text-white rounded-full text-xs font-mono font-bold">
+              <span className="px-1.5 py-0.2 bg-chinese-cinnabar text-white rounded-full text-[10px] font-mono font-bold">
                 {activeFilterCount}
               </span>
             )}
           </button>
-
-          {activeFilterCount > 0 && (
-            <button
-              onClick={handleResetFilters}
-              className="p-2.5 rounded-2xl border border-paper-300 dark:border-ink-700 text-ink-500 hover:text-chinese-cinnabar"
-              title="重置全部筛选"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
-          )}
         </div>
       </div>
 
@@ -350,6 +347,23 @@ export const PoemsPage: React.FC = () => {
             </>
           )}
         </div>
+      </div>
+
+      {/* Mobile Floating Filter Pill Button (Bottom Right) */}
+      <div className="md:hidden fixed bottom-20 right-4 z-30 animate-fade-in">
+        <button
+          type="button"
+          onClick={() => setIsMobileFilterOpen(true)}
+          className="px-4 py-2.5 rounded-full bg-chinese-cinnabar hover:bg-chinese-rouge text-white text-xs font-serif font-bold flex items-center gap-1.5 shadow-2xl active:scale-95 transition-all ring-2 ring-white/20"
+        >
+          <Filter className="w-3.5 h-3.5" />
+          <span>筛选</span>
+          {activeFilterCount > 0 && (
+            <span className="px-1.5 py-0.2 bg-white text-chinese-cinnabar rounded-full text-[10px] font-mono font-black">
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Mobile Bottom Sheet Drawer */}
