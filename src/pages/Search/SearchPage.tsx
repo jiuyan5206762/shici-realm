@@ -1,25 +1,26 @@
 import React from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Search, User } from 'lucide-react';
+import { Search, BookOpen, ArrowRight } from 'lucide-react';
 import { searchApi } from '@/api/search';
 import { poemApi } from '@/api/poems';
 import { SearchBar } from '@/components/Search/SearchBar';
 import { PoemList } from '@/components/Poem/PoemList';
 import { Pagination } from '@/components/Common/Pagination';
 import { ErrorState } from '@/components/Common/ErrorState';
-import { EmptyState } from '@/components/Common/EmptyState';
 import { findPoetByName } from '@/utils/poetDirectory';
+import { SealBadge } from '@/components/Common/SealBadge';
+import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   const q = searchParams.get('q') || '';
   const page = parseInt(searchParams.get('page') || '1', 10);
   const pageSize = 20;
 
   const handleSearch = (newQuery: string) => {
+    guqinAudio.playChime();
     const nextParams = new URLSearchParams();
     if (newQuery.trim()) {
       nextParams.set('q', newQuery.trim());
@@ -29,6 +30,7 @@ export const SearchPage: React.FC = () => {
   };
 
   const handlePageChange = (nextPage: number) => {
+    guqinAudio.playChime();
     const nextParams = new URLSearchParams(searchParams);
     if (nextPage > 1) {
       nextParams.set('page', String(nextPage));
@@ -42,14 +44,15 @@ export const SearchPage: React.FC = () => {
   // Check if searched query is a famous poet
   const matchedPoet = q ? findPoetByName(q) : undefined;
 
-  // 1. If searching for a poet, fetch spotlight poem from remote API
+  // 1. If searching for a poet, fetch spotlight poem
   const { data: poetSampleRes } = useQuery({
     queryKey: ['searchPoetSample', q],
     queryFn: () => (q ? poemApi.getRandom({ author: q }) : null),
     enabled: Boolean(q && (matchedPoet || q.trim().length <= 4)),
+    staleTime: 30 * 60 * 1000,
   });
 
-  // 2. Perform search query
+  // 2. Perform search query with in-memory & local cache
   const {
     data: searchRes,
     isLoading,
@@ -67,6 +70,7 @@ export const SearchPage: React.FC = () => {
       return res;
     },
     enabled: Boolean(q.trim()),
+    staleTime: 5 * 60 * 1000,
   });
 
   const poems = searchRes?.data || [];
@@ -75,149 +79,120 @@ export const SearchPage: React.FC = () => {
   const poetSample = poetSampleRes?.data;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10 animate-fade-in pb-20">
       {/* Search Header */}
       <div className="max-w-3xl mx-auto text-center space-y-4">
-        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ink-900 dark:text-ink-50">
-          全文诗词检索
-        </h1>
-        <p className="text-base text-ink-600 dark:text-ink-300 font-serif">
-          输入诗题、诗句、诗人名或意象关键词，检索 37万+ 首古籍名篇
+        <div className="flex items-center justify-center gap-2">
+          <SealBadge text="搜卷" size="sm" variant="cinnabar" />
+          <h1 className="text-3xl sm:text-4xl font-serif font-black text-ink-900 dark:text-ink-50">
+            全库检索 · 寻章摘句
+          </h1>
+        </div>
+        <p className="text-xs sm:text-sm text-ink-500 dark:text-ink-400 font-serif">
+          输入诗词名句、篇名或诗人姓名，毫秒级快速匹配古籍藏本
         </p>
 
         <div className="pt-2">
-          <SearchBar initialValue={q} onSearch={handleSearch} autoFocus={!q} />
+          <SearchBar initialValue={q} onSearch={handleSearch} autoFocus />
         </div>
       </div>
 
-      {/* Search Results Area */}
-      {q ? (
-        <div className="space-y-8">
-          {/* Header Info */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-stone-200 dark:border-stone-800">
-            <div className="text-base text-ink-700 dark:text-ink-200 font-serif">
-              检索关键词：<span className="font-bold text-chinese-ochre">“{q}”</span>
-              {!isLoading && (
-                <span className="text-sm text-ink-500 dark:text-ink-400 ml-2">
-                  (第 {page} 页)
-                </span>
-              )}
-            </div>
-
-            {matchedPoet && (
-              <Link
-                to={`/authors/${matchedPoet.id}?name=${encodeURIComponent(matchedPoet.name)}&dynasty=${encodeURIComponent(matchedPoet.dynasty.name)}`}
-                className="text-base text-chinese-cinnabar hover:underline flex items-center space-x-1 font-serif font-medium"
-              >
-                <User className="w-4 h-4" />
-                <span>进入【{matchedPoet.name}】专页</span>
-              </Link>
-            )}
-          </div>
-
-          {/* Poet Spotlight Card (if matched a poet) */}
-          {matchedPoet && (
-            <div className="p-8 rounded-3xl bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 shadow-sm space-y-5">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-2xl bg-chinese-cinnabar text-white font-serif font-bold text-xl flex items-center justify-center">
-                  {matchedPoet.name[0]}
-                </div>
-                <div>
-                  <h3 className="font-serif font-bold text-2xl text-ink-900 dark:text-ink-50">
-                    诗人 · {matchedPoet.name}（{matchedPoet.dynasty.name}代）
+      {/* When a poet is searched: Show Poet Profile Spotlight */}
+      {q && (matchedPoet || poetSample) && (
+        <div className="max-w-4xl mx-auto xuan-card rounded-3xl p-6 sm:p-8 space-y-5 border border-paper-400/40 shadow-oriental">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-paper-300/80 dark:border-ink-800">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-chinese-cinnabar text-white font-serif font-bold text-xl flex items-center justify-center shadow-xs">
+                {q.charAt(0)}
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-ink-900 dark:text-ink-50">
+                    {q}
                   </h3>
-                  <p className="text-base text-ink-600 dark:text-ink-300 font-serif mt-1">
-                    {matchedPoet.description}
-                  </p>
+                  <SealBadge text={matchedPoet?.dynasty?.name || poetSample?.dynasty?.name || '唐'} size="sm" variant="cinnabar" />
+                </div>
+                <div className="text-xs text-ink-400 font-serif mt-0.5">
+                  文学大家 · 传世名篇入选
                 </div>
               </div>
-
-              {/* Representative Works Chips */}
-              {matchedPoet.poems && matchedPoet.poems.length > 0 && (
-                <div className="space-y-3 pt-3 border-t border-stone-100 dark:border-stone-800">
-                  <span className="text-base font-serif font-bold text-chinese-ochre">
-                    传世代表名篇：
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                    {matchedPoet.poems.slice(0, 4).map((work) => (
-                      <Link
-                        key={work.id}
-                        to={`/poems/${work.id}`}
-                        className="p-4 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 hover:border-chinese-ochre block group"
-                      >
-                        <div className="font-serif font-bold text-base text-ink-900 dark:text-ink-100 group-hover:text-chinese-ochre truncate">
-                          《{work.title}》
-                        </div>
-                        <div className="text-sm font-serif text-ink-500 dark:text-ink-400 truncate mt-1">
-                          {(work.content || []).join(' ')}
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
+
+            <Link
+              to={`/poems?author=${encodeURIComponent(q)}`}
+              onClick={() => guqinAudio.playChime()}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-chinese-cinnabar hover:bg-chinese-rouge text-white text-xs font-serif font-bold shadow-xs transition-all interactive-tap"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>查看 {q} 传世作品</span>
+              <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
+            </Link>
+          </div>
+
+          {matchedPoet?.description && (
+            <p className="text-xs sm:text-sm text-ink-700 dark:text-ink-300 font-serif leading-relaxed">
+              {matchedPoet.description}
+            </p>
           )}
 
-          {/* Random sample if query is a poet */}
-          {poetSample && !matchedPoet && (
-            <div className="p-5 rounded-2xl bg-white dark:bg-[#1E1E22] border border-stone-200 dark:border-stone-700 flex items-center justify-between text-base font-serif">
-              <span className="text-ink-700 dark:text-ink-200">
-                匹配到诗人 <strong>{poetSample.author?.name}</strong> 作品：《{poetSample.title}》
-              </span>
-              <Link
-                to={`/poems/${poetSample.id}`}
-                className="text-chinese-ochre font-medium hover:underline ml-2"
-              >
-                阅读 →
+          {poetSample && (
+            <div className="p-4 sm:p-5 rounded-2xl bg-paper-100/70 dark:bg-ink-800/60 border border-paper-300/60 dark:border-ink-700/60 text-center space-y-1.5">
+              <div className="text-xs font-serif text-chinese-cinnabar">代表名篇赏析</div>
+              <Link to={`/poems/${poetSample.id}`}>
+                <h4 className="text-base sm:text-lg font-serif font-bold text-ink-900 dark:text-ink-50 hover:text-chinese-cinnabar transition-colors">
+                  《{poetSample.title}》
+                </h4>
               </Link>
+              <div className="font-serif text-ink-800 dark:text-ink-200 text-sm sm:text-base leading-relaxed py-1">
+                {(poetSample.content || []).slice(0, 4).map((line, idx) => (
+                  <p key={idx}>{line}</p>
+                ))}
+              </div>
             </div>
-          )}
-
-          {/* Search Result Poem Cards */}
-          {isError ? (
-            <ErrorState
-              title="检索未响应或接口繁忙"
-              message="请检查检索关键词，或稍后重新尝试"
-              onRetry={() => refetch()}
-            />
-          ) : (
-            <>
-              <PoemList
-                poems={poems}
-                isLoading={isLoading}
-                emptyTitle={matchedPoet ? `已在上方展示 ${q} 的代表作品` : `未找到包含 “${q}” 的相关诗词`}
-                emptyDescription={
-                  matchedPoet
-                    ? `您可以直接点击上方卡片阅读 ${q} 的诗作，或前往古诗总库浏览`
-                    : '可以尝试更换同义字词，例如搜索“明月”、“春风”、“李白”'
-                }
-              />
-
-              {/* Pagination */}
-              {!isLoading && poems.length > 0 && (
-                <div className="pt-6 border-t border-stone-200 dark:border-stone-800">
-                  <Pagination
-                    currentPage={page}
-                    hasMore={hasMore}
-                    pageSize={pageSize}
-                    onPageChange={handlePageChange}
-                  />
-                </div>
-              )}
-            </>
           )}
         </div>
-      ) : (
-        /* Empty State before searching */
-        <EmptyState
-          icon={<Search className="w-10 h-10 text-stone-400" />}
-          title="开启您的诗词探索之旅"
-          description="在上方输入关键词开始检索，或浏览首页推荐与朝代分类"
-          actionText="随便看看推荐"
-          onAction={() => navigate('/poems')}
-        />
       )}
+
+      {/* Main Search Results Area */}
+      <div className="max-w-4xl mx-auto">
+        {!q.trim() ? (
+          <div className="text-center py-16 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-paper-200 dark:bg-ink-800 flex items-center justify-center mx-auto text-ink-400">
+              <Search className="w-7 h-7" />
+            </div>
+            <p className="text-sm font-serif text-ink-400">
+              在上方搜索框输入关键词，开始查阅
+            </p>
+          </div>
+        ) : isError ? (
+          <ErrorState onRetry={() => refetch()} />
+        ) : (
+          <div className="space-y-8">
+            <div className="flex items-center justify-between text-xs font-serif text-ink-500 pb-2 border-b border-paper-300/60 dark:border-ink-800">
+              <span>检索关键词：「<strong className="text-chinese-cinnabar">{q}</strong>」</span>
+              {poems.length > 0 && <span>共检索到相关诗词结果</span>}
+            </div>
+
+            <PoemList
+              poems={poems}
+              isLoading={isLoading}
+              onResetFilter={() => handleSearch('')}
+            />
+
+            {/* Pagination */}
+            {!isLoading && poems.length > 0 && (
+              <div className="pt-6 border-t border-paper-300/80 dark:border-ink-800">
+                <Pagination
+                  currentPage={page}
+                  hasMore={hasMore}
+                  pageSize={pageSize}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

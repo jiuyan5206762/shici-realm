@@ -14,9 +14,11 @@ import { SearchPage } from '@/pages/Search/SearchPage';
 import { FavoritesPage } from '@/pages/Favorites/FavoritesPage';
 import { HistoryPage } from '@/pages/History/HistoryPage';
 import { SettingsPage } from '@/pages/Settings/SettingsPage';
+import { FeihuaPage } from '@/pages/Feihua/FeihuaPage';
 import { useThemeStore } from '@/store/themeStore';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { poemApi } from '@/api/poems';
+import { guqinAudio } from '@/services/audio/guqinAudio';
 
 // Scroll to top helper component
 const ScrollToTop: React.FC = () => {
@@ -41,6 +43,7 @@ export const App: React.FC = () => {
     onSearchFocus: () => navigate('/search'),
     onRandomPoem: async () => {
       try {
+        guqinAudio.playChime();
         const res = await poemApi.getRandom();
         if (res.data?.id) {
           navigate(`/poems/${res.data.id}`);
@@ -52,7 +55,7 @@ export const App: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen flex flex-col justify-between selection:bg-chinese-ochre/25 selection:text-chinese-ochre">
+    <div className="min-h-screen flex flex-col justify-between selection:bg-chinese-cinnabar/20 selection:text-chinese-cinnabar">
       <ScrollToTop />
       
       {/* Top Navigation */}
@@ -68,6 +71,7 @@ export const App: React.FC = () => {
           <Route path="/authors/:id" element={<AuthorDetailPage />} />
           <Route path="/dynasties" element={<DynastiesPage />} />
           <Route path="/types" element={<TypesPage />} />
+          <Route path="/feihua" element={<FeihuaPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/history" element={<HistoryPage />} />

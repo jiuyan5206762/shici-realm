@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Filter, BookOpen, RotateCcw } from 'lucide-react';
+import { Filter, RotateCcw } from 'lucide-react';
 import {
   poemApi,
   DYNASTY_NAME_TO_ID,
@@ -20,6 +20,8 @@ import { MobileFilterDrawer } from '@/components/Filter/MobileFilterDrawer';
 import { Pagination } from '@/components/Common/Pagination';
 import { ErrorState } from '@/components/Common/ErrorState';
 import { filterPoemsByCriteria } from '@/utils/poetDirectory';
+import { SealBadge } from '@/components/Common/SealBadge';
+import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const PoemsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,11 +38,13 @@ export const PoemsPage: React.FC = () => {
   const { data: dynastiesRes } = useQuery({
     queryKey: ['dynasties'],
     queryFn: () => dynastyApi.getDynasties(),
+    staleTime: 60 * 60 * 1000,
   });
 
   const { data: typesRes } = useQuery({
     queryKey: ['types'],
     queryFn: () => typeApi.getTypes(),
+    staleTime: 60 * 60 * 1000,
   });
 
   const dynasties = dynastiesRes?.data || [];
@@ -55,6 +59,7 @@ export const PoemsPage: React.FC = () => {
     author?: string | null;
     page?: number | null;
   }) => {
+    guqinAudio.playChime();
     const nextParams = new URLSearchParams(searchParams);
 
     if (updates.dynasty !== undefined) {
@@ -84,11 +89,12 @@ export const PoemsPage: React.FC = () => {
   };
 
   const handleResetFilters = () => {
+    guqinAudio.playChime();
     setSearchParams(new URLSearchParams());
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 2. Fetch Poems with true backend filtering and full database pagination
+  // 2. Fetch Poems with multi-level cache & smart fallback
   const {
     data: poemsRes,
     isLoading,
@@ -101,7 +107,7 @@ export const PoemsPage: React.FC = () => {
       const typeId = type ? TYPE_NAME_TO_ID[type] : undefined;
       const authorId = author ? AUTHOR_NAME_TO_ID[author] : undefined;
 
-      // Special handling for dynasties not indexed in remote database (两汉: 2, 南北朝: 4, 隋: 5)
+      // Special handling for dynasties not indexed in remote database
       if (dynastyId === 2 || dynastyId === 4 || dynastyId === 5) {
         const localFiltered = filterPoemsByCriteria(dynasty, type, author, page, pageSize);
         return {
@@ -142,7 +148,7 @@ export const PoemsPage: React.FC = () => {
         };
       }
 
-      // If author is not indexed by ID in remote API (e.g. 李清照, 陶渊明, 孟浩然):
+      // If author is not indexed by ID in remote API
       if (author) {
         const localFiltered = filterPoemsByCriteria(dynasty, type, author, page, pageSize);
         if (localFiltered.totalCount > 0) {
@@ -158,7 +164,6 @@ export const PoemsPage: React.FC = () => {
           };
         }
 
-        // Try /api/search for custom query
         try {
           if (author.length >= 2) {
             const searchRes = await searchApi.search({ q: author, page, pageSize });
@@ -171,12 +176,9 @@ export const PoemsPage: React.FC = () => {
               };
             }
           }
-        } catch {
-          // fallback
-        }
+        } catch {}
       }
 
-      // Priority 3: Fallback to curated library
       const localFiltered = filterPoemsByCriteria(dynasty, type, author, page, pageSize);
       return {
         data: localFiltered.poems,
@@ -197,29 +199,31 @@ export const PoemsPage: React.FC = () => {
   const totalCount = (poemsRes as any)?.totalCount;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 animate-fade-in">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-200 dark:border-stone-800">
-        <div>
-          <h1 className="text-2xl sm:text-4xl font-serif font-bold text-ink-900 dark:text-ink-50 flex items-center space-x-2.5">
-            <BookOpen className="w-7 h-7 sm:w-8 h-8 text-chinese-ochre" />
-            <span>古诗总库</span>
-          </h1>
-          <p className="text-sm text-ink-500 dark:text-ink-400 mt-1 font-serif">
-            按朝代、体裁与诗人多维组合探索古籍名篇
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-paper-300 dark:border-ink-800">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl sm:text-4xl font-serif font-black text-ink-900 dark:text-ink-50">
+              古籍诗库全帙
+            </h1>
+            <SealBadge text="典藏" size="sm" variant="cinnabar" />
+          </div>
+          <p className="text-xs sm:text-sm text-ink-500 dark:text-ink-400 font-serif">
+            多维联动朝代、体裁与名家，品读千载文脉风华
           </p>
         </div>
 
-        {/* Mobile Filter Button */}
-        <div className="flex items-center space-x-2 md:hidden">
+        {/* Mobile Filter Trigger Button */}
+        <div className="flex items-center gap-2 md:hidden">
           <button
             onClick={() => setIsMobileFilterOpen(true)}
-            className="flex-1 px-4 py-2.5 bg-white dark:bg-[#1E1E22] border border-stone-200 dark:border-stone-800 rounded-xl text-sm font-serif font-medium text-ink-800 dark:text-ink-200 flex items-center justify-center space-x-2 shadow-sm"
+            className="flex-1 px-4 py-2.5 bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 rounded-2xl text-xs font-serif font-bold text-ink-800 dark:text-ink-200 flex items-center justify-center gap-2 shadow-xs"
           >
-            <Filter className="w-4 h-4 text-chinese-ochre" />
+            <Filter className="w-3.5 h-3.5 text-chinese-cinnabar" />
             <span>筛选条件</span>
             {activeFilterCount > 0 && (
-              <span className="px-2 py-0.5 bg-chinese-cinnabar text-white rounded-full text-xs font-bold">
+              <span className="px-2 py-0.5 bg-chinese-cinnabar text-white rounded-full text-xs font-mono font-bold">
                 {activeFilterCount}
               </span>
             )}
@@ -228,8 +232,8 @@ export const PoemsPage: React.FC = () => {
           {activeFilterCount > 0 && (
             <button
               onClick={handleResetFilters}
-              className="p-2.5 rounded-xl border border-stone-200 dark:border-stone-800 text-ink-500 hover:text-rose-500"
-              title="重置全部"
+              className="p-2.5 rounded-2xl border border-paper-300 dark:border-ink-700 text-ink-500 hover:text-chinese-cinnabar"
+              title="重置全部筛选"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -239,15 +243,15 @@ export const PoemsPage: React.FC = () => {
 
       {/* Active Filter Tags Bar */}
       {activeFilterCount > 0 && (
-        <div className="flex items-center space-x-2.5 flex-wrap gap-y-2 p-3.5 rounded-2xl bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-sm font-serif">
+        <div className="flex items-center gap-2 flex-wrap p-3.5 rounded-2xl bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 text-xs font-serif">
           <span className="text-ink-500 dark:text-ink-400">已选条件：</span>
 
           {dynasty && (
-            <span className="inline-flex items-center bg-white dark:bg-[#1E1E22] text-ink-800 dark:text-ink-100 px-3 py-1 rounded-lg border border-stone-200 dark:border-stone-700 space-x-1.5 shadow-sm">
+            <span className="inline-flex items-center bg-paper-50 dark:bg-ink-900 text-ink-800 dark:text-ink-100 px-3 py-1 rounded-xl border border-paper-300 dark:border-ink-700 gap-1.5 shadow-xs">
               <span>朝代 · {dynasty}</span>
               <button
                 onClick={() => updateFilter({ dynasty: null })}
-                className="text-stone-400 hover:text-rose-500 font-bold ml-1"
+                className="text-ink-400 hover:text-chinese-cinnabar font-bold ml-1"
               >
                 ×
               </button>
@@ -255,11 +259,11 @@ export const PoemsPage: React.FC = () => {
           )}
 
           {type && (
-            <span className="inline-flex items-center bg-white dark:bg-[#1E1E22] text-ink-800 dark:text-ink-100 px-3 py-1 rounded-lg border border-stone-200 dark:border-stone-700 space-x-1.5 shadow-sm">
+            <span className="inline-flex items-center bg-paper-50 dark:bg-ink-900 text-ink-800 dark:text-ink-100 px-3 py-1 rounded-xl border border-paper-300 dark:border-ink-700 gap-1.5 shadow-xs">
               <span>体裁 · {type}</span>
               <button
                 onClick={() => updateFilter({ type: null })}
-                className="text-stone-400 hover:text-rose-500 font-bold ml-1"
+                className="text-ink-400 hover:text-chinese-cinnabar font-bold ml-1"
               >
                 ×
               </button>
@@ -267,11 +271,11 @@ export const PoemsPage: React.FC = () => {
           )}
 
           {author && (
-            <span className="inline-flex items-center bg-white dark:bg-[#1E1E22] text-ink-800 dark:text-ink-100 px-3 py-1 rounded-lg border border-stone-200 dark:border-stone-700 space-x-1.5 shadow-sm">
+            <span className="inline-flex items-center bg-paper-50 dark:bg-ink-900 text-ink-800 dark:text-ink-100 px-3 py-1 rounded-xl border border-paper-300 dark:border-ink-700 gap-1.5 shadow-xs">
               <span>诗人 · {author}</span>
               <button
                 onClick={() => updateFilter({ author: null })}
-                className="text-stone-400 hover:text-rose-500 font-bold ml-1"
+                className="text-ink-400 hover:text-chinese-cinnabar font-bold ml-1"
               >
                 ×
               </button>
@@ -280,7 +284,7 @@ export const PoemsPage: React.FC = () => {
 
           <button
             onClick={handleResetFilters}
-            className="text-chinese-cinnabar hover:underline ml-3 font-medium text-xs sm:text-sm"
+            className="text-chinese-cinnabar hover:underline ml-3 font-bold text-xs"
           >
             清空筛选
           </button>
@@ -316,9 +320,9 @@ export const PoemsPage: React.FC = () => {
                 onResetFilter={activeFilterCount > 0 ? handleResetFilters : undefined}
               />
 
-              {/* Pagination with exact matching count */}
+              {/* Pagination */}
               {!isLoading && (poems.length > 0 || (totalCount && totalCount > pageSize)) && (
-                <div className="pt-6 border-t border-stone-200 dark:border-stone-800">
+                <div className="pt-6 border-t border-paper-300/80 dark:border-ink-800">
                   <Pagination
                     currentPage={page}
                     hasMore={hasMore}

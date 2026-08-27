@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ArrowUpRight, Share2 } from 'lucide-react';
+import { Heart, ArrowUpRight, Share2, Copy, Check } from 'lucide-react';
 import { Poem } from '@/types';
 import { useFavoriteStore } from '@/store/favoriteStore';
 import { useSharePoem } from '@/hooks/useSharePoem';
+import { SealBadge } from '@/components/Common/SealBadge';
+import { guqinAudio } from '@/services/audio/guqinAudio';
 
 interface PoemCardProps {
   poem: Poem;
@@ -14,11 +16,13 @@ interface PoemCardProps {
 export const PoemCard: React.FC<PoemCardProps> = ({ poem, onShare, className = '' }) => {
   const { isFavorite, addFavorite, removeFavorite } = useFavoriteStore();
   const { sharePoem } = useSharePoem();
+  const [copied, setCopied] = useState(false);
   const favorite = isFavorite(poem.id);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    guqinAudio.playGuqinPluck();
     if (favorite) {
       removeFavorite(poem.id);
     } else {
@@ -26,9 +30,20 @@ export const PoemCard: React.FC<PoemCardProps> = ({ poem, onShare, className = '
     }
   };
 
+  const handleCopy = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    guqinAudio.playChime();
+    const contentText = `${poem.title}\n〔${poem.dynasty?.name || '古'}〕${poem.author?.name || '佚名'}\n\n${(poem.content || []).join('\n')}`;
+    navigator.clipboard.writeText(contentText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const handleShareClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    guqinAudio.playChime();
     if (onShare) {
       onShare(poem);
     } else {
@@ -36,38 +51,42 @@ export const PoemCard: React.FC<PoemCardProps> = ({ poem, onShare, className = '
     }
   };
 
-  // Preview content lines (up to 4 lines for comfortable reading)
   const lines = poem.content || [];
   const previewLines = lines.slice(0, 4);
 
   return (
     <div
-      className={`group relative bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 hover:border-chinese-ochre/70 dark:hover:border-chinese-ochre/60 rounded-2xl p-6 sm:p-7 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex flex-col justify-between ${className}`}
+      className={`group relative xuan-card rounded-3xl p-6 sm:p-7 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between overflow-hidden ${className}`}
     >
+      {/* Background Seal Watermark */}
+      <div className="absolute right-3 top-3 opacity-5 pointer-events-none select-none font-serif text-6xl text-chinese-cinnabar">
+        印
+      </div>
+
       <div>
-        {/* Top Header: Title & Favorite Button */}
-        <div className="flex items-start justify-between gap-3 mb-3">
+        {/* Top Header */}
+        <div className="flex items-start justify-between gap-3 mb-4">
           <div className="space-y-1.5 flex-1 min-w-0">
-            <Link to={`/poems/${poem.id}`} className="block group-hover:text-chinese-ochre transition-colors">
+            <Link to={`/poems/${poem.id}`} className="block group-hover:text-chinese-cinnabar transition-colors">
               <h3 className="font-serif font-bold text-xl sm:text-2xl text-ink-900 dark:text-ink-50 tracking-wide truncate">
                 {poem.title}
               </h3>
             </Link>
 
-            {/* Author & Dynasty Meta */}
-            <div className="flex items-center space-x-2 text-sm text-ink-500 dark:text-ink-400 font-serif">
-              <span>〔{poem.dynasty?.name || '古'}〕</span>
+            {/* Author & Dynasty */}
+            <div className="flex items-center gap-2 text-xs font-serif text-ink-500 dark:text-ink-400">
+              <SealBadge text={poem.dynasty?.name || '唐'} size="sm" variant="cinnabar" />
               <Link
                 to={`/authors?q=${encodeURIComponent(poem.author?.name || '')}`}
                 onClick={(e) => e.stopPropagation()}
-                className="font-medium text-ink-700 dark:text-ink-200 hover:text-chinese-ochre transition-colors"
+                className="font-medium text-ink-700 dark:text-ink-200 hover:text-chinese-cinnabar transition-colors"
               >
                 {poem.author?.name || '佚名'}
               </Link>
               {poem.type?.name && (
                 <>
-                  <span className="text-stone-300 dark:text-stone-700">·</span>
-                  <span className="text-xs text-ink-400 dark:text-ink-400">{poem.type.name}</span>
+                  <span className="text-paper-400 dark:text-ink-700">·</span>
+                  <span className="text-ink-400 dark:text-ink-400">{poem.type.name}</span>
                 </>
               )}
             </div>
@@ -75,28 +94,27 @@ export const PoemCard: React.FC<PoemCardProps> = ({ poem, onShare, className = '
 
           <button
             onClick={handleFavoriteClick}
-            className={`p-2.5 rounded-full transition-all active:scale-90 ${
+            className={`p-2.5 rounded-full transition-all interactive-tap ${
               favorite
-                ? 'text-chinese-cinnabar bg-chinese-cinnabar/10 dark:bg-chinese-cinnabar/20'
-                : 'text-stone-400 hover:text-chinese-cinnabar hover:bg-stone-100 dark:hover:bg-stone-800'
+                ? 'text-chinese-cinnabar bg-chinese-cinnabar/10 dark:bg-chinese-cinnabar/20 shadow-sm'
+                : 'text-ink-400 hover:text-chinese-cinnabar hover:bg-paper-200 dark:hover:bg-ink-800'
             }`}
-            title={favorite ? '取消收藏' : '加入收藏'}
-            aria-label={favorite ? '取消收藏' : '加入收藏'}
+            title={favorite ? '取消典藏' : '加入典藏'}
           >
-            <Heart className={`w-5 h-5 ${favorite ? 'fill-chinese-cinnabar' : ''}`} />
+            <Heart className={`w-4 h-4 ${favorite ? 'fill-chinese-cinnabar' : ''}`} />
           </button>
         </div>
 
-        {/* Poem Verses Preview */}
-        <Link to={`/poems/${poem.id}`} className="block my-5">
+        {/* Poem Preview Verses */}
+        <Link to={`/poems/${poem.id}`} className="block my-4">
           <div className="font-serif text-ink-800 dark:text-ink-100 text-base sm:text-lg leading-relaxed sm:leading-loose space-y-2 py-1 select-text">
             {previewLines.map((line, idx) => (
-              <p key={idx} className="line-clamp-1 tracking-wide">
+              <p key={idx} className="line-clamp-1 tracking-wider">
                 {line}
               </p>
             ))}
             {lines.length > 4 && (
-              <p className="text-sm text-ink-400 dark:text-ink-400 font-sans pt-1">
+              <p className="text-xs text-ink-400 font-serif pt-1">
                 …… (余 {lines.length - 4} 句)
               </p>
             )}
@@ -104,23 +122,34 @@ export const PoemCard: React.FC<PoemCardProps> = ({ poem, onShare, className = '
         </Link>
       </div>
 
-      {/* Clean Bottom Action Bar */}
-      <div className="pt-4 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between text-sm">
-        <button
-          onClick={handleShareClick}
-          className="text-xs sm:text-sm text-ink-500 dark:text-ink-400 hover:text-chinese-ochre flex items-center space-x-1.5 transition-colors"
-          title="生成雅致分享卡片"
-        >
-          <Share2 className="w-4 h-4" />
-          <span>分享</span>
-        </button>
+      {/* Action Footer */}
+      <div className="pt-4 border-t border-paper-300/60 dark:border-ink-800/80 flex items-center justify-between text-xs font-serif text-ink-500 dark:text-ink-400">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleCopy}
+            className="hover:text-chinese-cinnabar flex items-center gap-1 transition-colors"
+            title="复制诗词内容"
+          >
+            {copied ? <Check className="w-3.5 h-3.5 text-chinese-celadon" /> : <Copy className="w-3.5 h-3.5" />}
+            <span>{copied ? '已复制' : '复制'}</span>
+          </button>
+
+          <button
+            onClick={handleShareClick}
+            className="hover:text-chinese-cinnabar flex items-center gap-1 transition-colors"
+            title="生成雅致长图"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            <span>分享</span>
+          </button>
+        </div>
 
         <Link
           to={`/poems/${poem.id}`}
-          className="inline-flex items-center space-x-1 text-sm font-medium text-chinese-ochre hover:underline group-hover:translate-x-0.5 transition-transform"
+          className="inline-flex items-center gap-1 font-bold text-chinese-cinnabar hover:underline group-hover:translate-x-0.5 transition-transform"
         >
           <span>品读全文</span>
-          <ArrowUpRight className="w-4 h-4" />
+          <ArrowUpRight className="w-3.5 h-3.5" />
         </Link>
       </div>
     </div>

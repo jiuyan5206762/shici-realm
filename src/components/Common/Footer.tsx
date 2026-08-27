@@ -1,101 +1,88 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, Heart } from 'lucide-react';
+import { Scroll, Github } from 'lucide-react';
+import { SealBadge } from '@/components/Common/SealBadge';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="w-full bg-paper-200/60 dark:bg-chinese-nightCard border-t border-stone-200/70 dark:border-chinese-nightBorder mt-16 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          {/* Brand Col */}
+    <footer className="mt-16 sm:mt-24 border-t border-paper-300 dark:border-ink-800 bg-paper-100/50 dark:bg-ink-900/50 backdrop-blur-xs font-serif">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Brand Info */}
           <div className="space-y-3 md:col-span-2">
-            <div className="flex items-center space-x-2">
-              <div className="w-7 h-7 rounded-lg bg-chinese-cinnabar text-white flex items-center justify-center font-serif font-bold text-sm">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-chinese-cinnabar text-white font-serif font-bold flex items-center justify-center shadow-xs text-sm">
                 诗
               </div>
-              <span className="font-serif font-bold text-lg text-ink-800 dark:text-ink-100">
-                诗境 · 中国古诗词阅读与检索平台
+              <span className="font-serif font-black text-xl text-ink-900 dark:text-ink-50">
+                诗境 · 华夏文华
               </span>
+              <SealBadge text="宋韵" size="sm" variant="cinnabar" />
             </div>
-            <p className="text-sm text-ink-400 dark:text-ink-400 max-w-md leading-relaxed">
-              以现代设计与东方美学为基底，汇集历朝历代诗词名篇与先贤典籍。支持智能检索、多维筛选、沉浸阅读与 AI 深度赏析。
+            <p className="text-xs sm:text-sm text-ink-500 dark:text-ink-400 max-w-md leading-relaxed">
+              澄心载道，风雅传世。收录历朝历代传世名篇，融合右起竖排古籍卷轴与飞花令对诗竞技，传承千年文脉风雅。
             </p>
-            <div className="pt-2 text-xs text-ink-400 flex items-center space-x-1">
-              <span>数据来源：</span>
-              <a
-                href="https://poetry.palemoky.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-chinese-ochre hover:underline inline-flex items-center space-x-0.5"
-              >
-                <span>诗泉 API (poetry.palemoky.com)</span>
-                <ExternalLink className="w-3 h-3 ml-0.5" />
-              </a>
-            </div>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h4 className="font-serif font-bold text-sm text-ink-800 dark:text-ink-200 mb-3">
-              诗海探索
+          <div className="space-y-2.5">
+            <h4 className="text-xs font-bold text-ink-800 dark:text-ink-200 tracking-wider">
+              文苑揽胜
             </h4>
-            <ul className="space-y-2 text-sm text-ink-500 dark:text-ink-400">
+            <ul className="space-y-1.5 text-xs text-ink-500">
               <li>
-                <Link to="/poems" className="hover:text-chinese-ochre transition-colors">
-                  古诗总库
+                <Link to="/poems" className="hover:text-chinese-cinnabar transition-colors">
+                  古籍诗库全帙
                 </Link>
               </li>
               <li>
-                <Link to="/authors" className="hover:text-chinese-ochre transition-colors">
-                  名家名士
+                <Link to="/feihua" className="hover:text-chinese-cinnabar transition-colors text-chinese-cinnabar font-bold">
+                  飞花令 · 诗词对决
                 </Link>
               </li>
               <li>
-                <Link to="/dynasties" className="hover:text-chinese-ochre transition-colors">
-                  朝代沿革
+                <Link to="/authors" className="hover:text-chinese-cinnabar transition-colors">
+                  千古先贤百家
                 </Link>
               </li>
               <li>
-                <Link to="/types" className="hover:text-chinese-ochre transition-colors">
-                  体裁律例
+                <Link to="/dynasties" className="hover:text-chinese-cinnabar transition-colors">
+                  朝代纪元编年
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Features */}
-          <div>
-            <h4 className="font-serif font-bold text-sm text-ink-800 dark:text-ink-200 mb-3">
-              个人空间
+          {/* Architecture & Tech */}
+          <div className="space-y-2.5">
+            <h4 className="text-xs font-bold text-ink-800 dark:text-ink-200 tracking-wider">
+              典籍底蕴
             </h4>
-            <ul className="space-y-2 text-sm text-ink-500 dark:text-ink-400">
-              <li>
-                <Link to="/favorites" className="hover:text-chinese-ochre transition-colors">
-                  我的珍藏
-                </Link>
-              </li>
-              <li>
-                <Link to="/history" className="hover:text-chinese-ochre transition-colors">
-                  浏览足迹
-                </Link>
-              </li>
-              <li>
-                <Link to="/search" className="hover:text-chinese-ochre transition-colors">
-                  全文检索
-                </Link>
-              </li>
-            </ul>
+            <p className="text-xs text-ink-500 leading-relaxed">
+              数据汇聚 37 万+ 首正统古典诗章，采用 Web Audio 纯程序化实时古琴音律合成。
+            </p>
+            <div className="pt-2 flex items-center gap-3">
+              <a
+                href="https://github.com/jiuyan5206762/shici-realm"
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink-400 hover:text-ink-800 dark:hover:text-ink-100 transition-colors"
+                title="GitHub 源码仓库"
+              >
+                <Github className="w-4 h-4" />
+              </a>
+              <span className="text-[11px] text-ink-400 flex items-center gap-1">
+                <Scroll className="w-3.5 h-3.5" />
+                <span>诗泉文华开放 API</span>
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="pt-6 border-t border-stone-200 dark:border-stone-800 flex flex-col sm:flex-row items-center justify-between text-xs text-ink-400 space-y-2 sm:space-y-0">
-          <div>
-            © {new Date().getFullYear()} 诗境 Shici Realm. 保留所有权利。
-          </div>
-          <div className="flex items-center space-x-1">
-            <span>传承华夏千年文脉，致敬不朽先贤风骨</span>
-            <Heart className="w-3.5 h-3.5 text-chinese-cinnabar fill-chinese-cinnabar mx-1" />
-          </div>
+        {/* Copyright */}
+        <div className="mt-10 pt-6 border-t border-paper-300/60 dark:border-ink-800/80 flex flex-col sm:flex-row items-center justify-between text-[11px] text-ink-400 gap-2">
+          <span>© {new Date().getFullYear()} 诗境 (Shici Realm) · 东方美学数字典藏</span>
+          <span>博观而约取，厚积而薄发</span>
         </div>
       </div>
     </footer>

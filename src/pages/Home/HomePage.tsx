@@ -5,377 +5,356 @@ import {
   Shuffle,
   Compass,
   Layers,
-  Users,
-  ArrowRight,
   Heart,
-  BookOpen,
-  ArrowUpRight,
+  Sword,
+  ChevronRight,
 } from 'lucide-react';
-import { statsApi } from '@/api/stats';
 import { dynastyApi } from '@/api/dynasties';
 import { typeApi } from '@/api/types';
 import { poemApi } from '@/api/poems';
 import { SearchBar } from '@/components/Search/SearchBar';
 import { PoemCard } from '@/components/Poem/PoemCard';
+import { VerticalPoemView } from '@/components/Poem/VerticalPoemView';
+import { SealBadge } from '@/components/Common/SealBadge';
 import { useFavoriteStore } from '@/store/favoriteStore';
+import { guqinAudio } from '@/services/audio/guqinAudio';
 
 const MASTER_POETS = [
-  { name: '李白', dynasty: '唐', title: '诗仙' },
-  { name: '杜甫', dynasty: '唐', title: '诗圣' },
-  { name: '苏轼', dynasty: '宋', title: '东坡居士' },
-  { name: '李清照', dynasty: '宋', title: '易安居士' },
-  { name: '辛弃疾', dynasty: '宋', title: '稼轩居士' },
-  { name: '王维', dynasty: '唐', title: '诗佛' },
-  { name: '白居易', dynasty: '唐', title: '香山居士' },
-  { name: '陶渊明', dynasty: '魏晋', title: '五柳先生' },
+  { name: '李白', dynasty: '唐', title: '诗仙', quote: '天生我材必有用，千金散尽还复来。', id: 2045 },
+  { name: '杜甫', dynasty: '唐', title: '诗圣', quote: '会当凌绝顶，一览众山小。', id: 3911 },
+  { name: '苏轼', dynasty: '宋', title: '东坡居士', quote: '但愿人长久，千里共婵娟。', id: 11678 },
+  { name: '李清照', dynasty: '宋', title: '易安居士', quote: '生当作人杰，死亦为鬼雄。', id: 3074 },
+  { name: '辛弃疾', dynasty: '宋', title: '稼轩居士', quote: '明月别枝惊鹊，清风半夜鸣蝉。', id: 8618 },
+  { name: '王维', dynasty: '唐', title: '诗佛', quote: '行到水穷处，坐看云起时。', id: 7756 },
+  { name: '白居易', dynasty: '唐', title: '香山居士', quote: '乱花渐欲迷人眼，浅草才能没马蹄。', id: 9057 },
+  { name: '陶渊明', dynasty: '魏晋', title: '五柳先生', quote: '采菊东篱下，悠然见南山。', id: 8228 },
 ];
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { isFavorite, addFavorite, removeFavorite } = useFavoriteStore();
+  const [dailyViewMode, setDailyViewMode] = useState<'horizontal' | 'vertical'>('horizontal');
 
-  // 1. Fetch Stats
-  const { data: statsRes } = useQuery({
-    queryKey: ['stats'],
-    queryFn: () => statsApi.getStats(),
-  });
-
-  // 2. Fetch Dynasties
+  // 1. Fetch Dynasties
   const { data: dynastiesRes } = useQuery({
     queryKey: ['dynasties'],
     queryFn: () => dynastyApi.getDynasties(),
+    staleTime: 60 * 60 * 1000,
   });
 
-  // 3. Fetch Types
+  // 2. Fetch Types
   const { data: typesRes } = useQuery({
     queryKey: ['types'],
     queryFn: () => typeApi.getTypes(),
+    staleTime: 60 * 60 * 1000,
   });
 
-  // 4. Daily / Today's Recommended Poem
-  const {
-    data: dailyPoemRes,
-    refetch: refetchDailyPoem,
-    isFetching: isFetchingDaily,
-  } = useQuery({
+  // 3. Daily Featured Masterpiece
+  const { data: dailyPoemRes } = useQuery({
     queryKey: ['dailyPoem'],
-    queryFn: () => poemApi.getRandom(),
-    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const featuredId = 23908; // 水调歌头 · 明月几时有
+      const res = await poemApi.getById(featuredId);
+      return res;
+    },
+    staleTime: 24 * 60 * 60 * 1000,
   });
 
-  const dailyPoem = dailyPoemRes?.data;
-  const isDailyFav = dailyPoem ? isFavorite(dailyPoem.id) : false;
-
-  // 5. Random Explorer State
-  const [randomFilter, setRandomFilter] = useState<'all' | 'tang' | 'song' | 'libai' | 'jueju'>('all');
+  // 5. Random Poem Explorer
+  const [randomFilter, setRandomFilter] = useState<'all' | 'tang' | 'song'>('all');
   const {
     data: randomPoemRes,
-    refetch: refetchRandomPoem,
+    refetch: refetchRandom,
     isFetching: isFetchingRandom,
   } = useQuery({
     queryKey: ['randomPoem', randomFilter],
-    queryFn: () => {
-      if (randomFilter === 'tang') return poemApi.getRandom({ dynasty: '唐' });
-      if (randomFilter === 'song') return poemApi.getRandom({ dynasty: '宋' });
-      if (randomFilter === 'libai') return poemApi.getRandom({ author: '李白' });
-      if (randomFilter === 'jueju') return poemApi.getRandom({ type: '七言绝句' });
-      return poemApi.getRandom();
+    queryFn: async () => {
+      const dynastyParam = randomFilter === 'tang' ? '唐' : randomFilter === 'song' ? '宋' : undefined;
+      return poemApi.getRandom({ dynasty: dynastyParam });
     },
   });
 
-  const stats = statsRes?.data || {
-    poems: 371313,
-    authors: 13577,
-    dynasties: 11,
-    types: 17,
-  };
-
+  const dailyPoem = dailyPoemRes?.data;
+  const randomPoem = randomPoemRes?.data;
   const dynasties = dynastiesRes?.data || [];
   const types = typesRes?.data || [];
-  const randomPoem = randomPoemRes?.data;
+
+  const handleRandomRefresh = () => {
+    guqinAudio.playChime();
+    refetchRandom();
+  };
+
+  const handleDailyFavorite = () => {
+    if (!dailyPoem) return;
+    guqinAudio.playGuqinPluck();
+    if (isFavorite(dailyPoem.id)) {
+      removeFavorite(dailyPoem.id);
+    } else {
+      addFavorite(dailyPoem);
+    }
+  };
 
   return (
-    <div className="space-y-16 sm:space-y-24 pb-20">
-      {/* 1. Classical Minimalist Hero Section */}
-      <section className="relative pt-12 sm:pt-24 pb-6 text-center space-y-8 max-w-4xl mx-auto px-4">
-        {/* Calligraphic Seal Accent */}
-        <div className="inline-flex items-center space-x-2 px-5 py-2 rounded-full bg-stone-100 dark:bg-stone-800 text-ink-800 dark:text-ink-200 text-base font-serif border border-stone-200 dark:border-stone-700">
-          <BookOpen className="w-5 h-5 text-chinese-ochre" />
-          <span>中华古诗文库</span>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12 animate-fade-in pb-20">
+      {/* 1. Hero Minimalist Section */}
+      <section className="text-center space-y-6 pt-4 sm:pt-8">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-paper-100 dark:bg-ink-900 border border-paper-300 dark:border-ink-800 shadow-xs">
+          <SealBadge text="宋韵" size="sm" variant="cinnabar" />
+          <span className="text-xs font-serif text-ink-600 dark:text-ink-300">
+            收录华夏 37万+ 传世诗词名篇 · 经典宣纸风雅
+          </span>
         </div>
 
-        {/* Hero Title */}
-        <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-wider text-ink-900 dark:text-ink-50 leading-tight">
-          品读千年辞章 · 探寻华夏诗境
-        </h1>
+        <div className="space-y-3">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black tracking-widest text-ink-900 dark:text-ink-50 leading-tight">
+            粗缯大布裹生涯
+            <br />
+            <span className="text-chinese-cinnabar">腹有诗书气自华</span>
+          </h1>
+          <p className="text-xs sm:text-sm font-serif text-ink-500 dark:text-ink-400 max-w-lg mx-auto">
+            品读唐诗宋词、先秦雅颂，寻访历代名家风骨，开启飞花令对诗博弈。
+          </p>
+        </div>
 
-        {/* Subtitle */}
-        <p className="text-lg sm:text-xl text-ink-600 dark:text-ink-300 max-w-2xl mx-auto font-serif leading-relaxed">
-          汇萃历朝经典三十七万首，收录先贤名家万余人。
-        </p>
-
-        {/* Search Bar */}
+        {/* Hero Search Bar */}
         <div className="pt-2 max-w-2xl mx-auto">
-          <SearchBar onSearch={(q) => navigate(`/search?q=${encodeURIComponent(q)}`)} autoFocus={false} />
-        </div>
-
-        {/* Clean Stats Row */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 pt-8 max-w-3xl mx-auto text-center">
-          <div className="p-5 rounded-2xl bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 shadow-sm">
-            <div className="text-3xl sm:text-4xl font-serif font-bold text-chinese-ochre">
-              {stats.poems.toLocaleString()}
-            </div>
-            <div className="text-base text-ink-600 dark:text-ink-300 mt-1.5 font-serif">收录诗篇</div>
-          </div>
-          <div className="p-5 rounded-2xl bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 shadow-sm">
-            <div className="text-3xl sm:text-4xl font-serif font-bold text-chinese-cinnabar">
-              {stats.authors.toLocaleString()}
-            </div>
-            <div className="text-base text-ink-600 dark:text-ink-300 mt-1.5 font-serif">历代先贤</div>
-          </div>
-          <div className="p-5 rounded-2xl bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 shadow-sm">
-            <div className="text-3xl sm:text-4xl font-serif font-bold text-chinese-celadon">
-              {stats.dynasties}
-            </div>
-            <div className="text-base text-ink-600 dark:text-ink-300 mt-1.5 font-serif">朝代纪元</div>
-          </div>
-          <div className="p-5 rounded-2xl bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 shadow-sm">
-            <div className="text-3xl sm:text-4xl font-serif font-bold text-ink-800 dark:text-ink-200">
-              {stats.types}
-            </div>
-            <div className="text-base text-ink-600 dark:text-ink-300 mt-1.5 font-serif">体裁分类</div>
-          </div>
+          <SearchBar
+            placeholder="输入诗句、篇名或诗人（如：将进酒、李白、春风又绿）"
+            onSearch={(q) => {
+              guqinAudio.playChime();
+              navigate(`/search?q=${encodeURIComponent(q)}`);
+            }}
+          />
         </div>
       </section>
 
-      {/* 2. Today's Recommended Masterpiece (诗笺风格) */}
-      {dailyPoem && (
-        <section className="max-w-3xl mx-auto px-4">
-          <div className="bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 rounded-3xl p-8 sm:p-14 shadow-sm relative">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-4 mb-6 border-b border-stone-100 dark:border-stone-800">
-              <div className="font-serif font-bold text-lg text-chinese-ochre tracking-wider">
-                今日雅荐 · 每日一诗
-              </div>
-
-              <button
-                onClick={() => refetchDailyPoem()}
-                disabled={isFetchingDaily}
-                className="flex items-center space-x-2 px-4 py-2 rounded-xl text-base font-serif text-ink-700 dark:text-ink-200 hover:text-chinese-ochre hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors disabled:opacity-50"
-                title="换一首推荐"
-              >
-                <Shuffle className={`w-4 h-4 ${isFetchingDaily ? 'animate-spin' : ''}`} />
-                <span>换一首</span>
-              </button>
+      {/* 2. Feihua Duel Banner Feature */}
+      <section className="xuan-card rounded-3xl p-6 sm:p-8 relative overflow-hidden border border-chinese-cinnabar/30 shadow-oriental">
+        <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-chinese-cinnabar/10 to-transparent pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start gap-2">
+              <SealBadge text="新玩法" size="sm" variant="cinnabar" />
+              <span className="text-xs font-serif font-bold text-chinese-cinnabar">飞花令 AI 对诗竞技场</span>
             </div>
-
-            {/* Poem Core Content */}
-            <div className="py-4 text-center space-y-4">
-              <Link to={`/poems/${dailyPoem.id}`}>
-                <h2 className="text-3xl sm:text-5xl font-serif font-bold text-ink-900 dark:text-ink-50 hover:text-chinese-ochre transition-colors tracking-wide">
-                  {dailyPoem.title}
-                </h2>
-              </Link>
-
-              <div className="text-lg font-serif text-chinese-ochre flex items-center justify-center space-x-2">
-                <span>〔{dailyPoem.dynasty?.name || '古'}〕</span>
-                <span className="font-bold text-ink-800 dark:text-ink-100">{dailyPoem.author?.name || '佚名'}</span>
-                {dailyPoem.type?.name && (
-                  <>
-                    <span className="text-stone-300 dark:text-stone-700">·</span>
-                    <span className="text-ink-600 dark:text-ink-300">{dailyPoem.type.name}</span>
-                  </>
-                )}
-              </div>
-
-              <div className="font-serif text-ink-900 dark:text-ink-100 text-xl sm:text-3xl leading-loose sm:leading-[2.5] max-w-xl mx-auto py-6 tracking-widest select-text">
-                {(dailyPoem.content || []).map((line, idx) => (
-                  <p key={idx}>{line}</p>
-                ))}
-              </div>
-            </div>
-
-            {/* Action Bottom Bar */}
-            <div className="pt-6 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between flex-wrap gap-4">
-              <button
-                onClick={() =>
-                  isDailyFav ? removeFavorite(dailyPoem.id) : addFavorite(dailyPoem)
-                }
-                className={`px-5 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 flex items-center space-x-2 text-base font-medium transition-colors ${
-                  isDailyFav
-                    ? 'bg-chinese-cinnabar text-white'
-                    : 'hover:bg-stone-100 dark:hover:bg-stone-800 text-ink-700 dark:text-ink-200'
-                }`}
-              >
-                <Heart className={`w-4 h-4 ${isDailyFav ? 'fill-white' : ''}`} />
-                <span>{isDailyFav ? '已收藏' : '收藏'}</span>
-              </button>
-
-              <Link
-                to={`/poems/${dailyPoem.id}`}
-                className="inline-flex items-center space-x-2 text-chinese-ochre hover:underline font-serif font-medium text-lg"
-              >
-                <span>品读全篇与赏析</span>
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 3. Random Poetry Explorer */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-ink-900 dark:text-ink-100 flex items-center space-x-2">
-              <Shuffle className="w-6 h-6 text-chinese-ochre" />
-              <span>诗海漫游</span>
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-ink-900 dark:text-ink-50">
+              春城无处不飞花 · 与李白苏轼同席对令
             </h2>
-            <p className="text-base text-ink-600 dark:text-ink-300 mt-1 font-serif">
-              随心偶遇一首传世佳作
-            </p>
-          </div>
-
-          {/* Filter Chips */}
-          <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar text-base">
-            {[
-              { id: 'all', label: '随机全库' },
-              { id: 'tang', label: '唐诗' },
-              { id: 'song', label: '宋词' },
-              { id: 'libai', label: '李白' },
-              { id: 'jueju', label: '绝句' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setRandomFilter(tab.id as any)}
-                className={`px-4 py-2 rounded-xl font-serif transition-colors whitespace-nowrap ${
-                  randomFilter === tab.id
-                    ? 'bg-chinese-ochre text-white font-medium shadow-sm'
-                    : 'bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-300 hover:bg-stone-200 dark:hover:bg-stone-700'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-
-            <button
-              onClick={() => refetchRandomPoem()}
-              disabled={isFetchingRandom}
-              className="p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-300 hover:text-chinese-ochre transition-colors"
-              title="再抽一首"
-            >
-              <Shuffle className={`w-5 h-5 ${isFetchingRandom ? 'animate-spin' : ''}`} />
-            </button>
-          </div>
-        </div>
-
-        {randomPoem && (
-          <div className="max-w-2xl mx-auto">
-            <PoemCard poem={randomPoem} />
-          </div>
-        )}
-      </section>
-
-      {/* 4. Famous Poets Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="flex items-center justify-between pb-4 border-b border-stone-200 dark:border-stone-800">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-ink-900 dark:text-ink-100 flex items-center space-x-2">
-              <Users className="w-6 h-6 text-chinese-cinnabar" />
-              <span>千古名家</span>
-            </h2>
-            <p className="text-base text-ink-600 dark:text-ink-300 mt-1 font-serif">
-              历代先贤文采风流
+            <p className="text-xs sm:text-sm font-serif text-ink-500 dark:text-ink-400 max-w-xl">
+              选择令字，30 秒轮流应令赋诗。智能诗律核验、连对连击计分、殿试状元封号等你摘取！
             </p>
           </div>
 
           <Link
-            to="/authors"
-            className="inline-flex items-center space-x-1.5 text-base font-serif text-chinese-ochre hover:underline"
+            to="/feihua"
+            onClick={() => guqinAudio.playChime()}
+            className="flex-shrink-0 px-8 py-3.5 rounded-2xl bg-chinese-cinnabar hover:bg-chinese-rouge text-white font-serif font-bold text-sm flex items-center gap-2 shadow-lg shadow-chinese-cinnabar/25 transition-all interactive-tap"
           >
-            <span>全部诗人</span>
-            <ArrowRight className="w-4 h-4" />
+            <Sword className="w-4 h-4 text-chinese-gold" />
+            <span>立即赴令切磋</span>
+          </Link>
+        </div>
+      </section>
+
+      {/* 3. Daily Featured Masterpiece (Handscroll View) */}
+      {dailyPoem && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-2.5 h-5 bg-chinese-cinnabar rounded-full" />
+              <h2 className="text-xl sm:text-2xl font-serif font-bold text-ink-900 dark:text-ink-50 tracking-wider">
+                今日名篇 · 经典雅鉴
+              </h2>
+              <SealBadge text="必读" size="sm" variant="cinnabar" />
+            </div>
+
+            <div className="flex items-center gap-2">
+              {/* Layout switcher */}
+              <button
+                onClick={() => {
+                  guqinAudio.playChime();
+                  setDailyViewMode(dailyViewMode === 'horizontal' ? 'vertical' : 'horizontal');
+                }}
+                className="text-xs font-serif text-chinese-cinnabar px-3 py-1.5 rounded-xl border border-chinese-cinnabar/30 hover:bg-chinese-cinnabar/10 transition-colors"
+              >
+                {dailyViewMode === 'horizontal' ? '切换竖排古卷' : '切换现代横排'}
+              </button>
+
+              <button
+                onClick={handleDailyFavorite}
+                className={`p-2 rounded-xl border transition-all ${
+                  isFavorite(dailyPoem.id)
+                    ? 'bg-chinese-cinnabar text-white border-chinese-cinnabar'
+                    : 'border-paper-300 dark:border-ink-700 hover:bg-paper-200 text-ink-600'
+                }`}
+                title="典藏此篇"
+              >
+                <Heart className={`w-4 h-4 ${isFavorite(dailyPoem.id) ? 'fill-white' : ''}`} />
+              </button>
+            </div>
+          </div>
+
+          {dailyViewMode === 'vertical' ? (
+            <VerticalPoemView poem={dailyPoem} />
+          ) : (
+            <PoemCard poem={dailyPoem} />
+          )}
+        </section>
+      )}
+
+      {/* 4. Master Poets Gallery */}
+      <section className="space-y-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-2.5 h-5 bg-chinese-celadon rounded-full" />
+            <h2 className="text-xl sm:text-2xl font-serif font-bold text-ink-900 dark:text-ink-50 tracking-wider">
+              千古先贤 · 宗师风骨
+            </h2>
+            <SealBadge text="先贤" size="sm" variant="bamboo" />
+          </div>
+
+          <Link
+            to="/authors"
+            onClick={() => guqinAudio.playChime()}
+            className="text-xs font-serif text-ink-500 hover:text-chinese-cinnabar flex items-center gap-0.5 transition-colors"
+          >
+            <span>览尽历代百家</span>
+            <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {MASTER_POETS.map((poet) => (
             <Link
               key={poet.name}
-              to={`/poems?author=${encodeURIComponent(poet.name)}`}
-              className="p-6 rounded-2xl bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 hover:border-chinese-ochre/70 transition-all hover:shadow-md space-y-3 group text-center"
+              to={`/authors?q=${encodeURIComponent(poet.name)}`}
+              onClick={() => guqinAudio.playChime()}
+              className="xuan-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between space-y-3 hover:-translate-y-1 transition-all duration-300 border border-paper-400/40 group"
             >
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-stone-100 dark:bg-stone-800 text-chinese-cinnabar font-serif font-bold text-2xl flex items-center justify-center border border-stone-200 dark:border-stone-700 group-hover:scale-105 transition-transform">
-                {poet.name.charAt(0)}
-              </div>
               <div>
-                <h3 className="font-serif font-bold text-2xl text-ink-900 dark:text-ink-100 group-hover:text-chinese-ochre transition-colors">
-                  {poet.name}
-                </h3>
-                <div className="text-base text-ink-500 dark:text-ink-400 font-serif mt-1">
-                  〔{poet.dynasty}〕{poet.title}
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="font-serif font-bold text-base sm:text-lg text-ink-900 dark:text-ink-50 group-hover:text-chinese-cinnabar transition-colors">
+                    {poet.name}
+                  </span>
+                  <SealBadge text={poet.dynasty} size="sm" variant="bamboo" />
+                </div>
+                <div className="text-[11px] font-serif text-ink-400">
+                  {poet.title}
                 </div>
               </div>
-              <div className="pt-2 text-sm text-chinese-ochre font-serif font-medium flex items-center justify-center space-x-1 group-hover:underline">
-                <span>浏览作品</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </div>
+
+              <p className="text-xs font-serif text-ink-600 dark:text-ink-300 line-clamp-2 italic pt-1 border-t border-paper-300/40 dark:border-ink-800">
+                “{poet.quote}”
+              </p>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* 5. Dynasties and Genres Portals */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Dynasties */}
-          <div className="p-8 rounded-3xl bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 shadow-sm space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-stone-100 dark:border-stone-800">
-              <h3 className="font-serif font-bold text-2xl text-ink-900 dark:text-ink-100 flex items-center space-x-2">
-                <Compass className="w-6 h-6 text-chinese-ochre" />
-                <span>朝代历史</span>
-              </h3>
-              <Link to="/poems" className="text-base font-serif text-chinese-ochre hover:underline">
-                进入库览
-              </Link>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              {dynasties.map((d) => (
-                <Link
-                  key={d.id}
-                  to={`/poems?dynasty=${encodeURIComponent(d.name)}`}
-                  className="px-5 py-2.5 rounded-xl bg-stone-50 dark:bg-stone-900 hover:bg-chinese-ochre hover:text-white border border-stone-200 dark:border-stone-700 text-ink-900 dark:text-ink-100 font-serif text-base transition-all"
-                >
-                  {d.name}
-                </Link>
-              ))}
-            </div>
+      {/* 5. Dynasties & Formats Bento Scroll */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Dynasties */}
+        <div className="xuan-card rounded-3xl p-6 sm:p-7 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-serif font-bold text-lg text-ink-900 dark:text-ink-50 flex items-center gap-2">
+              <Compass className="w-4 h-4 text-chinese-cinnabar" />
+              <span>历代纪年长卷</span>
+            </h3>
+            <Link to="/dynasties" className="text-xs font-serif text-ink-400 hover:text-chinese-cinnabar">
+              查看全部
+            </Link>
           </div>
-
-          {/* Genres */}
-          <div className="p-8 rounded-3xl bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 shadow-sm space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-stone-100 dark:border-stone-800">
-              <h3 className="font-serif font-bold text-2xl text-ink-900 dark:text-ink-100 flex items-center space-x-2">
-                <Layers className="w-6 h-6 text-chinese-celadon" />
-                <span>诗词体裁</span>
-              </h3>
-              <Link to="/poems" className="text-base font-serif text-chinese-ochre hover:underline">
-                进入库览
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            {dynasties.slice(0, 11).map((d) => (
+              <Link
+                key={d.id}
+                to={`/dynasties`}
+                onClick={() => guqinAudio.playChime()}
+                className="py-2.5 px-3 rounded-xl bg-paper-100 dark:bg-ink-800/80 hover:bg-chinese-cinnabar/10 hover:text-chinese-cinnabar border border-paper-300/60 dark:border-ink-700/60 font-serif text-xs font-bold text-center transition-all"
+              >
+                {d.name}
               </Link>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              {types.slice(0, 10).map((t) => (
-                <Link
-                  key={t.id}
-                  to={`/poems?type=${encodeURIComponent(t.name)}`}
-                  className="px-5 py-2.5 rounded-xl bg-stone-50 dark:bg-stone-900 hover:bg-chinese-celadon hover:text-white border border-stone-200 dark:border-stone-700 text-ink-900 dark:text-ink-100 font-serif text-base transition-all"
-                >
-                  {t.name}
-                </Link>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
+
+        {/* Types */}
+        <div className="xuan-card rounded-3xl p-6 sm:p-7 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-serif font-bold text-lg text-ink-900 dark:text-ink-50 flex items-center gap-2">
+              <Layers className="w-4 h-4 text-chinese-celadon" />
+              <span>诗词曲赋体裁</span>
+            </h3>
+            <Link to="/types" className="text-xs font-serif text-ink-400 hover:text-chinese-cinnabar">
+              查看全部
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            {types.slice(0, 12).map((t) => (
+              <Link
+                key={t.id}
+                to={`/types`}
+                onClick={() => guqinAudio.playChime()}
+                className="py-2.5 px-3 rounded-xl bg-paper-100 dark:bg-ink-800/80 hover:bg-chinese-celadon/10 hover:text-chinese-celadon border border-paper-300/60 dark:border-ink-700/60 font-serif text-xs font-bold text-center transition-all"
+              >
+                {t.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Random Discovery Section */}
+      <section className="space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-2.5 h-5 bg-amber-600 rounded-full" />
+            <h2 className="text-xl sm:text-2xl font-serif font-bold text-ink-900 dark:text-ink-50 tracking-wider">
+              偶得佳句 · 随心漫游
+            </h2>
+            <SealBadge text="漫步" size="sm" variant="gold" />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex bg-paper-200 dark:bg-ink-800 p-1 rounded-xl text-xs font-serif">
+              <button
+                onClick={() => setRandomFilter('all')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  randomFilter === 'all' ? 'bg-paper-50 dark:bg-ink-900 text-chinese-cinnabar font-bold shadow-xs' : 'text-ink-600'
+                }`}
+              >
+                全部
+              </button>
+              <button
+                onClick={() => setRandomFilter('tang')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  randomFilter === 'tang' ? 'bg-paper-50 dark:bg-ink-900 text-chinese-cinnabar font-bold shadow-xs' : 'text-ink-600'
+                }`}
+              >
+                唐诗
+              </button>
+              <button
+                onClick={() => setRandomFilter('song')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  randomFilter === 'song' ? 'bg-paper-50 dark:bg-ink-900 text-chinese-cinnabar font-bold shadow-xs' : 'text-ink-600'
+                }`}
+              >
+                宋词
+              </button>
+            </div>
+
+            <button
+              onClick={handleRandomRefresh}
+              disabled={isFetchingRandom}
+              className="px-3.5 py-1.5 rounded-xl bg-paper-200 dark:bg-ink-800 hover:bg-chinese-cinnabar hover:text-white font-serif text-xs font-bold transition-all flex items-center gap-1.5"
+            >
+              <Shuffle className={`w-3.5 h-3.5 ${isFetchingRandom ? 'animate-spin' : ''}`} />
+              <span>随心换一篇</span>
+            </button>
+          </div>
+        </div>
+
+        {randomPoem && <PoemCard poem={randomPoem} />}
       </section>
     </div>
   );

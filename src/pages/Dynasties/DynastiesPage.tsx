@@ -1,28 +1,33 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Compass, ArrowRight } from 'lucide-react';
+import { ArrowRight, BookOpen, Users } from 'lucide-react';
 import { dynastyApi } from '@/api/dynasties';
 import { formatYearRange } from '@/utils/formatters';
+import { SealBadge } from '@/components/Common/SealBadge';
+import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const DynastiesPage: React.FC = () => {
   const { data: dynastiesRes } = useQuery({
     queryKey: ['dynasties'],
     queryFn: () => dynastyApi.getDynasties(),
+    staleTime: 60 * 60 * 1000,
   });
 
   const dynasties = dynastiesRes?.data || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10 animate-fade-in pb-20">
       {/* Header Banner */}
-      <div className="space-y-2 pb-6 border-b border-stone-200 dark:border-stone-800">
-        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ink-900 dark:text-ink-50 flex items-center space-x-3">
-          <Compass className="w-8 h-8 text-chinese-ochre" />
-          <span>朝代纪元 · 华夏诗史</span>
-        </h1>
-        <p className="text-base text-ink-600 dark:text-ink-300 font-serif">
-          自先秦源起，历经汉唐盛世、宋词鼎盛至明清遗风。体味不同历史维度的文心风骨。
+      <div className="space-y-2 pb-6 border-b border-paper-300 dark:border-ink-800">
+        <div className="flex items-center gap-2">
+          <SealBadge text="编年史" size="sm" variant="cinnabar" />
+          <h1 className="text-3xl sm:text-4xl font-serif font-black text-ink-900 dark:text-ink-50">
+            朝代纪元 · 华夏诗史
+          </h1>
+        </div>
+        <p className="text-xs sm:text-sm text-ink-500 dark:text-ink-400 font-serif">
+          自先秦源起，历经汉唐盛世、两宋词鼎至明清遗风。体味不同历史维度的文心风骨。
         </p>
       </div>
 
@@ -34,27 +39,25 @@ export const DynastiesPage: React.FC = () => {
           return (
             <div
               key={dynasty.id}
-              className="bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 hover:border-chinese-ochre/60 rounded-3xl p-7 shadow-sm transition-all duration-300 flex flex-col justify-between"
+              className="xuan-card rounded-3xl p-7 shadow-oriental transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between border border-paper-400/40"
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="px-3.5 py-1 rounded-xl text-base font-serif font-bold bg-stone-100 dark:bg-stone-800 text-chinese-ochre">
-                    {dynasty.name}代
-                  </span>
+                  <SealBadge text={`${dynasty.name}代`} size="md" variant="cinnabar" />
                   {years && (
-                    <span className="text-sm font-serif text-ink-500 dark:text-ink-400">
+                    <span className="text-xs font-serif text-ink-400">
                       {years}
                     </span>
                   )}
                 </div>
 
                 <div className="space-y-1 my-2">
-                  <h3 className="font-serif font-bold text-2xl text-ink-900 dark:text-ink-100">
+                  <h3 className="font-serif font-bold text-2xl text-ink-900 dark:text-ink-50">
                     {dynasty.name} · {dynasty.name_en || ''}
                   </h3>
                 </div>
 
-                <p className="text-base text-ink-600 dark:text-ink-300 leading-relaxed my-3 font-serif">
+                <p className="text-xs sm:text-sm text-ink-600 dark:text-ink-300 leading-relaxed my-3 font-serif">
                   {dynasty.name === '唐'
                     ? '大唐气象，千古风华。李白、杜甫、王维开创了中国诗歌最辉煌灿烂的黄金时代。'
                     : dynasty.name === '宋'
@@ -65,20 +68,24 @@ export const DynastiesPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="pt-5 mt-3 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between text-sm font-serif">
+              <div className="pt-5 mt-3 border-t border-paper-300/60 dark:border-ink-800 flex items-center justify-between text-xs font-serif">
                 <Link
                   to={`/authors?dynasty=${encodeURIComponent(dynasty.name)}`}
-                  className="text-ink-500 hover:text-chinese-ochre"
+                  onClick={() => guqinAudio.playChime()}
+                  className="text-ink-500 hover:text-chinese-cinnabar flex items-center gap-1"
                 >
-                  {dynasty.name}代诗人 →
+                  <Users className="w-3.5 h-3.5" />
+                  <span>{dynasty.name}代诗人</span>
                 </Link>
 
                 <Link
                   to={`/poems?dynasty=${encodeURIComponent(dynasty.name)}`}
-                  className="inline-flex items-center space-x-1 text-chinese-ochre font-medium hover:underline"
+                  onClick={() => guqinAudio.playChime()}
+                  className="inline-flex items-center gap-1 text-chinese-cinnabar font-bold hover:underline"
                 >
+                  <BookOpen className="w-3.5 h-3.5" />
                   <span>诗库作品</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>

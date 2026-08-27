@@ -6,26 +6,89 @@
   :root {
     --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', 'STSong', serif;
     --font-sans: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-kaiti: 'STKaiti', 'Kaiti SC', 'KaiTi', 'Noto Serif SC', serif;
   }
 
   body {
-    background-color: #F8F5EF;
+    background-color: #FAF6EE;
     color: #292524;
+    font-family: var(--font-serif);
     transition: background-color 0.3s ease, color 0.3s ease;
+    background-image: radial-gradient(rgba(184, 125, 75, 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 
   html.dark body {
-    background-color: #121212;
+    background-color: #131316;
     color: #F5F5F4;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 
   html.sepia body {
     background-color: #F3EBDD;
     color: #382E25;
+    background-image: radial-gradient(rgba(140, 94, 53, 0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 }
 
-/* Custom subtle scrollbar */
+/* Xuan Paper Card & Borders */
+.xuan-card {
+  background: rgba(253, 251, 247, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(213, 196, 175, 0.45);
+  box-shadow: 0 4px 20px -2px rgba(41, 37, 36, 0.05), 0 2px 6px -1px rgba(41, 37, 36, 0.03);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.xuan-card:hover {
+  border-color: rgba(186, 59, 70, 0.35);
+  box-shadow: 0 12px 30px -4px rgba(41, 37, 36, 0.09), 0 4px 12px -2px rgba(41, 37, 36, 0.05);
+}
+
+html.dark .xuan-card {
+  background: rgba(28, 28, 34, 0.75);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+}
+
+html.dark .xuan-card:hover {
+  border-color: rgba(186, 59, 70, 0.4);
+  box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.6);
+}
+
+/* Vertical Classical Chinese Typography */
+.writing-vertical-rl {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: 0.18em;
+}
+
+/* Chinese Seal Stamp Style */
+.seal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #BA3B46;
+  color: #BA3B46;
+  border-radius: 4px;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  user-select: none;
+  background: rgba(186, 59, 70, 0.04);
+}
+
+.seal-badge-gold {
+  border: 1.5px solid #C5A059;
+  color: #C5A059;
+  background: rgba(197, 160, 89, 0.06);
+}
+
+/* Subtle Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -36,12 +99,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(138, 110, 85, 0.25);
+  background: rgba(140, 94, 53, 0.22);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(138, 110, 85, 0.45);
+  background: rgba(186, 59, 70, 0.45);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -52,59 +115,10 @@
   scrollbar-width: none;
 }
 
-/* Keyframe animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Interactive Tap & Ripple micro-interaction */
+.interactive-tap {
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.12s ease;
 }
-
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideLeft {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleUp {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-slideUp {
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-slideLeft {
-  animation: slideLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-scaleUp {
-  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.interactive-tap:active {
+  transform: scale(0.97);
 }
