@@ -9,7 +9,7 @@ export const AuthorCard: React.FC<AuthorCardProps> = ({ author, className = '' }
 
   return (
     <div
-      className={`group xuan-card rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between border border-paper-400/40 shadow-oriental ${className}`}
+      className={`group xuan-card rounded-3xl p-6 transition-transform duration-200 hover:-translate-y-0.5 gpu-layer flex flex-col justify-between border border-paper-400/40 shadow-oriental ${className}`}
     >
       <div>
         <div className="flex items-center gap-3.5 mb-4">

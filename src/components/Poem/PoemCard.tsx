@@ -52,7 +52,7 @@ export const PoemCard: React.FC<PoemCardProps> = ({ poem, onShare, className = '
 
   return (
     <div
-      className={`group relative xuan-card rounded-3xl p-6 sm:p-7 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between overflow-hidden ${className}`}
+      className={`group relative xuan-card rounded-3xl p-6 sm:p-7 transition-transform duration-200 hover:-translate-y-0.5 gpu-layer flex flex-col justify-between overflow-hidden ${className}`}
     >
       {/* Background Seal Watermark */}
       <div className="absolute right-3 top-3 opacity-5 pointer-events-none select-none font-serif text-6xl text-chinese-cinnabar">

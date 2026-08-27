@@ -9,47 +9,66 @@
     --font-kaiti: 'STKaiti', 'Kaiti SC', 'KaiTi', 'Noto Serif SC', serif;
   }
 
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     background-color: #FAF6EE;
     color: #292524;
     font-family: var(--font-serif);
-    transition: background-color 0.3s ease, color 0.3s ease;
-    background-image: radial-gradient(rgba(184, 125, 75, 0.04) 1px, transparent 1px);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    background-image: radial-gradient(rgba(184, 125, 75, 0.035) 1px, transparent 1px);
     background-size: 24px 24px;
+    overflow-x: hidden;
   }
 
   html.dark body {
     background-color: #131316;
     color: #F5F5F4;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 }
 
-/* Xuan Paper Card & Borders */
+/* High Performance Xuan Paper Card & Borders */
 .xuan-card {
-  background: rgba(253, 251, 247, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(213, 196, 175, 0.45);
-  box-shadow: 0 4px 20px -2px rgba(41, 37, 36, 0.05), 0 2px 6px -1px rgba(41, 37, 36, 0.03);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #FDFBF7;
+  border: 1px solid rgba(213, 196, 175, 0.55);
+  box-shadow: 0 4px 16px -2px rgba(41, 37, 36, 0.04), 0 1px 3px 0 rgba(41, 37, 36, 0.02);
+  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.16s ease, border-color 0.16s ease;
+  contain: content;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 260px;
 }
 
 .xuan-card:hover {
   border-color: rgba(186, 59, 70, 0.35);
-  box-shadow: 0 12px 30px -4px rgba(41, 37, 36, 0.09), 0 4px 12px -2px rgba(41, 37, 36, 0.05);
+  box-shadow: 0 10px 24px -4px rgba(41, 37, 36, 0.08);
 }
 
 html.dark .xuan-card {
-  background: rgba(28, 28, 34, 0.75);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+  background-color: #18181E;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.35);
 }
 
 html.dark .xuan-card:hover {
   border-color: rgba(186, 59, 70, 0.4);
-  box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.5);
+}
+
+/* Hardware GPU composited layer */
+.gpu-layer {
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 /* Vertical Classical Chinese Typography */
@@ -108,9 +127,10 @@ html.dark .xuan-card:hover {
   scrollbar-width: none;
 }
 
-/* Interactive Tap & Ripple micro-interaction */
+/* Interactive Tap micro-interaction on GPU */
 .interactive-tap {
   transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.12s ease;
+  will-change: transform;
 }
 .interactive-tap:active {
   transform: scale(0.97);
