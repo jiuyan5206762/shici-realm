@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { RotateCcw, Compass, Layers, User, Search } from 'lucide-react';
 import { Dynasty, PoemType } from '@/types';
+import { SealBadge } from '@/components/Common/SealBadge';
+import { guqinAudio } from '@/services/audio/guqinAudio';
 
 interface FilterPanelProps {
   dynasties: Dynasty[];
@@ -51,6 +53,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
   const handleAuthorSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    guqinAudio.playChime();
     onSelectAuthor(authorInput.trim() || undefined);
   };
 
@@ -58,22 +61,25 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
   return (
     <div
-      className={`bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 rounded-2xl p-6 shadow-sm space-y-7 ${className}`}
+      className={`xuan-card rounded-3xl p-5 sm:p-6 shadow-oriental border border-paper-400/40 space-y-6 ${className}`}
     >
       {/* Header & Reset */}
-      <div className="flex items-center justify-between pb-4 border-b border-stone-100 dark:border-stone-800">
-        <h3 className="font-serif font-bold text-lg text-ink-900 dark:text-ink-100 flex items-center space-x-2">
-          <Layers className="w-4 h-4 text-chinese-ochre" />
-          <span>典籍筛选</span>
-        </h3>
+      <div className="flex items-center justify-between pb-3.5 border-b border-paper-300/80 dark:border-ink-800">
+        <div className="flex items-center gap-2">
+          <SealBadge text="选录" size="sm" variant="cinnabar" />
+          <h3 className="font-serif font-bold text-base sm:text-lg text-ink-900 dark:text-ink-50">
+            典籍精筛
+          </h3>
+        </div>
 
         {hasActiveFilters && (
           <button
             onClick={() => {
+              guqinAudio.playChime();
               setAuthorInput('');
               onReset();
             }}
-            className="flex items-center space-x-1 text-sm text-rose-600 dark:text-rose-400 hover:underline transition-colors"
+            className="flex items-center gap-1 text-xs font-serif text-chinese-cinnabar hover:underline transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>重置</span>
@@ -82,29 +88,35 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       </div>
 
       {/* 1. Dynasty Filter */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm font-semibold text-ink-700 dark:text-ink-300 font-serif">
-          <div className="flex items-center space-x-2">
-            <Compass className="w-4 h-4 text-chinese-ochre" />
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between text-xs font-bold text-ink-700 dark:text-ink-300 font-serif">
+          <div className="flex items-center gap-1.5">
+            <Compass className="w-3.5 h-3.5 text-chinese-cinnabar" />
             <span>朝代</span>
           </div>
           {selectedDynasty && (
             <button
-              onClick={() => onSelectDynasty(undefined)}
-              className="text-chinese-ochre hover:underline text-xs"
+              onClick={() => {
+                guqinAudio.playChime();
+                onSelectDynasty(undefined);
+              }}
+              className="text-chinese-cinnabar hover:underline text-xs font-serif"
             >
               清除
             </button>
           )}
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           <button
-            onClick={() => onSelectDynasty(undefined)}
-            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            onClick={() => {
+              guqinAudio.playChime();
+              onSelectDynasty(undefined);
+            }}
+            className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
               !selectedDynasty
-                ? 'bg-chinese-ochre text-white shadow-sm'
-                : 'bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                ? 'bg-chinese-cinnabar text-white font-bold shadow-xs'
+                : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
             }`}
           >
             全部
@@ -115,11 +127,14 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             return (
               <button
                 key={dynasty.id}
-                onClick={() => onSelectDynasty(isSelected ? undefined : dynasty.name)}
-                className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                onClick={() => {
+                  guqinAudio.playChime();
+                  onSelectDynasty(isSelected ? undefined : dynasty.name);
+                }}
+                className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
                   isSelected
-                    ? 'bg-chinese-ochre text-white shadow-sm'
-                    : 'bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                    ? 'bg-chinese-cinnabar text-white font-bold shadow-xs'
+                    : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
                 }`}
               >
                 {dynasty.name}
@@ -130,29 +145,35 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       </div>
 
       {/* 2. Genre / Type Filter */}
-      <div className="space-y-3 pt-4 border-t border-stone-100 dark:border-stone-800">
-        <div className="flex items-center justify-between text-sm font-semibold text-ink-700 dark:text-ink-300 font-serif">
-          <div className="flex items-center space-x-2">
-            <Layers className="w-4 h-4 text-chinese-ochre" />
+      <div className="space-y-2.5 pt-3.5 border-t border-paper-300/60 dark:border-ink-800">
+        <div className="flex items-center justify-between text-xs font-bold text-ink-700 dark:text-ink-300 font-serif">
+          <div className="flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-chinese-celadon" />
             <span>体裁</span>
           </div>
           {selectedType && (
             <button
-              onClick={() => onSelectType(undefined)}
-              className="text-chinese-ochre hover:underline text-xs"
+              onClick={() => {
+                guqinAudio.playChime();
+                onSelectType(undefined);
+              }}
+              className="text-chinese-cinnabar hover:underline text-xs font-serif"
             >
               清除
             </button>
           )}
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           <button
-            onClick={() => onSelectType(undefined)}
-            className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            onClick={() => {
+              guqinAudio.playChime();
+              onSelectType(undefined);
+            }}
+            className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
               !selectedType
-                ? 'bg-chinese-ochre text-white shadow-sm'
-                : 'bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                ? 'bg-chinese-celadon text-white font-bold shadow-xs'
+                : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
             }`}
           >
             全部
@@ -163,11 +184,14 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             return (
               <button
                 key={type.id}
-                onClick={() => onSelectType(isSelected ? undefined : type.name)}
-                className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                onClick={() => {
+                  guqinAudio.playChime();
+                  onSelectType(isSelected ? undefined : type.name);
+                }}
+                className={`px-3 py-1 rounded-xl text-xs font-serif transition-colors ${
                   isSelected
-                    ? 'bg-chinese-ochre text-white shadow-sm'
-                    : 'bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                    ? 'bg-chinese-celadon text-white font-bold shadow-xs'
+                    : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
                 }`}
               >
                 {type.name}
@@ -178,51 +202,53 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
       </div>
 
       {/* 3. Author Filter */}
-      <div className="space-y-3 pt-4 border-t border-stone-100 dark:border-stone-800">
-        <div className="flex items-center justify-between text-sm font-semibold text-ink-700 dark:text-ink-300 font-serif">
-          <div className="flex items-center space-x-2">
-            <User className="w-4 h-4 text-chinese-ochre" />
+      <div className="space-y-2.5 pt-3.5 border-t border-paper-300/60 dark:border-ink-800">
+        <div className="flex items-center justify-between text-xs font-bold text-ink-700 dark:text-ink-300 font-serif">
+          <div className="flex items-center gap-1.5">
+            <User className="w-3.5 h-3.5 text-chinese-cinnabar" />
             <span>诗人名家</span>
           </div>
           {selectedAuthor && (
             <button
               onClick={() => {
+                guqinAudio.playChime();
                 setAuthorInput('');
                 onSelectAuthor(undefined);
               }}
-              className="text-chinese-ochre hover:underline text-xs"
+              className="text-chinese-cinnabar hover:underline text-xs font-serif"
             >
               清除
             </button>
           )}
         </div>
 
-        {/* Author Search Form */}
-        <form onSubmit={handleAuthorSearch} className="flex items-center space-x-2">
+        {/* Author Search Form - Safe Nested Icon Button (Zero overflow) */}
+        <form onSubmit={handleAuthorSearch} className="relative w-full">
           <input
             type="text"
             value={authorInput}
             onChange={(e) => setAuthorInput(e.target.value)}
-            placeholder="搜索诗人姓名 (如李白)"
-            className="flex-1 px-3.5 py-2 text-sm bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl text-ink-900 dark:text-ink-100 focus:outline-none focus:ring-1 focus:ring-chinese-ochre font-serif"
+            placeholder="搜索诗人姓名 (如李白)..."
+            className="w-full pl-3.5 pr-10 py-2 text-xs bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 rounded-xl text-ink-900 dark:text-ink-100 focus:outline-hidden focus:border-chinese-cinnabar font-serif transition-colors"
           />
           <button
             type="submit"
-            className="px-3.5 py-2 rounded-xl bg-chinese-ochre hover:bg-chinese-ochre/90 text-white text-sm transition-colors flex items-center justify-center"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-chinese-cinnabar hover:bg-chinese-rouge text-white text-xs transition-colors flex items-center justify-center shadow-xs"
             title="检索诗人"
           >
-            <Search className="w-4 h-4" />
+            <Search className="w-3.5 h-3.5" />
           </button>
         </form>
 
         {/* Famous Poets Quick Chips */}
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="flex flex-wrap gap-1.5 pt-1">
           {FAMOUS_POETS.map((poet) => {
             const isSelected = selectedAuthor === poet;
             return (
               <button
                 key={poet}
                 onClick={() => {
+                  guqinAudio.playChime();
                   if (isSelected) {
                     setAuthorInput('');
                     onSelectAuthor(undefined);
@@ -231,10 +257,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                     onSelectAuthor(poet);
                   }
                 }}
-                className={`px-3 py-1.5 rounded-lg text-sm transition-colors font-serif ${
+                className={`px-2.5 py-1 rounded-xl text-xs transition-colors font-serif ${
                   isSelected
-                    ? 'bg-chinese-cinnabar text-white font-medium shadow-sm'
-                    : 'bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                    ? 'bg-chinese-cinnabar text-white font-bold shadow-xs'
+                    : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
                 }`}
               >
                 {poet}

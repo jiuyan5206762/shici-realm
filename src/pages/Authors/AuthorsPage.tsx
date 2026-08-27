@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Users, Search, Compass, RotateCcw, BookOpen, ArrowRight } from 'lucide-react';
+import { Search, Compass, RotateCcw, BookOpen, ArrowRight } from 'lucide-react';
 import { dynastyApi } from '@/api/dynasties';
 import { poemApi } from '@/api/poems';
 import { AuthorCard } from '@/components/Author/AuthorCard';
@@ -11,6 +11,8 @@ import { EmptyState } from '@/components/Common/EmptyState';
 import { ErrorState } from '@/components/Common/ErrorState';
 import { findPoetByName, filterAuthorsByCriteria } from '@/utils/poetDirectory';
 import { Author } from '@/types';
+import { SealBadge } from '@/components/Common/SealBadge';
+import { guqinAudio } from '@/services/audio/guqinAudio';
 
 export const AuthorsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,6 +27,7 @@ export const AuthorsPage: React.FC = () => {
   const { data: dynastiesRes } = useQuery({
     queryKey: ['dynasties'],
     queryFn: () => dynastyApi.getDynasties(),
+    staleTime: 60 * 60 * 1000,
   });
 
   const dynasties = dynastiesRes?.data || [];
@@ -41,7 +44,6 @@ export const AuthorsPage: React.FC = () => {
   } = useQuery({
     queryKey: ['authors', { page, pageSize, dynasty, q }],
     queryFn: async () => {
-      // If filtering by dynasty or searching by name
       if (dynasty || q) {
         const filtered = filterAuthorsByCriteria(dynasty, q, page, pageSize);
 
@@ -54,7 +56,6 @@ export const AuthorsPage: React.FC = () => {
           };
         }
 
-        // Try probing remote API for poet
         if (q) {
           try {
             const probe = await poemApi.getRandom({ author: q });
@@ -72,9 +73,7 @@ export const AuthorsPage: React.FC = () => {
                 lang: 'zh-Hans',
               };
             }
-          } catch {
-            // fallback
-          }
+          } catch {}
         }
 
         return {
@@ -85,7 +84,6 @@ export const AuthorsPage: React.FC = () => {
         };
       }
 
-      // Default: Return full verified famous poets directory
       const filtered = filterAuthorsByCriteria(undefined, undefined, page, pageSize);
       return {
         data: filtered.authors,
@@ -101,11 +99,13 @@ export const AuthorsPage: React.FC = () => {
     queryKey: ['poetSearchPoem', q],
     queryFn: () => (q ? poemApi.getRandom({ author: q }) : null),
     enabled: Boolean(q),
+    staleTime: 30 * 60 * 1000,
   });
 
   const poetSamplePoem = poetSamplePoemRes?.data;
 
   const updateParam = (updates: { dynasty?: string | null; q?: string | null; page?: number | null }) => {
+    guqinAudio.playChime();
     const nextParams = new URLSearchParams(searchParams);
 
     if (updates.dynasty !== undefined) {
@@ -135,6 +135,7 @@ export const AuthorsPage: React.FC = () => {
   };
 
   const handleReset = () => {
+    guqinAudio.playChime();
     setSearchInput('');
     setSearchParams(new URLSearchParams());
   };
@@ -145,53 +146,53 @@ export const AuthorsPage: React.FC = () => {
   const totalCount = (authorsRes as any)?.totalCount;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10 animate-fade-in pb-20">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-stone-200 dark:border-stone-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-paper-300 dark:border-ink-800">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ink-900 dark:text-ink-50 flex items-center space-x-3">
-            <Users className="w-8 h-8 text-chinese-cinnabar" />
-            <span>千古先贤 · 诗人百科</span>
-          </h1>
-          <p className="text-base text-ink-600 dark:text-ink-300 mt-2 font-serif">
-            溯源历朝文学巨匠生平与传世名篇
+          <div className="flex items-center gap-2">
+            <SealBadge text="先贤" size="sm" variant="bamboo" />
+            <h1 className="text-3xl sm:text-4xl font-serif font-black text-ink-900 dark:text-ink-50">
+              千古先贤 · 诗人百科
+            </h1>
+          </div>
+          <p className="text-xs sm:text-sm text-ink-500 dark:text-ink-400 mt-1 font-serif">
+            溯源历朝文学巨匠生平、字号别称与传世名篇
           </p>
         </div>
 
-        {/* Poet Quick Search Input */}
-        <form onSubmit={handleSearchSubmit} className="flex items-center space-x-2 max-w-sm w-full">
-          <div className="relative flex-1">
-            <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="搜索诗人姓名 (如李白、苏轼)..."
-              className="w-full pl-11 pr-4 py-2.5 text-base bg-white dark:bg-[#1E1E22] border border-stone-200 dark:border-stone-700 rounded-xl text-ink-900 dark:text-ink-50 focus:outline-none focus:ring-1 focus:ring-chinese-ochre font-serif"
-            />
-          </div>
+        {/* Poet Quick Search Input (Inner Search Button - zero overflow) */}
+        <form onSubmit={handleSearchSubmit} className="relative max-w-sm w-full">
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="搜索诗人姓名 (如李白、苏轼)..."
+            className="w-full pl-4 pr-12 py-2.5 text-xs sm:text-sm bg-paper-100 dark:bg-ink-800 border border-paper-300 dark:border-ink-700 rounded-2xl text-ink-900 dark:text-ink-50 focus:outline-hidden focus:border-chinese-cinnabar font-serif transition-colors"
+          />
           <button
             type="submit"
-            className="px-5 py-2.5 bg-chinese-ochre hover:bg-chinese-ochre/90 text-white rounded-xl text-base font-medium shadow-sm transition-colors"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-chinese-cinnabar hover:bg-chinese-rouge text-white rounded-xl text-xs font-serif font-bold shadow-xs transition-colors flex items-center gap-1"
           >
-            搜索
+            <Search className="w-3.5 h-3.5" />
+            <span>搜索</span>
           </button>
         </form>
       </div>
 
       {/* Dynasty Filter Chips Bar */}
-      <div className="flex items-center space-x-2.5 overflow-x-auto pb-2 no-scrollbar text-base font-serif">
-        <span className="text-ink-500 dark:text-ink-400 font-semibold flex items-center space-x-1.5 whitespace-nowrap">
-          <Compass className="w-4 h-4 text-chinese-ochre" />
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar text-xs font-serif">
+        <span className="text-ink-500 font-semibold flex items-center gap-1 whitespace-nowrap">
+          <Compass className="w-3.5 h-3.5 text-chinese-cinnabar" />
           <span>朝代：</span>
         </span>
 
         <button
           onClick={() => updateParam({ dynasty: null })}
-          className={`px-4 py-2 rounded-xl whitespace-nowrap transition-colors ${
+          className={`px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-colors ${
             !dynasty
-              ? 'bg-chinese-ochre text-white font-medium shadow-sm'
-              : 'bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+              ? 'bg-chinese-cinnabar text-white font-bold shadow-xs'
+              : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
           }`}
         >
           全部
@@ -201,10 +202,10 @@ export const AuthorsPage: React.FC = () => {
           <button
             key={d.id}
             onClick={() => updateParam({ dynasty: d.name === dynasty ? null : d.name })}
-            className={`px-4 py-2 rounded-xl whitespace-nowrap transition-colors ${
+            className={`px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-colors ${
               dynasty === d.name
-                ? 'bg-chinese-ochre text-white font-medium shadow-sm'
-                : 'bg-stone-100 dark:bg-stone-800 text-ink-700 dark:text-ink-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                ? 'bg-chinese-cinnabar text-white font-bold shadow-xs'
+                : 'bg-paper-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300 hover:bg-paper-200 dark:hover:bg-ink-700'
             }`}
           >
             {d.name}
@@ -214,57 +215,61 @@ export const AuthorsPage: React.FC = () => {
         {(dynasty || q) && (
           <button
             onClick={handleReset}
-            className="text-chinese-cinnabar hover:underline ml-3 flex items-center space-x-1 whitespace-nowrap text-sm"
+            className="text-chinese-cinnabar hover:underline ml-3 flex items-center gap-1 whitespace-nowrap text-xs font-bold"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
             <span>重置</span>
           </button>
         )}
       </div>
 
-      {/* When a poet is searched: Show Poet Works Spotlight & Direct Links */}
+      {/* When a poet is searched: Show Poet Works Spotlight */}
       {q && (matchedFamousPoet || poetSamplePoem) && (
-        <div className="p-8 rounded-3xl bg-white dark:bg-[#1E1E22] border border-stone-200/90 dark:border-stone-800 shadow-sm space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100 dark:border-stone-800">
-            <div className="flex items-center space-x-4">
-              <div className="w-14 h-14 rounded-2xl bg-chinese-cinnabar text-white font-serif font-bold text-2xl flex items-center justify-center shadow-sm">
+        <div className="xuan-card rounded-3xl p-6 sm:p-8 space-y-6 border border-paper-400/40 shadow-oriental">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-paper-300/80 dark:border-ink-800">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-chinese-cinnabar text-white font-serif font-bold text-2xl flex items-center justify-center shadow-xs">
                 {q.charAt(0)}
               </div>
               <div>
-                <h3 className="text-2xl font-serif font-bold text-ink-900 dark:text-ink-50">
-                  {q}
-                </h3>
-                <div className="text-base text-ink-500 dark:text-ink-400 font-serif mt-0.5">
-                  〔{matchedFamousPoet?.dynasty?.name || poetSamplePoem?.dynasty?.name || '古'}〕文学大家
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-ink-900 dark:text-ink-50">
+                    {q}
+                  </h3>
+                  <SealBadge text={matchedFamousPoet?.dynasty?.name || poetSamplePoem?.dynasty?.name || '唐'} size="sm" variant="cinnabar" />
+                </div>
+                <div className="text-xs text-ink-400 font-serif mt-0.5">
+                  文学大家 · 传世名篇入选
                 </div>
               </div>
             </div>
 
             <Link
               to={`/poems?author=${encodeURIComponent(q)}`}
-              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-chinese-ochre hover:bg-chinese-ochre/90 text-white text-base font-medium shadow-sm transition-colors"
+              onClick={() => guqinAudio.playChime()}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-chinese-cinnabar hover:bg-chinese-rouge text-white text-xs font-serif font-bold shadow-xs transition-colors"
             >
-              <BookOpen className="w-5 h-5" />
+              <BookOpen className="w-3.5 h-3.5" />
               <span>查看 {q} 全部诗篇</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
+              <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </Link>
           </div>
 
           {matchedFamousPoet?.description && (
-            <p className="text-base sm:text-lg text-ink-700 dark:text-ink-300 font-serif leading-relaxed">
+            <p className="text-xs sm:text-sm text-ink-700 dark:text-ink-300 font-serif leading-relaxed">
               {matchedFamousPoet.description}
             </p>
           )}
 
           {poetSamplePoem && (
-            <div className="p-6 rounded-2xl bg-stone-50 dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 text-center space-y-2">
-              <div className="text-sm font-serif text-chinese-ochre">名篇赏析</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-paper-100/70 dark:bg-ink-800/60 border border-paper-300/60 dark:border-ink-700/60 text-center space-y-1.5">
+              <div className="text-xs font-serif text-chinese-cinnabar">名篇赏析</div>
               <Link to={`/poems/${poetSamplePoem.id}`}>
-                <h4 className="text-xl font-serif font-bold text-ink-900 dark:text-ink-50 hover:text-chinese-ochre">
+                <h4 className="text-base sm:text-lg font-serif font-bold text-ink-900 dark:text-ink-50 hover:text-chinese-cinnabar">
                   《{poetSamplePoem.title}》
                 </h4>
               </Link>
-              <div className="font-serif text-ink-800 dark:text-ink-200 text-base sm:text-lg leading-loose py-2">
+              <div className="font-serif text-ink-800 dark:text-ink-200 text-xs sm:text-sm leading-relaxed py-1">
                 {(poetSamplePoem.content || []).slice(0, 4).map((line, idx) => (
                   <p key={idx}>{line}</p>
                 ))}
@@ -300,7 +305,7 @@ export const AuthorsPage: React.FC = () => {
 
           {/* Pagination */}
           {!q && (
-            <div className="pt-6 border-t border-stone-200 dark:border-stone-800">
+            <div className="pt-6 border-t border-paper-300/80 dark:border-ink-800">
               <Pagination
                 currentPage={page}
                 hasMore={hasMore}

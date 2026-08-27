@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X, History, Sparkles, Flame } from 'lucide-react';
 import { useSearchHistoryStore } from '@/store/searchHistoryStore';
+import { guqinAudio } from '@/services/audio/guqinAudio';
 
 interface SearchBarProps {
   initialValue?: string;
@@ -53,12 +54,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     e.preventDefault();
     const trimmed = query.trim();
     if (!trimmed) return;
+    guqinAudio.playChime();
     addSearch(trimmed);
     setIsFocused(false);
     onSearch(trimmed);
   };
 
   const handleSelectSuggestion = (text: string) => {
+    guqinAudio.playChime();
     setQuery(text);
     addSearch(text);
     setIsFocused(false);
@@ -66,13 +69,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const handleClear = () => {
+    guqinAudio.playChime();
     setQuery('');
     if (inputRef.current) inputRef.current.focus();
   };
 
   return (
     <div ref={containerRef} className={`relative w-full ${className}`}>
-      <form onSubmit={handleSubmit} className="relative flex items-center">
+      <form onSubmit={handleSubmit} className="relative flex items-center w-full">
         <div className="absolute left-4 text-ink-400">
           <Search className="w-5 h-5" />
         </div>
@@ -84,15 +88,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsFocused(true)}
           placeholder={placeholder}
-          className="w-full pl-12 pr-24 py-3.5 sm:py-4 bg-white dark:bg-chinese-nightCard border border-stone-200/90 dark:border-chinese-nightBorder rounded-2xl sm:rounded-3xl shadow-oriental text-sm sm:text-base text-ink-800 dark:text-ink-100 placeholder-ink-400 dark:placeholder-ink-500 focus:outline-none focus:ring-2 focus:ring-chinese-ochre/30 focus:border-chinese-ochre transition-all"
+          className="w-full pl-12 pr-28 py-3.5 sm:py-4 bg-paper-100 dark:bg-ink-800 border border-paper-400/60 dark:border-ink-700 rounded-2xl sm:rounded-3xl shadow-oriental text-xs sm:text-sm text-ink-900 dark:text-ink-50 placeholder-ink-400 dark:placeholder-ink-500 focus:outline-hidden focus:border-chinese-cinnabar font-serif transition-all"
         />
 
-        <div className="absolute right-3 flex items-center space-x-1.5">
+        <div className="absolute right-2.5 sm:right-3 flex items-center gap-1.5">
           {query && (
             <button
               type="button"
               onClick={handleClear}
-              className="p-1 rounded-full text-ink-400 hover:text-ink-700 dark:hover:text-ink-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              className="p-1 rounded-full text-ink-400 hover:text-ink-700 dark:hover:text-ink-200 hover:bg-paper-200 dark:hover:bg-ink-700 transition-colors"
               title="清空内容"
             >
               <X className="w-4 h-4" />
@@ -101,7 +105,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
           <button
             type="submit"
-            className="px-4 py-2 bg-chinese-ochre hover:bg-chinese-ochre/90 text-white text-xs sm:text-sm font-medium rounded-xl sm:rounded-2xl transition-all shadow-sm active:scale-95 flex items-center space-x-1"
+            className="px-3.5 sm:px-4 py-1.5 sm:py-2 bg-chinese-cinnabar hover:bg-chinese-rouge text-white text-xs sm:text-sm font-serif font-bold rounded-xl sm:rounded-2xl transition-all shadow-xs interactive-tap flex items-center gap-1 flex-shrink-0"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>检索</span>
@@ -111,21 +115,21 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
       {/* Suggestion Dropdown */}
       {showSuggestions && isFocused && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-chinese-nightCard border border-stone-200 dark:border-chinese-nightBorder rounded-2xl shadow-xl z-50 p-4 space-y-4 animate-fadeIn">
+        <div className="absolute top-full left-0 right-0 mt-2 xuan-card rounded-2xl shadow-xl z-50 p-4 space-y-4 border border-paper-400/50 animate-slide-down">
           {/* Recent Searches */}
           {searches.length > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-ink-400 font-semibold">
-                <span className="flex items-center space-x-1">
+              <div className="flex items-center justify-between text-xs text-ink-400 font-serif">
+                <span className="flex items-center gap-1">
                   <History className="w-3.5 h-3.5" />
                   <span>最近搜索</span>
                 </span>
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5 font-serif">
                 {searches.map((item, idx) => (
                   <div
                     key={idx}
-                    className="inline-flex items-center bg-stone-100 dark:bg-stone-800 rounded-lg text-xs text-ink-700 dark:text-ink-200 pl-2.5 pr-1 py-1 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+                    className="inline-flex items-center bg-paper-200 dark:bg-ink-800 rounded-xl text-xs text-ink-700 dark:text-ink-200 pl-2.5 pr-1 py-1 hover:bg-paper-300 dark:hover:bg-ink-700 transition-colors"
                   >
                     <span
                       onClick={() => handleSelectSuggestion(item)}
@@ -138,7 +142,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                         e.stopPropagation();
                         removeSearch(item);
                       }}
-                      className="ml-1 p-0.5 text-ink-400 hover:text-rose-500 rounded-full"
+                      className="ml-1 p-0.5 text-ink-400 hover:text-red-500 rounded-full"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -150,16 +154,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
           {/* Hot Searches */}
           <div className="space-y-2">
-            <div className="flex items-center space-x-1 text-xs text-chinese-cinnabar font-semibold">
-              <Flame className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-1 text-xs text-chinese-cinnabar font-serif font-bold">
+              <Flame className="w-3.5 h-3.5 fill-chinese-cinnabar" />
               <span>热门推荐词</span>
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1.5 font-serif">
               {HOT_SEARCHES.map((item) => (
                 <button
                   key={item}
                   onClick={() => handleSelectSuggestion(item)}
-                  className="px-2.5 py-1 rounded-lg text-xs bg-chinese-ochre/10 hover:bg-chinese-ochre/20 text-chinese-ochre font-medium transition-colors"
+                  className="px-2.5 py-1 rounded-xl text-xs bg-chinese-cinnabar/10 hover:bg-chinese-cinnabar/20 text-chinese-cinnabar transition-colors font-medium"
                 >
                   {item}
                 </button>
